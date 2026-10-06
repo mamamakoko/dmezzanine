@@ -1,3 +1,4 @@
+import { BackOffice } from '@/components/till/back-office/back-office';
 import { MenuBoard } from '@/components/till/menu-board';
 import { ModifierSheet } from '@/components/till/modifier-sheet';
 import { OrderPanel, SERVICES, type Service } from '@/components/till/order-panel';
@@ -8,6 +9,7 @@ import { ReceiptSheet } from '@/components/till/receipt-sheet';
 import { SendSheet } from '@/components/till/send-sheet';
 import { ConfirmDialog, Toast } from '@/components/till/sheet';
 import { TopBar, type TillScreen } from '@/components/till/top-bar';
+import { openBackOffice, type BackOfficeData } from '@/lib/back-office';
 import {
     connectPrinter,
     disconnectPrinter,
@@ -57,6 +59,10 @@ interface TillPageProps {
     paymentMethods?: TillPaymentMethod[];
     queue?: TillOrder[];
     receipt?: TillOrder | null;
+    /** Whether the staff member at the till runs this branch's back office (its lead or the Owner). */
+    canManageBranch?: boolean;
+    /** The open back-office tab's data, when the back office is open. */
+    backOffice?: BackOfficeData | null;
 }
 
 type ReadyTillProps = Required<TillPageProps> & { branch: TillBranch; staff: TillStaff };
@@ -305,6 +311,21 @@ function Till(props: ReadyTillProps & { now: Date }) {
 
     const shownReceipt = receipt && receipt.id !== dismissedReceiptId ? receipt : null;
 
+    if (props.backOffice) {
+        return (
+            <>
+                <BackOffice
+                    data={props.backOffice}
+                    branchName={branch.name}
+                    staffName={props.staff.name}
+                    staffRole={props.staff.role}
+                    toast={showToast}
+                />
+                <Toast message={toast} />
+            </>
+        );
+    }
+
     return (
         <div className="bg-bg font-body text-text flex min-h-screen flex-col lg:h-screen">
             <TopBar
@@ -316,10 +337,11 @@ function Till(props: ReadyTillProps & { now: Date }) {
                         : [
                               { value: 'till', label: 'Till' },
                               { value: 'queue', label: 'Queue', badge: queue.length },
+                              ...(props.canManageBranch ? [{ value: 'inventory' as const, label: 'Inventory' }] : []),
                           ]
                 }
                 screen={screen}
-                onScreen={setScreen}
+                onScreen={(next) => (next === 'inventory' ? openBackOffice('dash') : setScreen(next))}
                 printerName={printerName}
                 onPrinter={togglePrinter}
                 staffName={props.staff.name}

@@ -10,6 +10,7 @@ use App\Models\Branch;
 use App\Models\BranchMenuItem;
 use App\Models\PaymentMethod;
 use App\Models\User;
+use App\Services\BackOffice;
 use App\Services\TillCheckout;
 use App\Services\TillSession;
 use Illuminate\Http\Request;
@@ -26,9 +27,32 @@ class TillController extends Controller
     /**
      * The POS till. It opens on the PIN pad until a staff member unlocks it.
      */
-    public function pos(Request $request, TillSession $till): Response
+    public function pos(Request $request, TillSession $till, BackOffice $backOffice): Response
     {
-        return $this->render($request, $till->staff(), orderOnly: false);
+        $staff = $till->staff();
+        $branch = $request->user()->branch;
+        $canManage = $staff !== null && $branch !== null && $staff->managesBranch($branch->id);
+        $tab = $request->query('inv');
+
+        return $this->render($request, $staff, orderOnly: false)->with([
+            'canManageBranch' => $canManage,
+            'backOffice' => $canManage && in_array($tab, BackOffice::TABS, true)
+                ? $backOffice->props($branch, $staff, $tab, [
+                    'from' => $this->dateQuery($request, 'from'),
+                    'to' => $this->dateQuery($request, 'to'),
+                ])
+                : null,
+        ]);
+    }
+
+    /**
+     * A Y-m-d date from the query string, or null when it is missing or malformed.
+     */
+    private function dateQuery(Request $request, string $key): ?string
+    {
+        $value = $request->query($key);
+
+        return is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) && strtotime($value) !== false ? $value : null;
     }
 
     /**

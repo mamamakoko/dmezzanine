@@ -106,4 +106,14 @@ class Branch extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    /**
+     * On hand per stock item, from the last approved count.
+     *
+     * @return HasMany<BranchStock, $this>
+     */
+    public function stock(): HasMany
+    {
+        return $this->hasMany(BranchStock::class);
+    }
 }

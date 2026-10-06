@@ -100,6 +100,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Whether this user runs the branch's back office: the Owner anywhere, or the branch's own lead.
+     */
+    public function managesBranch(int $branchId): bool
+    {
+        return $this->active && ($this->isOwner() || ($this->role->name === Role::BRANCH_LEAD && $this->branch_id === $branchId));
+    }
+
+    /**
      * The areas this user may open: the role's defaults, with the user's overrides on top.
      * Inactive users get none; the Owner always gets all.
      *

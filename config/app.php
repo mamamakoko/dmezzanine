@@ -68,6 +68,12 @@ return [
     'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
+     * The cafés' local time. Timestamps are stored in UTC; a business day ("Sales today", date filters)
+     * runs midnight to midnight here.
+     */
+    'business_timezone' => env('BUSINESS_TIMEZONE', 'Asia/Manila'),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------

@@ -1,0 +1,307 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Addon;
+use App\Models\Branch;
+use App\Models\BranchMenuItem;
+use App\Models\BranchStock;
+use App\Models\Category;
+use App\Models\MenuItem;
+use App\Models\Order;
+use App\Models\OrderLine;
+use App\Models\OrderPayment;
+use App\Models\PaymentMethod;
+use App\Models\PaymentMethodLog;
+use App\Models\StockItem;
+use App\Models\User;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
+
+/**
+ * The data behind the till's back-office tabs. Only the open tab's data is built.
+ */
+class BackOffice
+{
+    public const TABS = ['dash', 'menu', 'addons', 'payments', 'stock', 'sales'];
+
+    /**
+     * The sales list shows at most this many receipts, newest first.
+     */
+    public const SALES_LIMIT = 300;
+
+    /**
+     * @param  array{from?: ?string, to?: ?string}  $filters
+     * @return array<string, mixed>
+     */
+    public function props(Branch $branch, User $staff, string $tab, array $filters): array
+    {
+        return [
+            'tab' => $tab,
+            'isOwner' => $staff->isOwner(),
+            'lowCount' => $this->stock($branch)->filter(fn (array $item) => $item['low'])->count(),
+            ...match ($tab) {
+                'dash' => $this->dashboard($branch),
+                'menu' => $this->menu($branch),
+                'addons' => $this->addons($branch),
+                'payments' => $this->paymentMethods($branch),
+                'stock' => ['stock' => $this->stock($branch)->values()->all()],
+                'sales' => $this->sales($branch, $filters),
+            },
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function dashboard(Branch $branch): array
+    {
+        [$start, $end] = $this->day(today(config('app.business_timezone'))->toDateString());
+        $today = $branch->orders()->whereNull('refund_of')->where('unpaid', false)->whereBetween('created_at', [$start, $end]);
+
+        return [
+            'stock' => $this->stock($branch)->sortBy(fn (array $item) => $item['par'] > 0 ? $item['on_hand'] / $item['par'] : 1)->values()->all(),
+            'salesToday' => ['total' => (float) (clone $today)->sum('total'), 'count' => $today->count()],
+            'unpaid' => $this->unpaidOrders($branch),
+        ];
+    }
+
+    /**
+     * Every stock item with this branch's on hand. Items never counted here show 0.
+     *
+     * @return Collection<int, array<string, mixed>>
+     */
+    private function stock(Branch $branch): Collection
+    {
+        $onHand = $branch->stock()->get()->keyBy('stock_item_id');
+
+        return StockItem::orderBy('name')->get()->map(function (StockItem $item) use ($onHand) {
+            /** @var BranchStock|null $count */
+            $count = $onHand->get($item->id);
+            $qty = (float) ($count->on_hand ?? 0);
+
+            return [
+                'id' => $item->id,
+                'sku' => $item->sku,
+                'name' => $item->name,
+                'category' => $item->category,
+                'unit' => $item->unit,
+                'par' => (float) $item->par,
+                'cost' => (float) $item->cost,
+                'on_hand' => $qty,
+                'counted_on' => $count?->counted_on?->toDateString(),
+                'low' => $qty < (float) $item->par * 0.5,
+            ];
+        });
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function menu(Branch $branch): array
+    {
+        $entries = $branch->menuEntries()->with(['menuItem.ingredients', 'menuItem.addons'])->orderBy('sort')->get();
+
+        return [
+            'categories' => $branch->categories()->orderBy('sort')->withCount('menuEntries')->get()
+                ->map(fn (Category $category) => ['id' => $category->id, 'name' => $category->name, 'count' => $category->menu_entries_count])
+                ->all(),
+            'items' => $entries->map(fn (BranchMenuItem $entry) => [
+                'entry_id' => $entry->id,
+                'id' => $entry->menuItem->id,
+                'name' => $entry->menuItem->name,
+                'note' => $entry->menuItem->note,
+                'price' => (float) $entry->menuItem->price,
+                'category_id' => $entry->category_id,
+                'available' => $entry->available,
+                'has_modifiers' => $entry->menuItem->has_modifiers,
+                'photo_url' => $entry->menuItem->photo_path ? Storage::disk('public')->url($entry->menuItem->photo_path) : null,
+                'recipe' => $entry->menuItem->ingredients
+                    ->map(fn (StockItem $stock) => ['stock_item_id' => $stock->id, 'qty' => (float) $stock->pivot->qty])
+                    ->all(),
+                'addon_ids' => $entry->menuItem->addons->pluck('id')->all(),
+            ])->all(),
+            'otherItems' => MenuItem::whereNotIn('id', $entries->pluck('menu_item_id'))->orderBy('name')->get(['id', 'name'])->toArray(),
+            'stockItems' => $this->stockChoices(),
+            'addons' => Addon::orderBy('id')->get()->map(fn (Addon $addon) => ['id' => $addon->id, 'name' => $addon->name, 'price' => (float) $addon->price])->all(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function addons(Branch $branch): array
+    {
+        $offHere = $branch->disabledAddons()->pluck('addons.id');
+
+        return [
+            'addons' => Addon::with(['parts', 'menuItems'])->orderBy('id')->get()->map(fn (Addon $addon) => [
+                'id' => $addon->id,
+                'name' => $addon->name,
+                'price' => (float) $addon->price,
+                'on' => ! $offHere->contains($addon->id),
+                'parts' => $addon->parts->map(fn (StockItem $stock) => ['stock_item_id' => $stock->id, 'qty' => (float) $stock->pivot->qty])->all(),
+                'menu_item_ids' => $addon->menuItems->pluck('id')->all(),
+            ])->all(),
+            'stockItems' => $this->stockChoices(),
+            'menuGroups' => $branch->categories()->orderBy('sort')->with(['menuEntries' => fn ($query) => $query->orderBy('sort')->with('menuItem')])->get()
+                ->map(fn (Category $category) => [
+                    'name' => $category->name,
+                    'items' => $category->menuEntries->map(fn (BranchMenuItem $entry) => ['id' => $entry->menu_item_id, 'name' => $entry->menuItem->name])->all(),
+                ])
+                ->filter(fn (array $group) => $group['items'] !== [])
+                ->values()->all(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function paymentMethods(Branch $branch): array
+    {
+        return [
+            'methods' => $branch->paymentMethods()->orderBy('id')->get()->map(fn (PaymentMethod $method) => [
+                'id' => $method->id,
+                'name' => $method->name,
+                'kind' => $method->kind,
+                'split' => $method->split,
+                'note' => $method->note,
+                'terminal' => $method->terminal,
+                'wallets' => $method->wallets,
+                'tab_limit' => $method->tab_limit === null ? null : (float) $method->tab_limit,
+                'lead_only' => $method->lead_only,
+                'active' => $method->active,
+            ])->all(),
+            'log' => $branch->paymentMethodLogs()->with('user')->latest('id')->limit(40)->get()->map(fn (PaymentMethodLog $log) => [
+                'id' => $log->id,
+                'who' => $log->user ? explode(' ', $log->user->name)[0] : 'Staff',
+                'text' => $log->description,
+                'when' => $log->created_at->toIso8601String(),
+            ])->all(),
+        ];
+    }
+
+    /**
+     * Receipts (sales and refunds) in the date range, the unpaid orders, and the refund choices.
+     *
+     * @param  array{from?: ?string, to?: ?string}  $filters
+     * @return array<string, mixed>
+     */
+    private function sales(Branch $branch, array $filters): array
+    {
+        $query = $branch->orders()
+            ->with(['lines.refundLines', 'lines.addons', 'payments', 'cashier', 'refundOf'])
+            ->latest('id')
+            ->limit(self::SALES_LIMIT);
+
+        if ($filters['from'] ?? null) {
+            $query->where('created_at', '>=', $this->day($filters['from'])[0]);
+        }
+
+        if ($filters['to'] ?? null) {
+            $query->where('created_at', '<=', $this->day($filters['to'])[1]);
+        }
+
+        [$todayStart, $todayEnd] = $this->day(today(config('app.business_timezone'))->toDateString());
+
+        return [
+            'filters' => ['from' => $filters['from'] ?? null, 'to' => $filters['to'] ?? null],
+            'today' => today(config('app.business_timezone'))->toDateString(),
+            'limit' => self::SALES_LIMIT,
+            'receipts' => $query->get()->map(fn (Order $order) => $this->receipt($order))->all(),
+            'todayTotals' => [
+                'total' => (float) $branch->orders()->where('unpaid', false)->whereBetween('created_at', [$todayStart, $todayEnd])->sum('total'),
+                'count' => $branch->orders()->whereNull('refund_of')->where('unpaid', false)->whereBetween('created_at', [$todayStart, $todayEnd])->count(),
+            ],
+            'unpaid' => $this->unpaidOrders($branch),
+            'refundReasons' => RefundService::REASONS,
+            'refundMethods' => array_keys(RefundService::METHODS),
+        ];
+    }
+
+    /**
+     * A receipt row on the Sales tab.
+     *
+     * @return array<string, mixed>
+     */
+    private function receipt(Order $order): array
+    {
+        $payments = $order->payments->map(fn (OrderPayment $payment) => ['method' => $payment->method_name, 'amount' => (float) $payment->amount])->all();
+
+        return [
+            'id' => $order->id,
+            'no' => $order->no,
+            'created_at' => $order->created_at->toIso8601String(),
+            'service' => $order->service->label(),
+            'ticket' => $order->ticket,
+            'method' => match (true) {
+                $order->isRefund() => 'Refund',
+                $order->unpaid => $order->tab_name ? 'Tab' : 'Unpaid',
+                count($payments) > 1 => 'Split',
+                default => $payments[0]['method'] ?? '—',
+            },
+            'payments' => $payments,
+            'unpaid' => $order->unpaid,
+            'tab_name' => $order->tab_name,
+            'senior' => $order->senior,
+            'gross' => (float) $order->gross,
+            'discount' => (float) $order->discount,
+            'vat_exempt' => (float) $order->vat_exempt,
+            'vat' => (float) $order->vat,
+            'total' => (float) $order->total,
+            'cashier' => $order->cashier?->name,
+            'refund_of_no' => $order->refundOf?->no,
+            'refund_reason' => $order->refund_reason,
+            'lines' => $order->lines->map(fn (OrderLine $line) => [
+                'id' => $line->id,
+                'qty' => $line->qty,
+                'name' => $line->name,
+                'mods' => $line->modsLabel(),
+                'line_total' => (float) $line->line_total,
+                'refunded' => (int) $line->refundLines->sum('qty'),
+            ])->all(),
+        ];
+    }
+
+    /**
+     * Orders still waiting for payment: tabs and Branch Menu orders.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function unpaidOrders(Branch $branch): array
+    {
+        return $branch->orders()->where('unpaid', true)->latest('id')->get()->map(fn (Order $order) => [
+            'id' => $order->id,
+            'no' => $order->no,
+            'ticket' => $order->ticket,
+            'tab_name' => $order->tab_name,
+            'total' => (float) $order->total,
+            'created_at' => $order->created_at->toIso8601String(),
+        ])->all();
+    }
+
+    /**
+     * Stock items for the recipe and add-on ingredient pickers.
+     *
+     * @return list<array{id: int, name: string, unit: string, cost: float}>
+     */
+    private function stockChoices(): array
+    {
+        return StockItem::orderBy('name')->get()
+            ->map(fn (StockItem $item) => ['id' => $item->id, 'name' => $item->name, 'unit' => $item->unit, 'cost' => (float) $item->cost])
+            ->all();
+    }
+
+    /**
+     * The start and end of a business day, in the stored (UTC) time.
+     *
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    private function day(string $date): array
+    {
+        $day = Carbon::parse($date, config('app.business_timezone'));
+
+        return [$day->copy()->startOfDay()->utc(), $day->copy()->endOfDay()->utc()];
+    }
+}

@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Order;
 use App\Models\User;
+use App\Policies\Concerns\ManagesBranches;
 use Illuminate\Auth\Access\Response;
 
 /**
@@ -12,6 +13,16 @@ use Illuminate\Auth\Access\Response;
  */
 class OrderPolicy
 {
+    use ManagesBranches;
+
+    /**
+     * Whether the user can refund the sale. A manager's PIN is still needed to approve it (RefundService).
+     */
+    public function refund(User $user, Order $order): Response
+    {
+        return $this->manageBranch($user, $order->branch_id);
+    }
+
     /**
      * Whether the user can move the order along the queue board or take payment for it.
      */

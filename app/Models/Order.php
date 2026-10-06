@@ -45,6 +45,9 @@ class Order extends Model
         'tab_name',
         'tab_payment_method_id',
         'note',
+        'refund_of',
+        'refund_reason',
+        'approved_by_id',
         'paid_at',
     ];
 
@@ -128,6 +131,41 @@ class Order extends Model
     public function tabPaymentMethod(): BelongsTo
     {
         return $this->belongsTo(PaymentMethod::class, 'tab_payment_method_id');
+    }
+
+    /**
+     * The sale this refund gives money back on.
+     *
+     * @return BelongsTo<Order, $this>
+     */
+    public function refundOf(): BelongsTo
+    {
+        return $this->belongsTo(Order::class, 'refund_of');
+    }
+
+    /**
+     * Refunds given against this sale.
+     *
+     * @return HasMany<Order, $this>
+     */
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(Order::class, 'refund_of');
+    }
+
+    /**
+     * The manager whose PIN approved this refund.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by_id');
+    }
+
+    public function isRefund(): bool
+    {
+        return $this->refund_of !== null;
     }
 
     /**

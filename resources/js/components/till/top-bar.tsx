@@ -1,11 +1,11 @@
 import { cn } from '@/lib/utils';
 
-export type TillScreen = 'till' | 'queue';
+export type TillScreen = 'till' | 'queue' | 'inventory';
 
 interface TopBarProps {
     branchName: string;
     clock: string;
-    /** Till and Queue tabs; the order-only Branch Menu has just the till. */
+    /** Till, Queue and (for the branch lead or Owner) Inventory; the order-only Branch Menu has just the till. */
     screens: { value: TillScreen; label: string; badge?: number }[];
     screen: TillScreen;
     onScreen: (screen: TillScreen) => void;

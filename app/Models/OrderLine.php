@@ -28,6 +28,7 @@ class OrderLine extends Model
      */
     protected $fillable = [
         'order_id',
+        'refund_of_line_id',
         'menu_item_id',
         'name',
         'size',
@@ -90,5 +91,15 @@ class OrderLine extends Model
     public function addons(): HasMany
     {
         return $this->hasMany(OrderLineAddon::class);
+    }
+
+    /**
+     * Refund lines that gave back some of this line.
+     *
+     * @return HasMany<OrderLine, $this>
+     */
+    public function refundLines(): HasMany
+    {
+        return $this->hasMany(OrderLine::class, 'refund_of_line_id');
     }
 }
