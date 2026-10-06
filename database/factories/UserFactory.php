@@ -38,6 +38,16 @@ class UserFactory extends Factory
     }
 
     /**
+     * Give the user an existing role by name, such as one created by RoleSeeder.
+     */
+    public function withRole(string $name): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role_id' => Role::where('name', $name)->value('id'),
+        ]);
+    }
+
+    /**
      * Indicate that the Owner has deactivated the user.
      */
     public function inactive(): static

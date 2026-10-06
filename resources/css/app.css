@@ -56,6 +56,48 @@
     --color-neutral-800: #474238;
     --color-neutral-900: #2e2b25;
 
+    /* Logo gold, used on the charcoal Landing */
+    --color-gold: #e0b12a;
+
+    --animate-rise: rise 0.4s ease both;
+    --animate-tin: tin 0.2s ease both;
+    --animate-drift-1: drift-1 26s ease-in-out infinite;
+    --animate-drift-2: drift-2 34s ease-in-out infinite;
+
+    @keyframes rise {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    @keyframes tin {
+        from {
+            opacity: 0;
+            transform: translateY(6px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    @keyframes drift-1 {
+        50% {
+            transform: translate3d(-38px, 42px, 0) scale(1.06);
+        }
+    }
+
+    @keyframes drift-2 {
+        50% {
+            transform: translate3d(46px, -34px, 0) scale(1.05);
+        }
+    }
+
     --color-background: var(--background);
     --color-foreground: var(--foreground);
 

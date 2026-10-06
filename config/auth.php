@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 return [
 
     /*
@@ -62,7 +64,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => env('AUTH_MODEL', User::class),
         ],
 
         // 'users' => [
@@ -111,5 +113,18 @@ return [
     */
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Email and Password Sign-in
+    |--------------------------------------------------------------------------
+    |
+    | Staff sign in with Google. Email and password sign-in (and password
+    | reset) is for local development only, so it defaults to on only when
+    | APP_ENV is "local".
+    |
+    */
+
+    'password_login' => (bool) env('AUTH_PASSWORD_LOGIN', env('APP_ENV') === 'local'),
 
 ];

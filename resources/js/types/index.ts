@@ -1,7 +1,11 @@
+import type { Area } from '@/lib/workspaces';
 import { LucideIcon } from 'lucide-react';
 
 export interface Auth {
     user: User;
+    role: string | null;
+    branch: string | null;
+    areas: Area[];
 }
 
 export interface BreadcrumbItem {

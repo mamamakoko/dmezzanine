@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\PermissionArea;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -83,5 +84,45 @@ class User extends Authenticatable
     public function permissionOverrides(): HasMany
     {
         return $this->hasMany(UserPermissionOverride::class);
+    }
+
+    public function isOwner(): bool
+    {
+        return $this->role->isOwner();
+    }
+
+    /**
+     * The areas this user may open: the role's defaults, with the user's overrides on top.
+     * Inactive users get none; the Owner always gets all.
+     *
+     * @return list<PermissionArea>
+     */
+    public function accessibleAreas(): array
+    {
+        if (! $this->active) {
+            return [];
+        }
+
+        if ($this->isOwner()) {
+            return PermissionArea::cases();
+        }
+
+        $allowed = $this->role->permissions->mapWithKeys(
+            fn (RolePermission $permission) => [$permission->area->value => $permission->allowed],
+        );
+
+        foreach ($this->permissionOverrides as $override) {
+            $allowed[$override->area->value] = $override->allowed;
+        }
+
+        return array_values(array_filter(
+            PermissionArea::cases(),
+            fn (PermissionArea $area) => $allowed[$area->value] ?? false,
+        ));
+    }
+
+    public function canAccess(PermissionArea $area): bool
+    {
+        return in_array($area, $this->accessibleAreas(), true);
     }
 }

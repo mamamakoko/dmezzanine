@@ -22,7 +22,7 @@ test('seeds the warehouse, commissary and two café branches', function () {
     ]);
 });
 
-test('seeds demo users with their role, location, password and PIN', function () {
+test('seeds demo users with their role, location, password and till PIN', function () {
     $this->seed();
 
     $users = User::with(['role', 'branch'])->orderBy('id')->get();
@@ -33,10 +33,13 @@ test('seeds demo users with their role, location, password and PIN', function ()
         ['deng@dmezzanine.ph', 'Commissary', 'Commissary'],
         ['joy@dmezzanine.ph', 'Branch lead', 'DMC-Iriga Branch'],
         ['paolo@dmezzanine.ph', 'Cashier', 'DMC-Iriga Branch'],
-    ]);
+    ])
+        ->and($users->map(fn (User $user) => Hash::check(
+            ['rico@dmezzanine.ph' => '9999', 'joy@dmezzanine.ph' => '5678'][$user->email] ?? '1234',
+            $user->pin_hash,
+        ))->all())->toBe([true, true, true, true, true]);
     $users->each(function (User $user) {
         expect(Hash::check('dmezzanine', $user->password))->toBeTrue()
-            ->and(Hash::check('1234', $user->pin_hash))->toBeTrue()
             ->and($user->active)->toBeTrue();
     });
 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\PermissionArea;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -38,12 +39,17 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $user = $request->user()?->loadMissing(['role.permissions', 'branch', 'permissionOverrides']);
+
         return array_merge(parent::share($request), [
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user?->withoutRelations(),
+                'role' => $user?->role->name,
+                'branch' => $user?->branch?->name,
+                'areas' => $user ? array_map(fn (PermissionArea $area) => $area->value, $user->accessibleAreas()) : [],
             ],
         ]);
     }

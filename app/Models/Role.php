@@ -13,6 +13,11 @@ class Role extends Model
     use HasFactory;
 
     /**
+     * The Owner always has every area, whatever the overrides say, so the console can't lock them out.
+     */
+    public const OWNER = 'Owner';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -20,6 +25,11 @@ class Role extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function isOwner(): bool
+    {
+        return $this->name === self::OWNER;
+    }
 
     /**
      * @return HasMany<User, $this>
