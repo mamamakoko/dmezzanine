@@ -92,6 +92,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Whether this user may open a tab on a payment method limited to the Branch lead or Owner.
+     */
+    public function isBranchLeadOrOwner(): bool
+    {
+        return $this->isOwner() || $this->role->name === Role::BRANCH_LEAD;
+    }
+
+    /**
      * The areas this user may open: the role's defaults, with the user's overrides on top.
      * Inactive users get none; the Owner always gets all.
      *

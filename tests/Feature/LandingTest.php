@@ -36,11 +36,11 @@ test('shares the user\'s location for the access line', function () {
 
 test('opens a workspace the user has access to', function () {
     $this->seed(RoleSeeder::class);
-    $user = User::factory()->withRole('Cashier')->create();
+    $user = User::factory()->withRole('Branch lead')->create();
 
-    $response = $this->actingAs($user)->get('/pos');
+    $response = $this->actingAs($user)->get('/sales');
 
-    $response->assertInertia(fn (Assert $page) => $page->component('workspace-pending')->where('area', 'pos'));
+    $response->assertInertia(fn (Assert $page) => $page->component('workspace-pending')->where('area', 'sales'));
 });
 
 test('returns 403 for a workspace outside the user\'s access', function () {

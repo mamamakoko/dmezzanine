@@ -98,4 +98,12 @@ class Branch extends Model
     {
         return $this->hasMany(PaymentMethodLog::class);
     }
+
+    /**
+     * @return HasMany<Order, $this>
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
 }

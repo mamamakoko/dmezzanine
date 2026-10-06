@@ -17,6 +17,8 @@ class Role extends Model
      */
     public const OWNER = 'Owner';
 
+    public const BRANCH_LEAD = 'Branch lead';
+
     /**
      * The attributes that are mass assignable.
      *
