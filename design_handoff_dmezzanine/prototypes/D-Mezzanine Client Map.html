@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Client map · D' Mezzanine Marketing</title>
+<link rel="stylesheet" href="organic.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)}
+a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-800)}
+*{box-sizing:border-box}
+h2,h3{font-family:var(--font-body);font-weight:600;letter-spacing:-.012em;margin:0}
+.wrap{height:100%;display:grid;grid-template-columns:360px minmax(0,1fr)}
+.side{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--color-divider)}
+.head{padding:20px 20px 14px;display:flex;flex-direction:column;gap:12px}
+.muted{font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)}
+.in{width:100%;height:42px;border:1px solid var(--color-divider);border-radius:4px;background:var(--color-neutral-100);padding:0 12px;font:inherit;font-size:14px;color:var(--color-text)}
+textarea.in{height:72px;padding:10px 12px;resize:vertical}
+.in:focus-visible,button:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
+.b{cursor:pointer;border:1px solid var(--color-divider);background:var(--color-neutral-100);color:var(--color-text);border-radius:4px;min-height:42px;padding:0 16px;font:inherit;font-weight:600;font-size:14px}
+.b:hover{background:var(--color-neutral-200)}
+.bp{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-bg)}
+.bp:hover{background:var(--color-accent-600)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{cursor:pointer;border:1px solid var(--color-divider);background:var(--color-neutral-100);border-radius:4px;padding:6px 11px;font:inherit;font-weight:600;font-size:12.5px;color:var(--color-text)}
+.chip[aria-pressed="true"]{background:var(--color-neutral-900);border-color:var(--color-neutral-900);color:var(--color-neutral-100)}
+.list{flex:1;overflow:auto;overscroll-behavior:contain;padding:0 12px 16px;display:flex;flex-direction:column;gap:6px}
+.row{cursor:pointer;text-align:left;border:1px solid transparent;background:transparent;border-radius:4px;padding:11px 12px;font:inherit;color:inherit;display:grid;grid-template-columns:10px minmax(0,1fr);gap:4px 10px;align-items:baseline}
+.row:hover{background:var(--color-surface)}
+.row[aria-current="true"]{background:var(--color-surface);border-color:var(--color-divider)}
+.dot{width:10px;height:10px;border-radius:999px;align-self:center}
+.name{font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta{grid-column:2;font-size:12px;color:color-mix(in srgb,var(--color-text) 72%,transparent)}
+.empty{padding:34px 12px;text-align:center}
+.mapbox{position:relative;min-width:0}
+#map{position:absolute;inset:0;background:var(--color-surface)}
+.banner{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:500;background:var(--color-neutral-900);color:var(--color-neutral-100);border-radius:4px;padding:10px 12px 10px 16px;display:none;align-items:center;gap:14px;font-size:13.5px;box-shadow:var(--shadow-md)}
+.banner .b{min-height:34px;background:transparent;color:var(--color-neutral-100);border-color:rgba(255,255,255,.25)}
+.banner .b:hover{background:var(--color-accent-2-700)}
+.legend{position:absolute;left:14px;bottom:30px;z-index:500;background:var(--color-bg);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:14px 16px;box-shadow:var(--shadow-md);display:flex;flex-direction:column;gap:9px;font-size:14px;font-weight:600;min-width:160px}
+.legend .lt{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:color-mix(in srgb,var(--color-text) 74%,transparent);margin-bottom:2px}
+.legend .li{display:flex;align-items:center;gap:10px}
+.legend .sw{width:18px;height:18px;border-radius:999px;border:3px solid var(--color-bg);box-shadow:0 0 0 1px var(--color-divider),0 1px 3px rgba(32,30,29,.3);flex:none}
+.panel{position:absolute;top:14px;right:14px;bottom:14px;width:340px;max-width:calc(100% - 28px);z-index:600;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden}
+.panel .body{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.panel label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;letter-spacing:.02em}
+.panel .foot{padding:14px 20px;border-top:1px solid var(--color-divider);display:flex;gap:8px}
+.kv{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px 12px;font-size:13.5px}
+.kv dt{color:color-mix(in srgb,var(--color-text) 72%,transparent)}
+.kv dd{margin:0}
+.srch{position:relative}
+.res{position:absolute;left:0;right:0;top:46px;z-index:10;background:var(--color-bg);border:1px solid var(--color-divider);border-radius:4px;box-shadow:var(--shadow-md);display:none;flex-direction:column;max-height:220px;overflow:auto}
+.res button{cursor:pointer;border:0;background:transparent;text-align:left;padding:9px 12px;font:inherit;font-size:13px;color:inherit}
+.res button:hover{background:var(--color-surface)}
+.pin{width:22px;height:22px;border-radius:999px;border:3px solid var(--color-bg);box-shadow:0 1px 4px rgba(32,30,29,.35)}
+.pin.sel{width:28px;height:28px;outline:3px solid var(--color-accent);outline-offset:1px}
+.hq{width:30px;height:30px;border-radius:999px;background:var(--color-neutral-900);border:3px solid var(--color-bg);box-shadow:0 1px 4px rgba(32,30,29,.35);display:flex;align-items:center;justify-content:center;color:#e0b12a;font-weight:700;font-size:11px}
+.leaflet-container{font-family:var(--font-body)}
+.leaflet-tooltip{font-family:var(--font-body);font-weight:600;font-size:12.5px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side">
+    <div class="head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1;min-width:0">
+          <h2 style="font-size:20px">Client map</h2>
+          <div class="muted" id="count"></div>
+        </div>
+        <button class="b bp" id="addBtn">Add client</button>
+      </div>
+      <input class="in" id="filter" placeholder="Search clients" autocomplete="off">
+      <div class="chips" id="typeChips"></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <select class="in" id="offFilter" style="flex:1;min-width:0;height:38px;font-size:13px"></select>
+        <button class="b" id="areasBtn" style="min-height:38px;padding:0 12px;font-size:13px">Areas</button>
+      </div>
+    </div>
+    <div id="branchNote" style="display:none;flex-direction:column;gap:8px;margin:0 20px 12px;padding:12px 14px;border-radius:4px;background:var(--color-accent-100);border:1px solid var(--color-divider)"></div>
+    <div class="list" id="list"></div>
+  </aside>
+  <div class="mapbox">
+    <div id="map"></div>
+    <div class="banner" id="banner"><span>Click the map where the client is, or search an address.</span><button class="b" id="cancelPlace">Cancel</button></div>
+    <div class="legend" id="legend"></div>
+    <div class="panel" id="panel"></div>
+  </div>
+</div>
+<script>
+const KEY = "dmz.clients";
+const TYPES_KEY = "dmz.clientTypes";
+const TYPES0 = [
+  { k: "Event", c: "oklch(0.55 0.11 135)" },
+  { k: "Corporate", c: "oklch(0.5 0.1 250)" },
+  { k: "Catering", c: "oklch(0.68 0.14 80)" },
+  { k: "Regular", c: "oklch(0.52 0.12 350)" }
+];
+const SWATCHES = ["oklch(0.55 0.11 135)", "oklch(0.5 0.1 250)", "oklch(0.68 0.14 80)", "oklch(0.52 0.12 350)", "oklch(0.58 0.12 40)", "oklch(0.55 0.09 190)", "oklch(0.48 0.1 300)", "oklch(0.45 0.03 60)"];
+let TYPES = (() => { try { const v = JSON.parse(localStorage.getItem(TYPES_KEY) || "null"); if (Array.isArray(v) && v.length) return v; } catch (e) {} return TYPES0.map(t => Object.assign({}, t)); })();
+const saveTypes = () => { try { localStorage.setItem(TYPES_KEY, JSON.stringify(TYPES)); } catch (e) {} };
+const OFFICERS = ["Rico Cortes", "Marisol Vera", "Deng Ramos"];
+const OFF_COLORS = ["oklch(0.5 0.1 250)", "oklch(0.55 0.12 30)", "oklch(0.52 0.1 160)", "oklch(0.5 0.12 310)", "oklch(0.6 0.12 85)"];
+const OC = n => OFF_COLORS[Math.max(0, OFFICERS.indexOf(n)) % OFF_COLORS.length];
+const AREA_KEY = "dmz.clientAreas";
+let areas = (() => { try { return JSON.parse(localStorage.getItem(AREA_KEY) || "[]") || []; } catch (e) { return []; } })();
+const saveAreas = () => { try { localStorage.setItem(AREA_KEY, JSON.stringify(areas)); } catch (e) {} };
+const areaOf = c => {
+  if (c.lat == null) return null;
+  const p = L.latLng(c.lat, c.lng);
+  return areas.filter(a => p.distanceTo(L.latLng(a.lat, a.lng)) <= a.r).sort((x, y) => x.r - y.r)[0] || null;
+};
+const officerOf = c => { if (c.officer) return { name: c.officer, via: "assigned" }; const a = areaOf(c); return a && a.officer ? { name: a.officer, via: a.name } : null; };
+let offFilter = "All", areaDraft = null, areaCircle = null, placingArea = false;
+const TC = t => (TYPES.find(x => x.k === t) || TYPES[0]).c;
+const BRANCH_POS = { "DMC-Iriga Branch": [13.4213, 123.4127], "DMC-Naga Branch": [13.6218, 123.1948] };
+const loadBranchRecs = () => { try { return JSON.parse(localStorage.getItem("dmz.branches") || "null"); } catch (e) { return null; } };
+const branchList = () => {
+  const recs = (loadBranchRecs() || []).filter(x => x && x.kind === "Branch" && x.name);
+  if (!recs.length) return Object.keys(BRANCH_POS).map(n => ({ name: n, pos: BRANCH_POS[n] }));
+  return recs.map(r => ({ name: r.name, addr: r.addr, manager: r.manager, status: r.status, staff: r.staff, pos: r.lat != null && r.lng != null ? [r.lat, r.lng] : (BRANCH_POS[r.name] || null) }));
+};
+const saveBranchPos = (name, lat, lng) => {
+  const recs = loadBranchRecs();
+  if (!recs || !recs.length) { BRANCH_POS[name] = [lat, lng]; return; }
+  localStorage.setItem("dmz.branches", JSON.stringify(recs.map(r => r.name === name ? Object.assign({}, r, { lat: lat, lng: lng }) : r)));
+};
+let BRANCHES = branchList().map(b => b.name);
+const SESS = (() => { try { return JSON.parse(localStorage.getItem("dmz.session") || "null"); } catch (e) { return null; } })();
+const IS_OWNER = !SESS || SESS.role === "Owner";
+const ME = (() => { try { const s = JSON.parse(localStorage.getItem("dmz.session") || "null"); return (s && (s.name || s.fullName || (s.user && s.user.name))) || ""; } catch (e) { return ""; } })();
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (e) { return []; } };
+const save = () => localStorage.setItem(KEY, JSON.stringify(clients));
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const niceDate = d => d ? new Date(d + "T00:00").toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" }) : "";
+
+let clients = load();
+let selId = null, placing = false, draft = null, typeFilter = "All", q = "";
+
+const map = L.map("map", { zoomControl: true }).setView([13.52, 123.3], 11);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap contributors", referrerPolicy: "strict-origin-when-cross-origin" }).addTo(map);
+
+const hqLayer = L.layerGroup().addTo(map);
+let placingBranch = null;
+function renderBranches() {
+  const list = branchList();
+  BRANCHES = list.map(b => b.name);
+  hqLayer.clearLayers();
+  list.filter(b => b.pos).forEach(b => {
+    const m = L.marker(b.pos, { icon: L.divIcon({ className: "", html: '<div class="hq">DM</div>', iconSize: [30, 30], iconAnchor: [15, 15] }), zIndexOffset: 1000 })
+      .bindTooltip(esc(b.name), { direction: "top", offset: [0, -14] });
+    m.on("click", () => { if (placing) return; showBranch(b); });
+    hqLayer.addLayer(m);
+  });
+  const missing = list.filter(b => !b.pos);
+  const box = $("branchNote");
+  if (!missing.length) { box.style.display = "none"; return; }
+  box.style.display = "flex";
+  box.innerHTML = '<div style="font-weight:600;font-size:13.5px">' + (missing.length === 1 ? "1 branch isn\u2019t on the map yet" : missing.length + " branches aren\u2019t on the map yet") + "</div>" +
+    missing.map(b => '<div style="display:flex;align-items:center;gap:10px"><span style="flex:1;min-width:0;font-size:13.5px">' + esc(b.name) + "</span>" +
+      (IS_OWNER ? '<button class="b" data-b="' + esc(b.name) + '" style="min-height:34px;padding:0 12px;font-size:13px">Place pin</button>' : "") + "</div>").join("") +
+    (IS_OWNER ? "" : '<div class="muted">Ask the Owner to place it.</div>');
+}
+
+const layer = L.layerGroup().addTo(map);
+let draftMarker = null;
+
+const $ = id => document.getElementById(id);
+function renderLegend() {
+  $("legend").innerHTML = '<div style="display:flex;align-items:center;gap:12px;justify-content:space-between"><div class="lt">Legend</div>' +
+    (IS_OWNER ? '<button id="legendEdit" title="Edit legend" aria-label="Edit legend" style="cursor:pointer;border:0;background:transparent;padding:4px;margin:-4px -4px -2px 0;border-radius:4px;display:flex;color:color-mix(in srgb,var(--color-text) 60%,transparent)" onmouseover="this.style.color=\'var(--color-accent-700)\';this.style.background=\'var(--color-surface)\'" onmouseout="this.style.color=\'color-mix(in srgb,var(--color-text) 60%,transparent)\';this.style.background=\'transparent\'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>' : "") + "</div>" +
+    '<div class="li"><span class="hq" style="width:22px;height:22px;border-width:2px;font-size:8px">DM</span>Branch</div>' +
+    TYPES.map(t => '<div class="li"><span class="sw" style="background:' + t.c + '"></span>' + esc(t.k) + "</div>").join("");
+  if (IS_OWNER) $("legendEdit").onclick = () => showTypes();
+}
+renderLegend();
+
+let typeDraft = null;
+function showTypes() {
+  if (placing) return;
+  if (!typeDraft) typeDraft = TYPES.map(t => ({ k: t.k, c: t.c, was: t.k }));
+  selId = null;
+  const p = $("panel"); p.style.display = "flex";
+  const count = k => clients.filter(c => c.type === k).length;
+  p.innerHTML = '<div class="body"><h3 style="font-size:19px">Client types</h3>' +
+    '<div class="muted" style="margin-top:-6px">These are the colors on the map and the type choices when saving a client.</div>' +
+    typeDraft.map((t, i) => '<div style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:4px;background:var(--color-surface)">' +
+      '<div style="display:flex;gap:8px;align-items:center"><span class="sw" style="width:18px;height:18px;border-radius:999px;flex:none;background:' + t.c + ';box-shadow:0 0 0 1px var(--color-divider)"></span>' +
+      '<input class="in" data-name="' + i + '" value="' + esc(t.k) + '" style="flex:1;min-width:0;height:38px">' +
+      '<button class="b" data-del="' + i + '" title="Remove" style="min-height:38px;width:38px;padding:0;flex:none">\u00d7</button></div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">' + SWATCHES.map(c => '<button type="button" data-sw="' + i + '" data-c="' + c + '" aria-label="Color" style="cursor:pointer;width:26px;height:26px;border-radius:999px;background:' + c + ';border:2px solid ' + (t.c === c ? "var(--color-text)" : "var(--color-bg)") + ';box-shadow:0 0 0 1px var(--color-divider)"></button>').join("") +
+      '<label title="Pick any color" style="position:relative;display:inline-flex;flex-direction:row;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:0;margin-left:4px">' +
+      '<input type="color" data-pick="' + i + '" value="' + (/^#[0-9a-f]{6}$/i.test(t.c) ? t.c : "#8a7a66") + '" style="width:30px;height:26px;padding:0;border:2px solid ' + (SWATCHES.indexOf(t.c) < 0 ? "var(--color-text)" : "var(--color-divider)") + ';border-radius:4px;background:var(--color-neutral-100);cursor:pointer">Custom</label></div>' +
+      '<div class="muted">' + (t.was ? count(t.was) + (count(t.was) === 1 ? " client" : " clients") : "New type") + "</div></div>").join("") +
+    '<button class="b" id="tAdd" style="align-self:flex-start">Add type</button>' +
+    '</div><div class="foot"><button class="b" id="tCancel">Cancel</button><div style="flex:1"></div><button class="b bp" id="tSave">Save legend</button></div>';
+  p.querySelectorAll("[data-name]").forEach(el => el.oninput = () => { typeDraft[+el.dataset.name].k = el.value; });
+  p.querySelectorAll("[data-sw]").forEach(el => el.onclick = () => { typeDraft[+el.dataset.sw].c = el.dataset.c; showTypes(); });
+  p.querySelectorAll("[data-pick]").forEach(el => {
+    el.oninput = () => { const i = +el.dataset.pick; typeDraft[i].c = el.value; const dot = el.closest("[style*='surface']").querySelector(".sw"); if (dot) dot.style.background = el.value; };
+    el.onchange = () => showTypes();
+  });
+  p.querySelectorAll("[data-del]").forEach(el => el.onclick = () => {
+    const i = +el.dataset.del, t = typeDraft[i];
+    if (typeDraft.length <= 1) return alert("Keep at least one client type.");
+    const n = t.was ? count(t.was) : 0;
+    if (n) {
+      const others = typeDraft.filter((x, j) => j !== i).map(x => x.k.trim()).filter(Boolean);
+      const to = prompt(n + (n === 1 ? " client uses " : " clients use ") + t.k + ". Move them to which type?\n" + others.join(", "), others[0]);
+      if (to == null) return;
+      const dest = typeDraft.find((x, j) => j !== i && x.k.trim().toLowerCase() === to.trim().toLowerCase());
+      if (!dest) return alert("No type called " + to + ".");
+      t.moveTo = dest;
+    }
+    typeDraft.splice(i, 1); typeDraft.removed = (typeDraft.removed || []).concat([t]);
+    showTypes();
+  });
+  $("tAdd").onclick = () => { const used = typeDraft.map(x => x.c); typeDraft.push({ k: "", c: SWATCHES.find(c => used.indexOf(c) < 0) || SWATCHES[0], was: null }); showTypes(); };
+  $("tCancel").onclick = () => { typeDraft = null; p.style.display = "none"; render(); };
+  $("tSave").onclick = () => {
+    const names = typeDraft.map(t => t.k.trim());
+    if (names.some(n => !n)) return alert("Give every type a name.");
+    if (new Set(names.map(n => n.toLowerCase())).size !== names.length) return alert("Two types have the same name.");
+    const rename = {};
+    typeDraft.forEach(t => { if (t.was) rename[t.was] = t.k.trim(); });
+    (typeDraft.removed || []).forEach(t => { if (t.was && t.moveTo) rename[t.was] = t.moveTo.k.trim(); });
+    clients = clients.map(c => rename[c.type] && rename[c.type] !== c.type ? Object.assign({}, c, { type: rename[c.type] }) : c);
+    save();
+    TYPES = typeDraft.map(t => ({ k: t.k.trim(), c: t.c }));
+    saveTypes();
+    if (typeFilter !== "All" && !TYPES.some(t => t.k === typeFilter)) typeFilter = rename[typeFilter] || "All";
+    typeDraft = null; p.style.display = "none";
+    renderLegend(); render();
+  };
+}
+window.addEventListener("storage", e => { if (e.key === TYPES_KEY) { try { TYPES = JSON.parse(e.newValue) || TYPES; } catch (x) {} renderLegend(); render(); } });
+
+function visible() {
+  const s = q.trim().toLowerCase();
+  return clients.filter(c => (typeFilter === "All" || c.type === typeFilter) &&
+    (offFilter === "All" || (offFilter === "__none" ? !officerOf(c) : (officerOf(c) || {}).name === offFilter)) &&
+    (!s || (c.name + " " + (c.address || "") + " " + (c.contact || "") + " " + (c.notes || "")).toLowerCase().includes(s)));
+}
+
+function render() {
+  const vis = visible();
+  $("count").textContent = clients.length ? (vis.length === clients.length ? clients.length + (clients.length === 1 ? " client" : " clients") : vis.length + " of " + clients.length + " clients") : "No clients recorded yet";
+  $("typeChips").innerHTML = ["All"].concat(TYPES.map(t => t.k)).map(t => '<button class="chip" data-t="' + t + '" aria-pressed="' + (typeFilter === t) + '">' + t + "</button>").join("");
+  $("offFilter").innerHTML = [["All", "All officers"]].concat(OFFICERS.map(o => [o, o + " \u00b7 " + clients.filter(c => (officerOf(c) || {}).name === o).length])).concat([["__none", "No officer \u00b7 " + clients.filter(c => !officerOf(c)).length]]).map(o => '<option value="' + esc(o[0]) + '"' + (offFilter === o[0] ? " selected" : "") + ">" + esc(o[1]) + "</option>").join("");
+  renderAreas();
+  $("list").innerHTML = vis.length ? vis.slice().sort((a, b) => (b.lastOrder || "").localeCompare(a.lastOrder || "")).map(c =>
+    '<button class="row" data-id="' + c.id + '" aria-current="' + (c.id === selId) + '"><span class="dot" style="background:' + TC(c.type) + '"></span>' +
+    '<span class="name">' + esc(c.name) + '</span><span class="meta">' + esc([c.type, c.address].filter(Boolean).join(" · ")) + "</span>" +
+    ((o => o ? '<span class="meta">Handled by ' + esc(o.name) + "</span>" : '<span class="meta" style="color:var(--color-accent-700)">No officer</span>')(officerOf(c))) +
+    (c.lastOrder ? '<span class="meta">Last order ' + niceDate(c.lastOrder) + "</span>" : "") + "</button>").join("")
+    : '<div class="empty muted">' + (clients.length ? "No clients match." : "Add a client and drop a pin where you served them. Each pin keeps their contact, event type and notes.") + "</div>";
+  layer.clearLayers();
+  vis.forEach(c => {
+    const sel = c.id === selId;
+    const m = L.marker([c.lat, c.lng], { icon: L.divIcon({ className: "", html: '<div class="pin' + (sel ? " sel" : "") + '" style="background:' + TC(c.type) + '"></div>', iconSize: sel ? [28, 28] : [22, 22], iconAnchor: sel ? [14, 14] : [11, 11] }), zIndexOffset: sel ? 900 : 0 });
+    m.bindTooltip(esc(c.name), { direction: "top", offset: [0, -10] });
+    m.on("click", () => select(c.id, false));
+    layer.addLayer(m);
+  });
+}
+
+function select(id, fly) {
+  selId = id; draft = null; setPlacing(false); clearDraft();
+  const c = clients.find(x => x.id === id);
+  if (c && fly) map.flyTo([c.lat, c.lng], Math.max(map.getZoom(), 15), { duration: .5 });
+  render(); showDetail(c);
+}
+
+function showDetail(c) {
+  const p = $("panel");
+  if (!c) { p.style.display = "none"; return; }
+  p.style.display = "flex";
+  p.innerHTML = '<div class="body"><div style="display:flex;align-items:flex-start;gap:10px"><div style="flex:1;min-width:0"><div class="muted" style="display:flex;align-items:center;gap:7px"><span class="dot" style="background:' + TC(c.type) + '"></span>' + esc(c.type) + '</div><h3 style="font-size:19px;margin-top:4px">' + esc(c.name) + '</h3></div><button class="b" id="pClose" aria-label="Close" style="min-height:34px;padding:0 11px">✕</button></div>' +
+    '<dl class="kv">' +
+    (c.contact ? "<dt>Contact</dt><dd>" + esc(c.contact) + "</dd>" : "") +
+    (c.address ? "<dt>Location</dt><dd>" + esc(c.address) + "</dd>" : "") +
+    (c.branch ? "<dt>Served by</dt><dd>" + esc(c.branch) + "</dd>" : "") +
+    ((o => "<dt>Officer</dt><dd>" + (o ? esc(o.name) + '<div class="muted">' + (o.via === "assigned" ? "Assigned to this client" : "From area: " + esc(o.via)) + "</div>" : '<span style="color:var(--color-accent-700)">None yet</span>') + "</dd>")(officerOf(c))) +
+    (c.lastOrder ? "<dt>Last order</dt><dd>" + niceDate(c.lastOrder) + "</dd>" : "") +
+    (c.addedBy ? "<dt>Recorded by</dt><dd>" + esc(c.addedBy) + "</dd>" : "") +
+    "</dl>" + (c.notes ? '<div style="padding:10px 12px;border-radius:4px;background:var(--color-surface);font-size:13.5px;line-height:1.5;white-space:pre-wrap">' + esc(c.notes) + "</div>" : "") +
+    '</div><div class="foot"><button class="b" id="pDel">Delete</button><div style="flex:1"></div><button class="b" id="pMove">Move pin</button><button class="b bp" id="pEdit">Edit</button></div>';
+  $("pClose").onclick = () => { selId = null; render(); showDetail(null); };
+  $("pEdit").onclick = () => showForm(Object.assign({}, c));
+  $("pMove").onclick = () => { draft = Object.assign({}, c); selId = null; render(); p.style.display = "none"; setPlacing(true); };
+  $("pDel").onclick = () => { if (!confirm("Delete " + c.name + " from the map?")) return; clients = clients.filter(x => x.id !== c.id); save(); selId = null; render(); showDetail(null); };
+}
+
+function showBranch(b) {
+  draft = null; clearDraft(); selId = null; render();
+  const served = clients.filter(c => c.branch === b.name).sort((x, y) => (y.lastOrder || "").localeCompare(x.lastOrder || ""));
+  const last = served.find(c => c.lastOrder);
+  const p = $("panel"); p.style.display = "flex";
+  p.innerHTML = '<div class="body"><div style="display:flex;align-items:flex-start;gap:10px"><div style="flex:1;min-width:0"><div class="muted" style="display:flex;align-items:center;gap:7px"><span class="hq" style="width:18px;height:18px;border-width:2px;font-size:0"></span>Branch' + (b.status ? " \u00b7 " + esc(b.status) : "") + '</div><h3 style="font-size:19px;margin-top:4px">' + esc(b.name) + '</h3></div><button class="b" id="pClose" aria-label="Close" style="min-height:34px;padding:0 11px">\u2715</button></div>' +
+    '<dl class="kv">' +
+    (b.addr ? "<dt>Address</dt><dd>" + esc(b.addr) + "</dd>" : "") +
+    (b.manager ? "<dt>Manager</dt><dd>" + esc(b.manager) + "</dd>" : "") +
+    (b.staff != null ? "<dt>Staff</dt><dd>" + esc(b.staff) + "</dd>" : "") +
+    "<dt>Clients</dt><dd>" + served.length + (served.length === 1 ? " client served" : " clients served") + "</dd>" +
+    (last ? "<dt>Last order</dt><dd>" + esc(last.name) + " \u00b7 " + niceDate(last.lastOrder) + "</dd>" : "") +
+    "</dl>" +
+    (served.length ? '<div><div class="muted" style="font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:11.5px;margin-bottom:6px">Clients served</div><div style="display:flex;flex-direction:column;gap:2px">' +
+      served.map(c => '<button class="row" data-cid="' + c.id + '" style="padding:8px 10px"><span class="dot" style="background:' + TC(c.type) + '"></span><span class="name" style="font-size:13.5px">' + esc(c.name) + '</span></button>').join("") + "</div></div>" : "") +
+    '</div>' + (IS_OWNER ? '<div class="foot"><div style="flex:1"></div><button class="b" id="bMove">Change location</button></div>' : "");
+  $("pClose").onclick = () => { p.style.display = "none"; };
+  p.querySelectorAll("[data-cid]").forEach(el => el.onclick = () => select(el.dataset.cid, true));
+  if (IS_OWNER) $("bMove").onclick = () => startBranchPlace(b.name, true);
+}
+
+function showForm(d) {
+  draft = d;
+  const p = $("panel"); p.style.display = "flex";
+  const isNew = !clients.some(x => x.id === d.id);
+  p.innerHTML = '<div class="body"><h3 style="font-size:19px">' + (isNew ? "New client" : "Edit client") + "</h3>" +
+    '<label>Client name<input class="in" id="fName" value="' + esc(d.name) + '" placeholder="Company, family or event host"></label>' +
+    '<label>Type<div class="chips" id="fType">' + TYPES.map(t => '<button type="button" class="chip" data-t="' + t.k + '" aria-pressed="' + (d.type === t.k) + '">' + t.k + "</button>").join("") + "</div></label>" +
+    '<label>Contact<input class="in" id="fContact" value="' + esc(d.contact) + '" placeholder="Name and mobile number"></label>' +
+    '<label>Location<div class="srch"><input class="in" id="fAddr" value="' + esc(d.address) + '" placeholder="Search or type an address" autocomplete="off"><div class="res" id="fRes"></div></div></label>' +
+    '<div class="muted" style="margin-top:-6px">' + (d.lat != null ? "Pin placed. Drag it on the map to adjust." : "No pin yet. Click the map or pick a search result.") + "</div>" +
+    '<label>Served by<select class="in" id="fBranch"><option value="">—</option>' + BRANCHES.map(b => '<option' + (d.branch === b ? " selected" : "") + ">" + esc(b) + "</option>").join("") + "</select></label>" +
+    '<label>Officer<select class="in" id="fOfficer"><option value="">Auto (from area)</option>' + OFFICERS.map(o => '<option' + (d.officer === o ? " selected" : "") + ">" + esc(o) + "</option>").join("") + "</select></label>" +
+    '<label>Last order<input class="in" type="date" id="fDate" value="' + esc(d.lastOrder) + '"></label>' +
+    '<label>Notes<textarea class="in" id="fNotes" placeholder="What they ordered, headcount, follow-ups">' + esc(d.notes) + "</textarea></label>" +
+    '</div><div class="foot"><button class="b" id="fCancel">Cancel</button><div style="flex:1"></div><button class="b bp" id="fSave">Save client</button></div>';
+  $("fType").onclick = e => { const t = e.target.closest("[data-t]"); if (!t) return; draft.type = t.dataset.t; [...$("fType").children].forEach(x => x.setAttribute("aria-pressed", x.dataset.t === draft.type)); };
+  $("fCancel").onclick = () => { const had = clients.find(x => x.id === d.id); draft = null; clearDraft(); setPlacing(false); if (had) { selId = had.id; render(); showDetail(had); } else { p.style.display = "none"; } };
+  $("fSave").onclick = () => {
+    const name = $("fName").value.trim();
+    if (!name) { $("fName").focus(); return; }
+    if (draft.lat == null) { alert("Place a pin on the map first."); return; }
+    Object.assign(draft, { name, contact: $("fContact").value.trim(), address: $("fAddr").value.trim(), branch: $("fBranch").value, officer: $("fOfficer").value, lastOrder: $("fDate").value, notes: $("fNotes").value.trim() });
+    if (!draft.addedBy) draft.addedBy = ME;
+    const i = clients.findIndex(x => x.id === draft.id);
+    if (i >= 0) clients[i] = draft; else clients.push(draft);
+    save(); const id = draft.id; clearDraft(); setPlacing(false); select(id, false);
+  };
+  let t = null;
+  $("fAddr").oninput = e => { clearTimeout(t); const v = e.target.value.trim(); if (v.length < 3) { $("fRes").style.display = "none"; return; } t = setTimeout(() => geocode(v), 450); };
+  setPlacing(d.lat == null);
+  if (d.lat != null) setDraftMarker(d.lat, d.lng);
+  $("fName").focus();
+}
+
+async function geocode(v) {
+  const r = $("fRes"); if (!r) return;
+  try {
+    const res = await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=ph&viewbox=122.9,13.9,123.7,13.2&q=" + encodeURIComponent(v));
+    const rows = await res.json();
+    if (!rows.length) { r.innerHTML = '<div class="muted" style="padding:9px 12px">No match. Click the map instead.</div>'; r.style.display = "flex"; return; }
+    r.innerHTML = rows.map((x, i) => '<button type="button" data-i="' + i + '">' + esc(x.display_name) + "</button>").join("");
+    r.style.display = "flex";
+    r.onclick = e => { const b = e.target.closest("[data-i]"); if (!b) return; const x = rows[+b.dataset.i];
+      $("fAddr").value = x.display_name.split(",").slice(0, 3).join(",").trim(); r.style.display = "none";
+      placeDraft(+x.lat, +x.lon); map.flyTo([+x.lat, +x.lon], 16, { duration: .5 }); };
+  } catch (e) { r.innerHTML = '<div class="muted" style="padding:9px 12px">Address search is unavailable. Click the map instead.</div>'; r.style.display = "flex"; }
+}
+
+function setDraftMarker(lat, lng) {
+  clearDraft();
+  draftMarker = L.marker([lat, lng], { draggable: true, zIndexOffset: 1200, icon: L.divIcon({ className: "", html: '<div class="pin sel" style="background:' + TC(draft.type) + '"></div>', iconSize: [28, 28], iconAnchor: [14, 14] }) }).addTo(map);
+  draftMarker.on("dragend", () => { const p = draftMarker.getLatLng(); draft.lat = p.lat; draft.lng = p.lng; });
+}
+function clearDraft() { if (draftMarker) { map.removeLayer(draftMarker); draftMarker = null; } }
+function placeDraft(lat, lng) {
+  draft.lat = lat; draft.lng = lng; setDraftMarker(lat, lng); setPlacing(false);
+  if ($("panel").style.display !== "flex" || !$("fSave")) showForm(draft);
+}
+function setPlacing(on) { if (!on) { placingBranch = null; $("banner").querySelector("span").textContent = "Click the map where the client is, or search an address."; } placing = on; $("banner").style.display = on ? "flex" : "none"; map.getContainer().style.cursor = on ? "crosshair" : ""; }
+
+map.on("click", e => {
+  if (placingArea && areaDraft) {
+    areaDraft.lat = e.latlng.lat; areaDraft.lng = e.latlng.lng; placingArea = false; setPlacing(false); showAreaForm(); return;
+  }
+  if (placing && placingBranch) {
+    saveBranchPos(placingBranch, e.latlng.lat, e.latlng.lng);
+    placingBranch = null; setPlacing(false); renderBranches(); return;
+  }
+  if (!placing || !draft) return;
+  const moving = clients.some(x => x.id === draft.id) && !$("fSave");
+  placeDraft(e.latlng.lat, e.latlng.lng);
+  if (moving) { const i = clients.findIndex(x => x.id === draft.id); clients[i] = draft; save(); const id = draft.id; clearDraft(); select(id, false); }
+});
+
+const areaLayer = L.layerGroup().addTo(map);
+function renderAreas() {
+  areaLayer.clearLayers();
+  areas.forEach(a => {
+    if (areaDraft && areaDraft.id === a.id) return;
+    const col = a.officer ? OC(a.officer) : "oklch(0.45 0.03 60)";
+    const ci = L.circle([a.lat, a.lng], { radius: a.r, color: col, weight: 2, dashArray: a.officer ? null : "6 6", fillColor: col, fillOpacity: offFilter === "All" || offFilter === a.officer ? .1 : .03, interactive: true });
+    ci.bindTooltip(esc(a.name) + " \u00b7 " + esc(a.officer || "No officer"), { sticky: true });
+    ci.on("click", ev => { if (placing) return; L.DomEvent.stop(ev); showAreas(a.id); });
+    areaLayer.addLayer(ci);
+  });
+}
+function drawDraftCircle() {
+  if (areaCircle) { map.removeLayer(areaCircle); areaCircle = null; }
+  if (!areaDraft || areaDraft.lat == null) return;
+  const col = areaDraft.officer ? OC(areaDraft.officer) : "oklch(0.45 0.03 60)";
+  areaCircle = L.circle([areaDraft.lat, areaDraft.lng], { radius: areaDraft.r, color: col, weight: 3, fillColor: col, fillOpacity: .15, interactive: false }).addTo(map);
+}
+function showAreas(focusId) {
+  areaDraft = null; drawDraftCircle(); selId = null; draft = null; clearDraft(); setPlacing(false); render();
+  const p = $("panel"); p.style.display = "flex";
+  const inA = a => clients.filter(c => (areaOf(c) || {}).id === a.id).length;
+  p.innerHTML = '<div class="body"><div style="display:flex;align-items:flex-start;gap:10px"><div style="flex:1;min-width:0"><h3 style="font-size:19px">Areas</h3>' +
+    '<div class="muted">Each area is handled by one marketing officer. Clients inside it go to that officer unless a client has its own officer.</div></div><button class="b" id="aClose" aria-label="Close" style="min-height:34px;padding:0 11px">\u2715</button></div>' +
+    '<div style="display:flex;flex-direction:column;gap:12px">' + OFFICERS.map(o => {
+      const mine = areas.filter(a => a.officer === o);
+      const total = clients.filter(c => (officerOf(c) || {}).name === o).length;
+      return '<div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="dot" style="width:10px;height:10px;border-radius:999px;background:' + OC(o) + '"></span><span style="font-weight:600;font-size:14px;flex:1">' + esc(o) + '</span><span class="muted">' + total + (total === 1 ? " client" : " clients") + "</span></div>" +
+        (mine.length ? mine.map(a => '<button class="row" data-area="' + a.id + '" aria-current="' + (a.id === focusId) + '" style="padding:8px 10px"><span></span><span class="name" style="font-size:13.5px">' + esc(a.name) + '</span><span class="meta">' + (a.r / 1000).toFixed(1) + " km radius \u00b7 " + inA(a) + (inA(a) === 1 ? " client" : " clients") + "</span></button>").join("") : '<div class="muted" style="padding:2px 0 0 18px">No areas yet.</div>') + "</div>";
+    }).join("") +
+    (areas.some(a => !a.officer) ? '<div><div style="font-weight:600;font-size:14px;margin-bottom:4px">No officer</div>' + areas.filter(a => !a.officer).map(a => '<button class="row" data-area="' + a.id + '" style="padding:8px 10px"><span></span><span class="name" style="font-size:13.5px">' + esc(a.name) + "</span></button>").join("") + "</div>" : "") +
+    "</div></div>" + (IS_OWNER ? '<div class="foot"><div style="flex:1"></div><button class="b bp" id="aNew">Draw area</button></div>' : "");
+  $("aClose").onclick = () => { p.style.display = "none"; };
+  p.querySelectorAll("[data-area]").forEach(el => el.onclick = () => {
+    const a = areas.find(x => x.id === el.dataset.area); if (!a) return;
+    map.flyToBounds(L.latLng(a.lat, a.lng).toBounds(a.r * 2.4), { duration: .5 });
+    if (IS_OWNER) { areaDraft = Object.assign({}, a); renderAreas(); drawDraftCircle(); showAreaForm(); }
+  });
+  if (IS_OWNER) $("aNew").onclick = () => {
+    areaDraft = { id: "a" + Date.now(), name: "", officer: OFFICERS[0], r: 2000, lat: null, lng: null, isNew: true };
+    p.style.display = "none"; placingArea = true;
+    $("banner").querySelector("span").textContent = "Click the center of the area.";
+    setPlacing(true);
+  };
+}
+function showAreaForm() {
+  const a = areaDraft; if (!a) return;
+  drawDraftCircle();
+  const p = $("panel"); p.style.display = "flex";
+  const inside = clients.filter(c => c.lat != null && L.latLng(c.lat, c.lng).distanceTo(L.latLng(a.lat, a.lng)) <= a.r).length;
+  p.innerHTML = '<div class="body"><h3 style="font-size:19px">' + (a.isNew ? "New area" : "Edit area") + "</h3>" +
+    '<label>Area name<input class="in" id="arName" value="' + esc(a.name) + '" placeholder="Iriga Poblacion"></label>' +
+    '<label>Marketing officer<select class="in" id="arOff"><option value="">No officer yet</option>' + OFFICERS.map(o => '<option' + (a.officer === o ? " selected" : "") + ">" + esc(o) + "</option>").join("") + "</select></label>" +
+    '<label>Radius \u00b7 <span id="arKm">' + (a.r / 1000).toFixed(1) + ' km</span><input type="range" id="arR" min="300" max="15000" step="100" value="' + a.r + '" style="accent-color:var(--color-accent)"></label>' +
+    '<div class="muted" id="arIn">' + inside + (inside === 1 ? " client" : " clients") + " inside</div>" +
+    '<button class="b" id="arMove" style="align-self:flex-start">Move center</button>' +
+    '</div><div class="foot">' + (a.isNew ? "" : '<button class="b" id="arDel">Delete</button>') + '<div style="flex:1"></div><button class="b" id="arCancel">Cancel</button><button class="b bp" id="arSave">Save area</button></div>';
+  $("arName").oninput = e => { a.name = e.target.value; };
+  $("arOff").onchange = e => { a.officer = e.target.value; drawDraftCircle(); };
+  $("arR").oninput = e => {
+    a.r = +e.target.value; $("arKm").textContent = (a.r / 1000).toFixed(1) + " km"; drawDraftCircle();
+    const n = clients.filter(c => c.lat != null && L.latLng(c.lat, c.lng).distanceTo(L.latLng(a.lat, a.lng)) <= a.r).length;
+    $("arIn").textContent = n + (n === 1 ? " client" : " clients") + " inside";
+  };
+  $("arMove").onclick = () => { p.style.display = "none"; placingArea = true; $("banner").querySelector("span").textContent = "Click the new center of the area."; setPlacing(true); };
+  $("arCancel").onclick = () => { areaDraft = null; drawDraftCircle(); showAreas(); };
+  if (!a.isNew) $("arDel").onclick = () => { if (!confirm("Delete the " + (a.name || "area") + " area? Its clients keep any officer assigned to them directly.")) return; areas = areas.filter(x => x.id !== a.id); saveAreas(); areaDraft = null; drawDraftCircle(); showAreas(); };
+  $("arSave").onclick = () => {
+    const name = $("arName").value.trim(); if (!name) { $("arName").focus(); return; }
+    const clean = { id: a.id, name: name, officer: a.officer || "", r: a.r, lat: a.lat, lng: a.lng };
+    const i = areas.findIndex(x => x.id === a.id); if (i >= 0) areas[i] = clean; else areas.push(clean);
+    saveAreas(); areaDraft = null; drawDraftCircle(); showAreas(clean.id);
+  };
+}
+$("areasBtn").onclick = () => showAreas();
+$("offFilter").onchange = e => { offFilter = e.target.value; render(); };
+
+function startBranchPlace(name, moving) {
+  draft = null; clearDraft(); selId = null; render(); showDetail(null);
+  placingBranch = name;
+  $("banner").querySelector("span").textContent = moving ? "Click the new location for " + name + "." : "Click the map where " + name + " is.";
+  setPlacing(true);
+}
+$("branchNote").onclick = e => { const b = e.target.closest("[data-b]"); if (b) startBranchPlace(b.dataset.b, false); };
+$("addBtn").onclick = () => { selId = null; render(); showForm({ id: "c" + Date.now(), name: "", type: "Event", contact: "", address: "", branch: BRANCHES[0] || "", lastOrder: "", notes: "", lat: null, lng: null }); };
+$("cancelPlace").onclick = () => { if (placingArea) { placingArea = false; setPlacing(false); if (areaDraft && areaDraft.lat != null) showAreaForm(); else { areaDraft = null; showAreas(); } return; } setPlacing(false); if (!$("fSave")) { draft = null; const c = clients.find(x => x.id === selId); showDetail(c); } };
+$("filter").oninput = e => { q = e.target.value; render(); };
+$("typeChips").onclick = e => { const t = e.target.closest("[data-t]"); if (!t) return; typeFilter = t.dataset.t; render(); };
+$("list").onclick = e => { const r = e.target.closest("[data-id]"); if (r) select(r.dataset.id, true); };
+window.addEventListener("storage", e => { if (e.key === KEY) { clients = load(); render(); } if (e.key === "dmz.branches") renderBranches(); if (e.key === AREA_KEY) { try { areas = JSON.parse(e.newValue) || []; } catch (x) {} render(); } });
+
+renderBranches();
+render();
+if (clients.length) map.fitBounds(L.latLngBounds(clients.map(c => [c.lat, c.lng]).concat(branchList().filter(b => b.pos).map(b => b.pos))).pad(0.15));
+</script>
+</body>
+</html>

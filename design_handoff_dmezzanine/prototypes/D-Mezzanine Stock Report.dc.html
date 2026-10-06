@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="organic.css"><style>html,body{margin:0;height:100%;overflow:hidden}#root{height:100%}a{color:var(--color-accent-700);text-decoration:none}a:hover{color:var(--color-accent-800)}*{scrollbar-width:none;-ms-overflow-style:none}*::-webkit-scrollbar{width:0;height:0;display:none}@keyframes tin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}h1,h2,h3,h4{font-family:var(--font-body);font-weight:600;letter-spacing:-.012em}body{font-variant-numeric:tabular-nums}.input{border-radius:4px!important}.btn{font-family:var(--font-body)!important;font-weight:600!important;border-radius:4px!important;letter-spacing:0}@media print{html,body,#root{height:auto;overflow:visible}.noprint{display:none!important}.sheet{display:block!important}.pane{overflow:visible!important}}</style></helmet>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+<div class="sheet" style="height:100vh;display:grid;grid-template-columns:246px 1fr;background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)">
+
+  <div class="noprint" style="background:var(--color-neutral-900);color:var(--color-neutral-100);display:flex;flex-direction:column;overflow:hidden">
+    <div style="padding:20px 18px 16px;display:flex;align-items:center;gap:11px;flex:none">
+      <img src="logo.png" alt="D' Mezzanine Cafe" style="width:36px;height:36px;border-radius:999px;flex:none;object-fit:cover">
+      <div>
+        <div style="font-family:var(--font-body);font-weight:600;font-size:15px;line-height:1.15">DMC Stock Report</div>
+        <div style="font-size:10px;letter-spacing:.28em;color:#e0b12a">D’ MEZZANINE CAFE</div>
+      </div>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 10px 16px;display:flex;flex-direction:column;gap:2px">
+      <div style="padding:14px 12px 8px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.42;font-weight:600">REVIEW</div>
+
+      <div style="padding:0 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <button onClick="{{ tabDay }}" style="cursor:pointer;border:1px solid {{ dayTabBorder }};background:{{ dayTabBg }};color:{{ dayTabFg }};font-family:var(--font-body);font-weight:600;font-size:12.5px;border-radius:4px;padding:8px 6px" style-hover="border-color:var(--color-accent)">Daily</button>
+        <button onClick="{{ tabMonth }}" style="cursor:pointer;border:1px solid {{ monTabBorder }};background:{{ monTabBg }};color:{{ monTabFg }};font-family:var(--font-body);font-weight:600;font-size:12.5px;border-radius:4px;padding:8px 6px" style-hover="border-color:var(--color-accent)">Month</button>
+      </div>
+
+      <div style="display:{{ dayPickShow }};padding:14px 12px 4px">
+        <div style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.6;margin-bottom:5px">Count date</div>
+        <select value="{{ day }}" onChange="{{ setDay }}" style="width:100%;cursor:pointer;border:1px solid rgba(255,255,255,.18);background:var(--color-neutral-800);color:var(--color-neutral-100);font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:4px;padding:7px 8px" style-focus="border-color:var(--color-accent)">
+          <sc-for list="{{ dayOpts }}" as="d" hint-placeholder-count="4">
+            <option value="{{ d.key }}">{{ d.label }}</option>
+          </sc-for>
+        </select>
+      </div>
+
+      <div style="display:{{ monPickShow }};padding:14px 12px 4px">
+        <div style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.6;margin-bottom:5px">Month</div>
+        <select value="{{ month }}" onChange="{{ setMonth }}" style="width:100%;cursor:pointer;border:1px solid rgba(255,255,255,.18);background:var(--color-neutral-800);color:var(--color-neutral-100);font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:4px;padding:7px 8px" style-focus="border-color:var(--color-accent)">
+          <sc-for list="{{ monthOpts }}" as="m" hint-placeholder-count="3">
+            <option value="{{ m.key }}">{{ m.label }}</option>
+          </sc-for>
+        </select>
+      </div>
+
+      <div style="margin-top:14px;padding:13px 13px 14px;border-radius:4px;background:color-mix(in srgb,var(--color-neutral-100) 7%,transparent)">
+        <div style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;opacity:.6">Branch</div>
+        <div style="display:{{ branchFixedShow }};margin-top:5px;font-family:var(--font-body);font-weight:600;font-size:13.5px;line-height:1.25">{{ branch }}</div>
+        <select value="{{ branch }}" onChange="{{ setBranch }}" style="display:{{ branchPickShow }};margin-top:6px;width:100%;cursor:pointer;border:1px solid rgba(255,255,255,.18);background:var(--color-neutral-800);color:var(--color-neutral-100);font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:4px;padding:7px 8px" style-focus="border-color:var(--color-accent)">
+          <sc-for list="{{ branchOpts }}" as="o" hint-placeholder-count="2">
+            <option value="{{ o }}">{{ o }}</option>
+          </sc-for>
+        </select>
+        <div style="margin-top:5px;font-size:11.5px;opacity:.6">{{ branchNote }}</div>
+      </div>
+
+      <button onClick="{{ doExport }}" style="margin-top:14px;width:100%;border:1px solid rgba(255,255,255,.14);background:transparent;cursor:pointer;color:color-mix(in srgb,var(--color-neutral-100) 82%,transparent);font-family:var(--font-body);font-weight:600;font-size:12.5px;border-radius:4px;padding:9px 10px;text-align:center" style-hover="background:color-mix(in srgb,var(--color-neutral-100) 8%,transparent);color:var(--color-neutral-100)">{{ exportLabel }}</button>
+      <a href="D-Mezzanine Stock Count.dc.html" style="margin-top:6px;display:block;color:color-mix(in srgb,var(--color-neutral-100) 62%,transparent);font-size:12.5px;padding:8px 12px">Go to today's count</a>
+    </div>
+
+    <div style="flex:none;padding:14px 18px 18px;border-top:1px solid rgba(255,255,255,.12);font-size:12px">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div style="width:28px;height:28px;border-radius:999px;background:var(--color-neutral-700);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--font-body);font-weight:600">{{ meInitials }}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ meName }}</div>
+          <div style="opacity:.55;font-size:11px">{{ meRole }}</div>
+        </div>
+      </div>
+      <button onClick="{{ signOut }}" style="margin-top:12px;width:100%;border:1px solid rgba(255,255,255,.14);background:transparent;cursor:pointer;color:color-mix(in srgb,var(--color-neutral-100) 72%,transparent);font-family:var(--font-body);font-size:12.5px;border-radius:4px;padding:8px 10px;text-align:center" style-hover="background:color-mix(in srgb,var(--color-neutral-100) 8%,transparent);color:var(--color-neutral-100)">Exit</button>
+    </div>
+  </div>
+
+  <div class="pane" style="overflow-y:auto;overflow-x:hidden;position:relative;min-width:0">
+    <div style="position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--color-bg) 92%,transparent);backdrop-filter:blur(8px);padding:22px 32px 16px;border-bottom:1px solid var(--color-divider);display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap">
+      <div style="flex:1 1 220px;min-width:200px">
+        <div style="font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ kicker }}</div>
+        <h2 style="margin:4px 0 0;font-size:23px;line-height:1.1">{{ title }}</h2>
+      </div>
+      <div style="display:{{ statusShow }};flex:0 0 auto;align-items:center;gap:8px;padding:6px 13px;border-radius:999px;background:{{ statusBg }};color:{{ statusFg }};font-size:12.5px;font-weight:600">{{ statusText }}</div>
+      <div class="noprint" style="display:flex;align-items:center;gap:10px;flex:0 0 auto">
+        <input value="{{ query }}" onChange="{{ setQuery }}" class="input" placeholder="Search item or SKU" style="border-radius:4px;width:200px">
+      </div>
+    </div>
+
+    <div style="display:{{ dayShow }};padding:26px 32px 60px;animation:tin .22s ease both">
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
+        <sc-for list="{{ dayStats }}" as="s" hint-placeholder-count="3">
+          <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:15px 18px;border-left:3px solid {{ s.rule }}">
+            <div style="font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ s.label }}</div>
+            <div style="margin-top:6px;font-family:var(--font-body);font-weight:600;font-size:{{ s.size }};line-height:1.12;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.value }}</div>
+            <div style="margin-top:4px;font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ s.sub }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:{{ noCountShow }};margin-top:16px;background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:34px;text-align:center;font-size:13.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">No count has been submitted at {{ branch }} for this date.</div>
+
+      <div style="display:{{ dayBodyShow }};margin-top:20px;flex-direction:column;gap:18px">
+
+        <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden;min-width:0">
+          <div style="padding:14px 18px 12px;border-bottom:1px solid var(--color-divider);display:flex;align-items:baseline;gap:10px 14px;flex-wrap:wrap">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:15px">Counted against sales</div>
+            <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ countedBy }}</div>
+            <div class="noprint" style="margin-left:auto;display:flex;gap:6px;align-items:center">
+              <button onClick="{{ toggleOff }}" style="cursor:pointer;border:1px solid {{ offBorder }};background:{{ offBg }};color:{{ offFg }};font-family:var(--font-body);font-weight:600;font-size:11.5px;border-radius:4px;padding:5px 10px" style-hover="border-color:var(--color-accent)">{{ offLabel }}</button>
+              <button onClick="{{ toggleSort }}" style="cursor:pointer;border:1px solid var(--color-divider);background:transparent;color:color-mix(in srgb,var(--color-text) 74%,transparent);font-family:var(--font-body);font-weight:600;font-size:11.5px;border-radius:4px;padding:5px 10px" style-hover="background:var(--color-neutral-100);color:var(--color-text)">{{ sortLabel }}</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <div style="display:grid;min-width:700px;grid-template-columns:minmax(104px,1.5fr) 52px 44px 68px 60px 64px 58px 68px 60px;gap:8px;padding:10px 16px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);background:var(--color-neutral-100);border-bottom:1px solid var(--color-divider);font-weight:700">
+              <div>Item</div><div style="text-align:right">Begin</div><div style="text-align:right">In</div><div style="text-align:right">Ending</div><div style="text-align:right">Counted</div><div style="text-align:right">Expected</div><div style="text-align:right">Gap</div><div style="text-align:right">Value</div><div style="text-align:right">Check</div>
+            </div>
+            <sc-for list="{{ dayRows }}" as="r" hint-placeholder-count="12">
+              <div style="border-bottom:1px solid var(--color-divider);background:{{ r.bg }};min-width:700px">
+                <div style="display:grid;min-width:0;grid-template-columns:minmax(104px,1.5fr) 52px 44px 68px 60px 64px 58px 68px 60px;gap:8px;align-items:center;padding:8px 16px">
+                  <div style="min-width:0">
+                    <div style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.name }}</div>
+                    <div style="font-size:10.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ r.sku }} · {{ r.unit }}</div>
+                  </div>
+                  <div style="text-align:right;font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ r.beginning }}</div>
+                  <div style="text-align:right;font-size:13px;color:{{ r.recvFg }}">{{ r.received }}</div>
+                  <input value="{{ r.endingVal }}" onChange="{{ r.setEnding }}" disabled="{{ lockEdit }}" style="width:100%;box-sizing:border-box;text-align:right;font-family:var(--font-body);font-weight:600;font-size:13px;font-variant-numeric:tabular-nums;border:1px solid {{ r.editBorder }};border-radius:4px;padding:5px 6px;background:{{ r.editBg }};color:var(--color-text)" style-focus="border-color:var(--color-accent);outline:none">
+                  <div style="text-align:right;font-family:var(--font-body);font-weight:600;font-size:13px">{{ r.usage }}</div>
+                  <div style="text-align:right;font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ r.expected }}</div>
+                  <div style="text-align:right;font-size:13px;font-weight:600;color:{{ r.gapFg }}">{{ r.gap }}</div>
+                  <div style="text-align:right;font-size:12.5px;color:{{ r.gapFg }}">{{ r.gapValue }}</div>
+                  <div style="display:flex;justify-content:flex-end;gap:4px">
+                    <button onClick="{{ r.ok }}" title="Tallies" style="cursor:pointer;width:26px;height:26px;border-radius:4px;border:1px solid {{ r.okBorder }};background:{{ r.okBg }};color:{{ r.okFg }};font-size:13px;font-weight:600;line-height:1;padding:0" style-hover="border-color:var(--color-accent-2-600)">✓</button>
+                    <button onClick="{{ r.flag }}" title="Flag for re-count" style="cursor:pointer;width:26px;height:26px;border-radius:4px;border:1px solid {{ r.flagBorder }};background:{{ r.flagBg }};color:{{ r.flagFg }};font-size:12px;font-weight:600;line-height:1;padding:0" style-hover="border-color:var(--color-accent-600)">⚑</button>
+                  </div>
+                </div>
+                <div style="display:{{ r.noteShow }};padding:0 16px 10px">
+                  <input value="{{ r.note }}" onChange="{{ r.setNote }}" placeholder="Why is this flagged? (e.g. spillage, unrecorded staff drinks, delivery not keyed in)" style="width:100%;box-sizing:border-box;font-family:var(--font-body);font-size:12.5px;border:1px solid var(--color-accent-300);border-radius:4px;padding:6px 8px;background:var(--color-bg);color:var(--color-text)" style-focus="border-color:var(--color-accent);outline:none">
+                </div>
+              </div>
+            </sc-for>
+            <div style="display:{{ dayEmptyShow }};padding:30px;text-align:center;font-size:13.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ dayEmptyText }}</div>
+          </div>
+          <div style="padding:11px 16px;background:var(--color-neutral-100);font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent);line-height:1.5">Expected usage is drawn from the POS recipe for each product sold. Items with no recipe linked show a dash and are left out of the tolerance check.</div>
+        </div>
+
+        <div style="display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(330px,1fr))">
+          <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden;min-width:0">
+            <div style="padding:14px 18px 12px;border-bottom:1px solid var(--color-divider)">
+              <div style="font-family:var(--font-body);font-weight:600;font-size:15px">Sales by item</div>
+              <div style="margin-top:2px;font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ salesSub }}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 46px 80px;gap:8px;padding:10px 16px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);background:var(--color-neutral-100);border-bottom:1px solid var(--color-divider);font-weight:700">
+              <div>Product</div><div style="text-align:right">Qty</div><div style="text-align:right">Amount</div>
+            </div>
+            <sc-for list="{{ salesRows }}" as="s" hint-placeholder-count="10">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) 46px 80px;gap:8px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--color-divider)">
+                <div style="min-width:0">
+                  <div style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.name }}</div>
+                  <div style="font-size:10.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ s.cat }}</div>
+                </div>
+                <div style="text-align:right;font-family:var(--font-body);font-weight:600;font-size:13px">{{ s.qty }}</div>
+                <div style="text-align:right;font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ s.amt }}</div>
+              </div>
+            </sc-for>
+            <div style="display:{{ noSalesShow }};padding:26px;text-align:center;font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">No sales recorded for this date.</div>
+            <div style="display:{{ salesTotalShow }};padding:11px 16px;grid-template-columns:minmax(0,1fr) 46px 80px;gap:8px;background:var(--color-neutral-100)">
+              <div style="font-size:12.5px;font-weight:600">Total</div>
+              <div style="text-align:right;font-size:12.5px;font-weight:600">{{ salesQty }}</div>
+              <div style="text-align:right;font-size:12.5px;font-weight:600">{{ salesAmt }}</div>
+            </div>
+          </div>
+
+          <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:18px;min-width:0;align-self:start">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:15px">Manager sign-off</div>
+            <div style="margin-top:4px;font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent);line-height:1.45">{{ signNote }}</div>
+            <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <button onClick="{{ approveDay }}" disabled="{{ lockEdit }}" style="cursor:pointer;border:1px solid var(--color-accent-2-600);background:var(--color-accent-2-500);color:#fff;font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:4px;padding:10px 8px" style-hover="background:var(--color-accent-2-600)">Approve day</button>
+              <button onClick="{{ flagDay }}" disabled="{{ lockEdit }}" style="cursor:pointer;border:1px solid var(--color-divider);background:transparent;color:var(--color-text);font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:4px;padding:10px 8px" style-hover="background:var(--color-neutral-100)">Return for re-count</button>
+            </div>
+            <div style="display:{{ stampShow }};margin-top:13px;padding-top:13px;border-top:1px solid var(--color-divider);font-size:12.5px;line-height:1.5">
+              <div style="font-weight:600">{{ stampName }}</div>
+              <div style="color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ stampMeta }}</div>
+              <button onClick="{{ reopen }}" style="display:{{ reopenShow }};margin-top:9px;cursor:pointer;border:1px solid var(--color-divider);background:transparent;color:color-mix(in srgb,var(--color-text) 74%,transparent);font-family:var(--font-body);font-size:12px;border-radius:4px;padding:6px 10px" style-hover="background:var(--color-neutral-100);color:var(--color-text)">Reopen review</button>
+            </div>
+            <div style="display:{{ lockNoteShow }};margin-top:12px;font-size:12.5px;color:var(--color-accent-700)">{{ lockNote }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:{{ monthShow }};padding:26px 32px 60px;animation:tin .22s ease both">
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
+        <sc-for list="{{ stats }}" as="s" hint-placeholder-count="3">
+          <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:15px 18px;border-left:3px solid {{ s.rule }}">
+            <div style="font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ s.label }}</div>
+            <div style="margin-top:6px;font-family:var(--font-body);font-weight:600;font-size:{{ s.size }};line-height:1.12;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.value }}</div>
+            <div style="margin-top:4px;font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ s.sub }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:{{ emptyMonthShow }};margin-top:16px;background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:34px;text-align:center;font-size:13.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">No counts were submitted at {{ branch }} in {{ monthLabel }}.</div>
+
+      <div style="display:{{ bodyShow }}">
+
+        <div style="margin-top:20px;background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden;min-width:0">
+          <div style="padding:14px 18px 12px;border-bottom:1px solid var(--color-divider);display:flex;align-items:baseline;gap:10px 14px;flex-wrap:wrap">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:15px">Counted against sales</div>
+            <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ mCountedBy }}</div>
+            <div class="noprint" style="margin-left:auto;display:flex;gap:6px;align-items:center">
+              <button onClick="{{ toggleOff }}" style="cursor:pointer;border:1px solid {{ mOffBorder }};background:{{ mOffBg }};color:{{ mOffFg }};font-family:var(--font-body);font-weight:600;font-size:11.5px;border-radius:4px;padding:5px 10px" style-hover="border-color:var(--color-accent)">{{ mOffLabel }}</button>
+              <button onClick="{{ toggleSort }}" style="cursor:pointer;border:1px solid var(--color-divider);background:transparent;color:color-mix(in srgb,var(--color-text) 74%,transparent);font-family:var(--font-body);font-weight:600;font-size:11.5px;border-radius:4px;padding:5px 10px" style-hover="background:var(--color-neutral-100);color:var(--color-text)">{{ sortLabel }}</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <div style="display:grid;min-width:700px;grid-template-columns:minmax(104px,1.5fr) 52px 44px 68px 60px 64px 58px 68px 60px;gap:8px;padding:10px 16px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);background:var(--color-neutral-100);border-bottom:1px solid var(--color-divider);font-weight:700">
+              <div>Item</div><div style="text-align:right">Begin</div><div style="text-align:right">In</div><div style="text-align:right">Ending</div><div style="text-align:right">Counted</div><div style="text-align:right">Expected</div><div style="text-align:right">Gap</div><div style="text-align:right">Value</div><div style="text-align:right">Check</div>
+            </div>
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="10">
+              <div style="border-bottom:1px solid var(--color-divider);background:{{ r.bg }};min-width:700px">
+                <div onClick="{{ r.open }}" style="display:grid;min-width:0;grid-template-columns:minmax(104px,1.5fr) 52px 44px 68px 60px 64px 58px 68px 60px;gap:8px;align-items:center;padding:8px 16px">
+                  <div style="min-width:0">
+                    <div style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.name }}</div>
+                    <div style="font-size:10.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ r.sku }} · {{ r.unit }} · {{ r.days }}</div>
+                  </div>
+                  <div style="text-align:right;font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ r.beginning }}</div>
+                  <div style="text-align:right;font-size:13px;color:{{ r.recvFg }}">{{ r.received }}</div>
+                  <input value="{{ r.endingVal }}" onChange="{{ r.setEnding }}" disabled="{{ mLockEdit }}" style="width:100%;box-sizing:border-box;text-align:right;font-family:var(--font-body);font-weight:600;font-size:13px;font-variant-numeric:tabular-nums;border:1px solid {{ r.editBorder }};border-radius:4px;padding:5px 6px;background:{{ r.editBg }};color:var(--color-text)" style-focus="border-color:var(--color-accent);outline:none">
+                  <div style="text-align:right;font-family:var(--font-body);font-weight:600;font-size:13px">{{ r.usage }}</div>
+                  <div style="text-align:right;font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ r.expected }}</div>
+                  <div style="text-align:right;font-size:13px;font-weight:600;color:{{ r.gapFg }}">{{ r.gap }}</div>
+                  <div style="text-align:right;font-size:12.5px;color:{{ r.gapFg }}">{{ r.gapValue }}</div>
+                  <div style="display:flex;justify-content:flex-end;gap:4px">
+                    <button onClick="{{ r.ok }}" title="Tallies" style="cursor:pointer;width:26px;height:26px;border-radius:4px;border:1px solid {{ r.okBorder }};background:{{ r.okBg }};color:{{ r.okFg }};font-size:13px;font-weight:600;line-height:1;padding:0" style-hover="border-color:var(--color-accent-2-600)">✓</button>
+                    <button onClick="{{ r.flag }}" title="Flag for re-count" style="cursor:pointer;width:26px;height:26px;border-radius:4px;border:1px solid {{ r.flagBorder }};background:{{ r.flagBg }};color:{{ r.flagFg }};font-size:12px;font-weight:600;line-height:1;padding:0" style-hover="border-color:var(--color-accent-600)">⚑</button>
+                  </div>
+                </div>
+                <div style="display:{{ r.noteShow }};padding:0 16px 10px">
+                  <input value="{{ r.note }}" onChange="{{ r.setNote }}" placeholder="Why is this flagged? (e.g. spillage, unrecorded staff drinks, delivery not keyed in)" style="width:100%;box-sizing:border-box;font-family:var(--font-body);font-size:12.5px;border:1px solid var(--color-accent-300);border-radius:4px;padding:6px 8px;background:var(--color-bg);color:var(--color-text)" style-focus="border-color:var(--color-accent);outline:none">
+                </div>
+              </div>
+            </sc-for>
+            <div style="display:{{ emptyShow }};padding:30px;text-align:center;font-size:13.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ monEmptyText }}</div>
+          </div>
+          <div style="padding:11px 16px;background:var(--color-neutral-100);font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent);line-height:1.5">Beginning is the last ending counted before {{ monthLabel }}. Expected usage covers every sale in the month.</div>
+        </div>
+
+        <div style="margin-top:18px;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(330px,1fr))">
+          <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden;min-width:0">
+            <div style="padding:14px 18px 12px;border-bottom:1px solid var(--color-divider)">
+              <div style="font-family:var(--font-body);font-weight:600;font-size:15px">Sales by item</div>
+              <div style="margin-top:2px;font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ mSalesSub }}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 46px 90px;gap:8px;padding:10px 16px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);background:var(--color-neutral-100);border-bottom:1px solid var(--color-divider);font-weight:700">
+              <div>Product</div><div style="text-align:right">Qty</div><div style="text-align:right">Amount</div>
+            </div>
+            <sc-for list="{{ mSalesRows }}" as="s" hint-placeholder-count="10">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) 46px 90px;gap:8px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--color-divider)">
+                <div style="min-width:0">
+                  <div style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.name }}</div>
+                  <div style="font-size:10.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ s.cat }}</div>
+                </div>
+                <div style="text-align:right;font-family:var(--font-body);font-weight:600;font-size:13px">{{ s.qty }}</div>
+                <div style="text-align:right;font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ s.amt }}</div>
+              </div>
+            </sc-for>
+            <div style="display:{{ mNoSalesShow }};padding:26px;text-align:center;font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">No sales recorded this month.</div>
+            <div style="display:{{ mSalesTotalShow }};padding:11px 16px;grid-template-columns:minmax(0,1fr) 46px 90px;gap:8px;background:var(--color-neutral-100)">
+              <div style="font-size:12.5px;font-weight:600">Total</div>
+              <div style="text-align:right;font-size:12.5px;font-weight:600">{{ mSalesQty }}</div>
+              <div style="text-align:right;font-size:12.5px;font-weight:600">{{ mSalesAmt }}</div>
+            </div>
+          </div>
+
+          <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:18px;min-width:0;align-self:start">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:15px">Manager sign-off</div>
+            <div style="margin-top:4px;font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent);line-height:1.45">{{ mSignNote }}</div>
+            <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <button onClick="{{ mApprove }}" disabled="{{ mLockEdit }}" style="cursor:pointer;border:1px solid var(--color-accent-2-600);background:var(--color-accent-2-500);color:#fff;font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:4px;padding:10px 8px" style-hover="background:var(--color-accent-2-600)">Approve month</button>
+              <button onClick="{{ mFlagMonth }}" disabled="{{ mLockEdit }}" style="cursor:pointer;border:1px solid var(--color-divider);background:transparent;color:var(--color-text);font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:4px;padding:10px 8px" style-hover="background:var(--color-neutral-100)">Return for re-count</button>
+            </div>
+            <div style="display:{{ mStampShow }};margin-top:13px;padding-top:13px;border-top:1px solid var(--color-divider);font-size:12.5px;line-height:1.5">
+              <div style="font-weight:600">{{ mStampName }}</div>
+              <div style="color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ mStampMeta }}</div>
+              <button onClick="{{ mReopen }}" style="display:{{ mReopenShow }};margin-top:9px;cursor:pointer;border:1px solid var(--color-divider);background:transparent;color:color-mix(in srgb,var(--color-text) 74%,transparent);font-family:var(--font-body);font-size:12px;border-radius:4px;padding:6px 10px" style-hover="background:var(--color-neutral-100);color:var(--color-text)">Reopen review</button>
+            </div>
+            <div style="display:{{ mLockNoteShow }};margin-top:12px;font-size:12.5px;color:var(--color-accent-700)">{{ lockNote }}</div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:20px 22px 22px">
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:15px">{{ chartTitle }}</div>
+            <div style="font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ chartSub }}</div>
+          </div>
+          <div style="margin-top:18px;display:flex;align-items:flex-end;gap:8px;height:150px;overflow-x:auto;padding-bottom:2px">
+            <sc-for list="{{ chartBars }}" as="c" hint-placeholder-count="8">
+              <div style="flex:1 0 34px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:6px">
+                <div style="font-size:11px;font-variant-numeric:tabular-nums;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ c.value }}</div>
+                <div style="width:100%;border-radius:3px 3px 0 0;background:{{ c.fill }};height:{{ c.h }}"></div>
+                <div style="font-size:10.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ c.day }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:{{ recvNoteShow }};margin-top:12px;font-size:12px;color:var(--color-accent-2-800)">{{ recvNote }}</div>
+        </div>
+
+        <div style="margin-top:18px;background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow-x:auto">
+          <div style="display:grid;min-width:470px;grid-template-columns:minmax(80px,1fr) minmax(92px,1.1fr) 60px 84px 88px;gap:10px;padding:12px 18px;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);background:var(--color-neutral-100);font-weight:700;font-family:var(--font-body)">
+            <div>Date</div><div>Submitted by</div><div style="text-align:right">Items</div><div style="text-align:right">Received</div><div style="text-align:right">Review</div>
+          </div>
+          <sc-for list="{{ monthDayRows }}" as="d" hint-placeholder-count="4">
+            <div onClick="{{ d.open }}" role="button" style="display:grid;min-width:470px;grid-template-columns:minmax(80px,1fr) minmax(92px,1.1fr) 60px 84px 88px;gap:10px;align-items:center;padding:13px 18px;border-top:1px solid var(--color-divider);cursor:pointer" style-hover="background:var(--color-neutral-100)">
+              <div style="font-size:13.5px">{{ d.date }}</div>
+              <div style="font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ d.by }}</div>
+              <div style="text-align:right;font-size:13px">{{ d.items }}</div>
+              <div style="text-align:right;font-size:13px;color:{{ d.recvFg }}">{{ d.recv }}</div>
+              <div style="text-align:right;font-size:12.5px;font-weight:600;color:{{ d.revFg }}">{{ d.rev }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ logoutOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(32,30,29,.42);display:flex;align-items:center;justify-content:center;z-index:60;padding:24px" onClick="{{ cancelLogout }}">
+  <div onClick="{{ stopLogout }}" style="width:100%;max-width:380px;background:var(--color-surface);border-radius:var(--radius-md);padding:26px;box-shadow:var(--shadow-lg)">
+    <h3 style="margin:0 0 6px;font-size:18px">Exit?</h3>
+    <p style="margin:0 0 22px;font-size:13.5px;line-height:1.55;color:color-mix(in srgb,var(--color-text) 74%,transparent)">You'll go back to the workspace picker. You stay signed in.</p>
+    <div style="display:flex;gap:10px">
+      <button onClick="{{ cancelLogout }}" style="flex:1;border:1px solid var(--color-divider);background:var(--color-bg);cursor:pointer;border-radius:4px;padding:11px;font-family:var(--font-body);font-size:13.5px">Stay here</button>
+      <button onClick="{{ confirmLogout }}" style="flex:1;border:0;cursor:pointer;background:var(--color-accent);color:var(--color-neutral-100);border-radius:4px;padding:11px;font-family:var(--font-body);font-weight:600;font-size:13.5px">Exit</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1366,&quot;height&quot;:860}}">
+const SESSION = () => { try { return JSON.parse(localStorage.getItem("dmz.session") || "null"); } catch (e) { return null; } };
+const GOHOME = () => { try { location.replace("D-Mezzanine%20Landing.dc.html"); } catch (e) {} };
+const PERM_DEFAULTS = {
+  Owner: { pos: 1, inventory: 1, owner: 1, sales: 1, count: 1 },
+  Warehouse: { pos: 0, inventory: 1, owner: 0, sales: 0, count: 0 },
+  Commissary: { pos: 0, inventory: 1, owner: 0, sales: 0, count: 0 },
+  "Branch lead": { pos: 1, inventory: 0, owner: 0, sales: 1, count: 1 },
+  Cashier: { pos: 1, inventory: 0, owner: 0, sales: 0, count: 0 }
+};
+const CAN = (u, page) => {
+  if (!u) return false;
+  if (u.role === "Owner") return true;
+  let over = {};
+  try { over = (JSON.parse(localStorage.getItem("dmz.perms") || "{}") || {})[String(u.email || "").toLowerCase()] || {}; } catch (e) {}
+  return !!Object.assign({}, PERM_DEFAULTS[u.role] || PERM_DEFAULTS.Cashier, over)[page];
+};
+// only the manager on duty signs off — cashiers and warehouse read only
+const CAN_SIGN = (u) => !!u && (u.role === "Owner" || u.role === "Branch lead");
+
+const BRANCHES = (() => {
+  try {
+    const b = JSON.parse(localStorage.getItem("dmz.branches") || "null");
+    if (b && b.length) {
+      const names = b.filter(x => !x.kind || /branch|cafe|caf\u00e9|store/i.test(x.kind)).map(x => x.name);
+      if (names.length) return names;
+    }
+  } catch (e) {}
+  return ["DMC-Iriga Branch", "DMC-Naga Branch"];
+})();
+const ALL_BRANCH = (u) => !!u && (u.role === "Owner" || u.loc === "All locations");
+const BRANCH_FOR = (u) => {
+  if (!u) return BRANCHES[0];
+  return BRANCHES.indexOf(u.loc) >= 0 ? u.loc : BRANCHES[0];
+};
+const NORM = s => String(s || "").toLowerCase().replace(/[^a-z]/g, "");
+
+// one-time move from branch-local codes to warehouse SKUs; existing counts, reviews and
+// approvals are rewritten in place so nothing on record is orphaned
+const SKU_WAS = {"BAR-BEAN":"WH-COF-001","BAR-MILK":"WH-DRY-011","BAR-OAT":"WH-DRY-018","BAR-MAT":"WH-DRY-024","BAR-CAR":"WH-SYR-002","BAR-VAN":"WH-SYR-003","KIT-RICE":"WH-KIT-020","KIT-PORK":"WH-KIT-022","KIT-CHIK":"WH-KIT-024","KIT-EGG":"WH-KIT-031","KIT-OIL":"WH-KIT-040","PST-CRO":"WH-PST-001","PST-CIN":"WH-PST-004","PST-BAN":"WH-PST-007","PST-UBE":"WH-PST-011","DRY-SUG":"WH-DRY-002","DRY-FLR":"WH-BAK-003","DRY-COC":"WH-BAK-009","DRY-CON":"WH-DRY-014","CHL-CRM":"WH-DRY-027","CHL-TAP":"WH-CHL-002","CHL-TOC":"WH-CHL-004","CHL-ICE":"WH-CHL-010","STK-CUP":"WH-PKG-021","STK-LID":"WH-PKG-022","STK-BAG":"WH-PKG-030","STK-STR":"WH-PKG-035","STK-NAP":"WH-PKG-038"};
+const MIGRATE_SKUS = () => {
+  try {
+    if (localStorage.getItem("dmz.skus") === "wh") return;
+    const keys = o => {
+      if (!o || typeof o !== "object") return o;
+      const out = {};
+      Object.keys(o).forEach(k => { out[SKU_WAS[k] || k] = o[k]; });
+      return out;
+    };
+    const counts = JSON.parse(localStorage.getItem("dmz.counts") || "null");
+    if (counts && counts.counts) {
+      Object.keys(counts.counts).forEach(k => { counts.counts[k] = keys(counts.counts[k]); });
+      localStorage.setItem("dmz.counts", JSON.stringify(counts));
+    }
+    const review = JSON.parse(localStorage.getItem("dmz.review") || "null");
+    if (review) {
+      Object.keys(review).forEach(k => {
+        const r = review[k];
+        if (!r) return;
+        ["ending", "marks", "notes"].forEach(f => { if (r[f]) r[f] = keys(r[f]); });
+      });
+      localStorage.setItem("dmz.review", JSON.stringify(review));
+    }
+    const onhand = JSON.parse(localStorage.getItem("dmz.onhand") || "null");
+    if (onhand) {
+      Object.keys(onhand).forEach(b => { onhand[b] = keys(onhand[b]); });
+      localStorage.setItem("dmz.onhand", JSON.stringify(onhand));
+    }
+    const recv = JSON.parse(localStorage.getItem("dmz.received") || "null");
+    if (recv) {
+      Object.keys(recv).forEach(k => { recv[k] = keys(recv[k]); });
+      localStorage.setItem("dmz.received", JSON.stringify(recv));
+    }
+    const roster = JSON.parse(localStorage.getItem("dmz.items") || "null");
+    if (roster) {
+      Object.keys(roster).forEach(b => { roster[b] = (roster[b] || []).map(s => SKU_WAS[s] || s); });
+      localStorage.setItem("dmz.items", JSON.stringify(roster));
+    }
+    localStorage.setItem("dmz.skus", "wh");
+  } catch (e) {}
+};
+MIGRATE_SKUS();
+
+const MONTH = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_FULL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const PESO = n => "\u20b1" + Math.round(n || 0).toLocaleString("en-PH");
+
+// sku, name, unit, standing level, unit cost (demo figures — real prices still outstanding)
+// unit cost is the warehouse figure — Branch Menu STOCK0 and Inventory carry the same numbers
+const ITEMS = [
+  ["WH-COF-001", "Arabica beans, house blend", "kg", 6.4, 620, "BAR"],
+  ["WH-DRY-011", "Fresh milk", "L", 18, 92, "BAR"],
+  ["WH-DRY-018", "Oat milk", "L", 6, 165, "BAR"],
+  ["WH-DRY-024", "Matcha powder", "g", 620, 4.2, "BAR"],
+  ["WH-SYR-002", "Caramel syrup", "btl", 3, 240, "BAR"],
+  ["WH-SYR-003", "Vanilla syrup", "btl", 2, 240, "BAR"],
+  ["WH-KIT-020", "Jasmine rice", "kg", 18, 62, "KIT"],
+  ["WH-KIT-022", "Pork belly", "kg", 5.5, 380, "KIT"],
+  ["WH-KIT-024", "Chicken thigh", "kg", 7, 210, "KIT"],
+  ["WH-KIT-031", "Eggs", "tray", 4, 245, "KIT"],
+  ["WH-KIT-040", "Cooking oil", "L", 9, 135, "KIT"],
+  ["WH-PST-001", "Butter croissant", "pc", 14, 38, "PST"],
+  ["WH-PST-004", "Cinnamon roll", "pc", 10, 42, "PST"],
+  ["WH-PST-007", "Banana bread", "slice", 12, 30, "PST"],
+  ["WH-PST-011", "Ube cheese pandesal", "pack", 8, 75, "PST"],
+  ["WH-DRY-002", "Refined sugar", "kg", 12, 78, "DRY"],
+  ["WH-BAK-003", "Bread flour", "kg", 25, 55, "DRY"],
+  ["WH-BAK-009", "Cocoa powder", "kg", 3.2, 520, "DRY"],
+  ["WH-DRY-014", "Condensed milk", "can", 16, 68, "DRY"],
+  ["WH-DRY-027", "Whipping cream", "L", 5, 320, "CHL"],
+  ["WH-CHL-002", "Beef tapa, marinated", "kg", 4.2, 380, "CHL"],
+  ["WH-CHL-004", "Tocino, marinated", "kg", 3.6, 340, "CHL"],
+  ["WH-CHL-010", "Ice", "kg", 20, 12, "CHL"],
+  ["WH-PKG-021", "Paper cups, 16oz", "pc", 320, 6.5, "STK"],
+  ["WH-PKG-022", "Dome lids, 16oz", "pc", 180, 3.2, "STK"],
+  ["WH-PKG-030", "Kraft carrier bags", "pack", 6, 145, "STK"],
+  ["WH-PKG-035", "Paper straws", "pack", 9, 120, "STK"],
+  ["WH-PKG-038", "Napkins", "pack", 14, 85, "STK"]
+].slice().sort((a, b) => a[1].localeCompare(b[1]));
+const BASE = {}; const COST = {};
+ITEMS.forEach(i => { BASE[i[0]] = i[3]; COST[i[0]] = i[4]; });
+
+// what each branch actually holds — the count sheet only ever offers these
+const RKEY = s => String(s || "").toLowerCase().replace(/[^a-z]/g, "");
+// branches that do not carry the full list (no in-house baking, no oat milk at Naga)
+const ROSTER_EXCLUDE = { "dmcnagabranch": ["WH-DRY-018", "WH-BAK-003"] };
+const ROSTER = (branch) => {
+  try {
+    const saved = JSON.parse(localStorage.getItem("dmz.items") || "null");
+    if (saved) {
+      const k = Object.keys(saved).find(x => RKEY(x) === RKEY(branch));
+      if (k && saved[k] && saved[k].length) return saved[k];
+    }
+  } catch (e) {}
+  const drop = ROSTER_EXCLUDE[RKEY(branch)] || [];
+  return ITEMS.map(i => i[0]).filter(s => drop.indexOf(s) < 0);
+};
+const ITEMS_AT = (branch) => { const keep = ROSTER(branch); return ITEMS.filter(i => keep.indexOf(i[0]) >= 0); };
+
+
+// bill of materials: what one unit of each POS product draws from stock
+const RECIPE = {
+  "Americano": { "WH-COF-001": 0.018, "WH-PKG-021": 1, "WH-PKG-022": 1 },
+  "Espresso": { "WH-COF-001": 0.018 },
+  "Cafe Latte": { "WH-COF-001": 0.018, "WH-DRY-011": 0.18, "WH-PKG-021": 1, "WH-PKG-022": 1 },
+  "Cappuccino": { "WH-COF-001": 0.018, "WH-DRY-011": 0.15, "WH-PKG-021": 1, "WH-PKG-022": 1 },
+  "Spanish Latte": { "WH-COF-001": 0.018, "WH-DRY-011": 0.15, "WH-DRY-014": 0.08, "WH-SYR-003": 0.004, "WH-PKG-021": 1, "WH-PKG-022": 1 },
+  "Cafe Mocha": { "WH-COF-001": 0.018, "WH-DRY-011": 0.15, "WH-BAK-009": 0.012, "WH-PKG-021": 1, "WH-PKG-022": 1 },
+  "Matcha Latte": { "WH-DRY-024": 4, "WH-DRY-011": 0.18, "WH-PKG-021": 1, "WH-PKG-022": 1, "WH-PKG-035": 0.02 },
+  "Hot Chocolate": { "WH-BAK-009": 0.018, "WH-DRY-011": 0.2, "WH-DRY-002": 0.015 },
+  "Strawberry Milk": { "WH-DRY-011": 0.2, "WH-DRY-002": 0.02, "WH-PKG-021": 1, "WH-PKG-022": 1, "WH-PKG-035": 0.02 },
+  "Lemon Iced Tea": { "WH-DRY-002": 0.03, "WH-CHL-010": 0.15, "WH-PKG-021": 1, "WH-PKG-022": 1, "WH-PKG-035": 0.02 },
+  "Java Chip": { "WH-COF-001": 0.018, "WH-DRY-011": 0.12, "WH-BAK-009": 0.01, "WH-DRY-027": 0.03, "WH-CHL-010": 0.25, "WH-PKG-021": 1, "WH-PKG-022": 1, "WH-PKG-035": 0.02 },
+  "Caramel Frappe": { "WH-COF-001": 0.018, "WH-DRY-011": 0.12, "WH-SYR-002": 0.02, "WH-DRY-027": 0.03, "WH-CHL-010": 0.25, "WH-PKG-021": 1, "WH-PKG-022": 1, "WH-PKG-035": 0.02 },
+  "Matcha Frappe": { "WH-DRY-024": 5, "WH-DRY-011": 0.12, "WH-DRY-027": 0.03, "WH-CHL-010": 0.25, "WH-PKG-021": 1, "WH-PKG-022": 1, "WH-PKG-035": 0.02 },
+  "Butter Croissant": { "WH-PST-001": 1, "WH-PKG-038": 0.02 },
+  "Cinnamon Roll": { "WH-PST-004": 1, "WH-PKG-038": 0.02 },
+  "Banana Bread": { "WH-PST-007": 1, "WH-PKG-038": 0.02 },
+  "Ube Cheese Pandesal": { "WH-PST-011": 0.5, "WH-PKG-038": 0.02 },
+  "Chicken Adobo Rice": { "WH-KIT-024": 0.18, "WH-KIT-020": 0.2, "WH-KIT-040": 0.02, "WH-KIT-031": 0.05, "WH-PKG-030": 0.05, "WH-PKG-038": 0.03 },
+  "Beef Tapa Rice": { "WH-CHL-002": 0.15, "WH-KIT-020": 0.2, "WH-KIT-040": 0.02, "WH-KIT-031": 0.05, "WH-PKG-030": 0.05, "WH-PKG-038": 0.03 },
+  "Pork Sisig Rice": { "WH-KIT-022": 0.16, "WH-KIT-020": 0.2, "WH-KIT-040": 0.03, "WH-KIT-031": 0.05, "WH-PKG-030": 0.05, "WH-PKG-038": 0.03 },
+  "Tocino Rice": { "WH-CHL-004": 0.15, "WH-KIT-020": 0.2, "WH-KIT-040": 0.02, "WH-KIT-031": 0.05, "WH-PKG-030": 0.05, "WH-PKG-038": 0.03 }
+};
+const TOL = 0.05; // an item is off tolerance past 5% of expected usage
+// demo only: items that habitually run over what sales explain — melt, spillage, over-issue, waste
+const LEAKY = { "WH-CHL-010": 0.34, "WH-PST-001": 0.19, "WH-DRY-011": 0.13, "WH-KIT-022": 0.11, "WH-PKG-021": 0.08 };
+
+// the POS catalogue, mirrored from the Sales page so its seeded figures match
+const CATALOG = [
+  ["Americano", "Espresso", 110], ["Espresso", "Espresso", 95], ["Cafe Latte", "Espresso", 140],
+  ["Cappuccino", "Espresso", 140], ["Spanish Latte", "Espresso", 155], ["Cafe Mocha", "Espresso", 160],
+  ["Matcha Latte", "Non-Coffee", 165], ["Hot Chocolate", "Non-Coffee", 130], ["Strawberry Milk", "Non-Coffee", 145],
+  ["Lemon Iced Tea", "Non-Coffee", 95], ["Java Chip", "Frappe", 175], ["Caramel Frappe", "Frappe", 170],
+  ["Matcha Frappe", "Frappe", 180], ["Butter Croissant", "Pastries", 95], ["Cinnamon Roll", "Pastries", 105],
+  ["Banana Bread", "Pastries", 85], ["Ube Cheese Pandesal", "Pastries", 90], ["Chicken Adobo Rice", "Rice Meals", 185],
+  ["Beef Tapa Rice", "Rice Meals", 195], ["Pork Sisig Rice", "Rice Meals", 205], ["Tocino Rice", "Rice Meals", 175]
+];
+const SALES_BRANCHES = ["DMC-Iriga Branch", "DMC Naga Branch"];
+const METHODS = [["Cash", 0.52], ["E-wallet", 0.26], ["Card", 0.18], ["Split", 0.04]];
+const r2 = n => Math.round(n * 100) / 100;
+
+function seededSales() {
+  let s = 20260831;
+  const rnd = () => { s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; };
+  const out = [];
+  const now = new Date();
+  for (let back = 0; back < 45; back++) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - back);
+    const weekend = d.getDay() === 0 || d.getDay() === 6;
+    const tx = Math.round((weekend ? 62 : 44) + rnd() * 18) - (back === 0 ? 26 : 0);
+    for (let i = 0; i < Math.max(4, tx); i++) {
+      const lines = [];
+      const n = 1 + Math.floor(rnd() * 3);
+      for (let k = 0; k < n; k++) {
+        const c = CATALOG[Math.floor(rnd() * CATALOG.length)];
+        const qty = rnd() > 0.82 ? 2 : 1;
+        lines.push({ name: c[0], cat: c[1], qty: qty, total: c[2] * qty });
+      }
+      const gross = lines.reduce((a, l) => a + l.total, 0);
+      const senior = rnd() > 0.93;
+      const net = r2(gross / 1.12);
+      const vat = r2(gross - net);
+      const disc = senior ? r2(net * 0.2) : 0;
+      let m = rnd(), pick = METHODS[0][0], acc = 0;
+      for (let j = 0; j < METHODS.length; j++) { acc += METHODS[j][1]; if (m <= acc) { pick = METHODS[j][0]; break; } }
+      out.push({
+        ts: d.getTime() + (8 + Math.floor(rnd() * 12)) * 3600000,
+        branch: rnd() > 0.34 ? SALES_BRANCHES[0] : SALES_BRANCHES[1],
+        gross: gross, net: net, vat: senior ? 0 : vat, vatOff: senior ? vat : 0,
+        disc: disc, senior: senior, total: senior ? r2(net - disc) : gross,
+        method: pick, lines: lines
+      });
+    }
+  }
+  return out;
+}
+
+const pad = n => String(n).padStart(2, "0");
+const dayKey = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const monthOf = k => k.slice(0, 7);
+const prettyDay = k => { const p = k.split("-"); return MONTH[+p[1] - 1] + " " + (+p[2]); };
+const longDay = k => { const p = k.split("-"); return MONTH_FULL[+p[1] - 1] + " " + (+p[2]) + ", " + p[0]; };
+const prettyMonth = k => { const p = k.split("-"); return MONTH_FULL[+p[1] - 1] + " " + p[0]; };
+const num = v => { const n = parseFloat(String(v).replace(/[^0-9.\-]/g, "")); return isNaN(n) ? null : n; };
+const trim = n => String(Math.round(n * 100) / 100);
+const signed = n => (n > 0 ? "+" : "") + trim(n);
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const seeded = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 100000; return (h % 1000) / 1000; };
+
+class Component extends DCLogic {
+  state = {
+    me: SESSION(), pick: BRANCH_FOR(SESSION()), tab: "day", day: null,
+    month: monthOf(dayKey(new Date())), query: "", sel: null,
+    sort: "gap", offOnly: false,
+    counts: {}, submitted: {}, received: {}, review: {}
+  };
+
+  _sales = seededSales();
+
+  componentDidMount() {
+    const s = SESSION();
+    if (!s || !CAN(s, "count")) return GOHOME();
+    let counts = {}, submitted = {}, received = {}, review = {};
+    try {
+      const raw = JSON.parse(localStorage.getItem("dmz.counts") || "null");
+      if (raw) { submitted = raw.submitted || {}; counts = raw.counts || {}; }
+    } catch (e) {}
+    try { received = JSON.parse(localStorage.getItem("dmz.received") || "null") || {}; } catch (e) {}
+    try { review = JSON.parse(localStorage.getItem("dmz.review") || "null") || {}; } catch (e) {}
+    try { this._live = JSON.parse(localStorage.getItem("dmz.sales") || "[]"); } catch (e) { this._live = []; }
+    const seed = this.seedDemo(submitted, counts, received);
+    this.setState({ submitted: seed.submitted, counts: seed.counts, received: seed.received, review: review });
+    this._iv = setInterval(() => {
+      try {
+        const raw = JSON.parse(localStorage.getItem("dmz.sales") || "[]");
+        if (raw.length !== (this._live || []).length) { this._live = raw; this.forceUpdate(); }
+      } catch (e) {}
+    }, 4000);
+  }
+  componentWillUnmount() { clearInterval(this._iv); }
+
+  saveReview(next) {
+    this.setState({ review: next });
+    try { localStorage.setItem("dmz.review", JSON.stringify(next)); } catch (e) {}
+  }
+  patch(key, fn) {
+    const all = Object.assign({}, this.state.review);
+    const cur = Object.assign({ ending: {}, marks: {}, notes: {} }, all[key] || {});
+    cur.ending = Object.assign({}, cur.ending);
+    cur.marks = Object.assign({}, cur.marks);
+    cur.notes = Object.assign({}, cur.notes);
+    fn(cur);
+    all[key] = cur;
+    this.saveReview(all);
+  }
+
+  // expected consumption from the POS: every sold line exploded through its recipe
+  expectedUse(branch, test) {
+    const all = (this._sales || []).concat(this._live || []);
+    const nb = NORM(branch);
+    const out = {};
+    all.forEach(r => {
+      if (NORM(r.branch) !== nb) return;
+      if (!test(r.ts)) return;
+      (r.lines || []).forEach(l => {
+        const rc = RECIPE[l.name];
+        if (!rc) return;
+        Object.keys(rc).forEach(sku => { out[sku] = (out[sku] || 0) + rc[sku] * l.qty; });
+      });
+    });
+    Object.keys(out).forEach(k => { out[k] = Math.round(out[k] * 1000) / 1000; });
+    return out;
+  }
+  expectedDay(branch, day) { return this.expectedUse(branch, ts => dayKey(new Date(ts)) === day); }
+  expectedMonth(branch, month) { return this.expectedUse(branch, ts => monthOf(dayKey(new Date(ts))) === month); }
+
+  // a branch with no history at all gets a readable demo month; real data is never touched.
+  // seeded endings are derived from what sales say should have been used, so variances mean something.
+  seedDemo(submitted, counts, received) {
+    const today = new Date();
+    const mk = monthOf(dayKey(today));
+    const sub = Object.assign({}, submitted), cnt = Object.assign({}, counts), rec = Object.assign({}, received);
+    const by = ["Joy Bermudo", "Paolo Rivas"];
+    BRANCHES.forEach(branch => {
+      const own = Object.keys(submitted).filter(k => submitted[k].branch === branch && monthOf(submitted[k].day || "") === mk);
+      if (own.length > 4) return;
+      const bItems = ITEMS_AT(branch);
+      const dk = d => today.getFullYear() + "-" + pad(today.getMonth() + 1) + "-" + pad(d);
+      // chain off whatever is actually on record — including real counts already submitted
+      const lastEnd = (upto, sku) => {
+        for (let i = upto; i >= 1; i--) {
+          const v = num((cnt[branch + "|" + dk(i)] || {})[sku]);
+          if (v != null) return v;
+        }
+        return BASE[sku];
+      };
+      const start = Math.max(1, today.getDate() - 13);
+      for (let d = start; d <= today.getDate(); d++) {
+        const day = dk(d);
+        const key = branch + "|" + day;
+        if (day === dayKey(today) || sub[key]) continue;
+        const exp = this.expectedDay(branch, day);
+        const sheet = {};
+        const recvDay = {};
+        const delivery = d % 3 === 0;
+        bItems.forEach(i => {
+          const sku = i[0], base = i[3];
+          const begin = lastEnd(d - 1, sku);
+          // most items track sales within a couple of percent; a handful drift wide
+          const drift = (LEAKY[sku] || 0) + (seeded(sku + day + branch) - 0.5) * 0.05;
+          const want = exp[sku] != null ? exp[sku] : base * (0.05 + seeded(sku + day) * 0.06);
+          const used = Math.max(0, want * (1 + drift));
+          let inQty = delivery && seeded(sku + day) > 0.45 ? Math.round(base * 0.45 * 100) / 100 : 0;
+          // top up rather than run the shelf negative — and book it as a delivery, never silently
+          if (begin + inQty - used < base * 0.2) inQty = Math.round((inQty + base * 0.6) * 100) / 100;
+          if (inQty) recvDay[sku] = inQty;
+          sheet[sku] = trim(Math.max(0, begin + inQty - used));
+        });
+        cnt[key] = sheet;
+        sub[key] = { by: by[d % 2], at: (d % 2 ? "9:41 PM" : "10:06 PM"), counted: bItems.length, vars: 0, branch: branch, day: day };
+        if (Object.keys(recvDay).length) rec[key] = recvDay;
+      }
+    });
+    return { submitted: sub, counts: cnt, received: rec };
+  }
+
+  initials = n => n.split(" ").map(w => w[0]).join("").slice(0, 2);
+
+  // the figure that stands for a day: the manager's corrected ending if there is one, else the count
+  endingOn(branch, day, sku) {
+    const rev = this.state.review[branch + "|" + day] || {};
+    if (rev.ending && rev.ending[sku] != null) {
+      const v = num(rev.ending[sku]);
+      if (v != null) return v;
+    }
+    return num((this.state.counts[branch + "|" + day] || {})[sku]);
+  }
+
+  // the last ending recorded for this sku before `idx`, walking back through every prior
+  // count day — not just the immediately preceding one. Falls back to the standing level.
+  priorEnd(branch, dayList, idx, sku) {
+    for (let i = idx - 1; i >= 0; i--) {
+      const v = this.endingOn(branch, dayList[i], sku);
+      if (v != null) return v;
+    }
+    return BASE[sku] != null ? BASE[sku] : null;
+  }
+
+  // approving a day publishes its endings as the branch's on-hand stock
+  pushOnHand(branch, day, rows, me, at) {
+    let all = {};
+    try { all = JSON.parse(localStorage.getItem("dmz.onhand") || "{}") || {}; } catch (e) {}
+    const cur = Object.assign({}, all[branch] || {});
+    rows.forEach(r => {
+      if (r.ending == null) return;
+      if (cur[r.sku] && cur[r.sku].day > day) return; // never walk a newer approved figure backwards
+      cur[r.sku] = { qty: r.ending, day: day, by: me ? me.name : "", at: at };
+    });
+    all[branch] = cur;
+    try { localStorage.setItem("dmz.onhand", JSON.stringify(all)); } catch (e) {}
+  }
+
+  salesAgg(branch, test) {
+    const all = (this._sales || []).concat(this._live || []);
+    const nb = NORM(branch);
+    const agg = {};
+    let qty = 0, amt = 0;
+    all.forEach(r => {
+      if (NORM(r.branch) !== nb) return;
+      if (!test(r.ts)) return;
+      (r.lines || []).forEach(l => {
+        const it = agg[l.name] = agg[l.name] || { name: l.name, cat: l.cat, qty: 0, amt: 0 };
+        it.qty += l.qty; it.amt += l.total; qty += l.qty; amt += l.total;
+      });
+    });
+    return { rows: Object.keys(agg).map(k => agg[k]).sort((a, b) => b.qty - a.qty), qty: qty, amt: amt };
+  }
+
+  // one row per counted item: what the shelf says, what the till says, and the gap
+  reconcile(raw, rev, exp) {
+    return raw.map(p => {
+      const ov = rev.ending && rev.ending[p.sku] != null ? num(rev.ending[p.sku]) : null;
+      const ending = ov != null ? ov : p.submittedEnd;
+      const usage = p.beginning == null || ending == null ? null : Math.round((p.beginning + p.inQty - ending) * 100) / 100;
+      const expected = exp[p.sku] != null ? Math.round(exp[p.sku] * 100) / 100 : null;
+      const gap = usage == null || expected == null ? null : Math.round((usage - expected) * 100) / 100;
+      const pct = gap == null || !expected ? null : gap / expected;
+      return Object.assign({}, p, {
+        ending: ending,
+        raw: ov != null ? String(rev.ending[p.sku]) : (p.submittedEnd == null ? "" : trim(p.submittedEnd)),
+        edited: ov != null && Math.round((ov - p.submittedEnd) * 100) / 100 !== 0,
+        usage: usage, expected: expected, gap: gap, pct: pct,
+        value: gap == null ? null : gap * (COST[p.sku] || 0),
+        off: pct != null && Math.abs(pct) > TOL,
+        mark: rev.marks ? rev.marks[p.sku] : null,
+        note: (rev.notes && rev.notes[p.sku]) || ""
+      });
+    });
+  }
+
+  order(rows, sort) {
+    const r = rows.slice();
+    if (sort === "gap") r.sort((a, b) => Math.abs(b.value || 0) - Math.abs(a.value || 0) || a.name.localeCompare(b.name));
+    else r.sort((a, b) => a.name.localeCompare(b.name));
+    return r;
+  }
+
+  rowVals(rows, key, lock, DIM) {
+    return rows.map(r => ({
+      sku: r.sku, name: r.name, unit: r.unit, days: r.days,
+      beginning: r.beginning == null ? "\u2014" : trim(r.beginning),
+      received: r.inQty ? "+" + trim(r.inQty) : "\u2014",
+      recvFg: r.inQty ? "var(--color-accent-2-800)" : DIM,
+      endingVal: r.raw,
+      editBg: r.edited ? "var(--color-accent-100)" : "var(--color-bg)",
+      editBorder: r.edited ? "var(--color-accent-400)" : "var(--color-divider)",
+      setEnding: e => { const v = e.target.value; this.patch(key, c => { if (String(v).trim() === "") delete c.ending[r.sku]; else c.ending[r.sku] = v; }); },
+      usage: r.usage == null ? "\u2014" : trim(r.usage),
+      expected: r.expected == null ? "\u2014" : trim(r.expected),
+      gap: r.gap == null ? "\u2014" : signed(r.gap),
+      gapValue: r.value == null || Math.round(r.value) === 0 ? "\u2014" : (r.value > 0 ? "\u2212" : "+") + PESO(Math.abs(r.value)),
+      gapFg: r.off ? "var(--color-accent-800)" : DIM,
+      bg: r.mark === "flag" ? "var(--color-accent-100)" : r.mark === "ok" ? "var(--color-accent-2-100)" : r.off ? "color-mix(in srgb,var(--color-accent-100) 45%,transparent)" : "transparent",
+      okBg: r.mark === "ok" ? "var(--color-accent-2-500)" : "transparent",
+      okFg: r.mark === "ok" ? "#fff" : DIM,
+      okBorder: r.mark === "ok" ? "var(--color-accent-2-600)" : "var(--color-divider)",
+      flagBg: r.mark === "flag" ? "var(--color-accent-500)" : "transparent",
+      flagFg: r.mark === "flag" ? "#fff" : DIM,
+      flagBorder: r.mark === "flag" ? "var(--color-accent-600)" : "var(--color-divider)",
+      ok: () => { if (lock) return; this.patch(key, c => { if (c.marks[r.sku] === "ok") delete c.marks[r.sku]; else { c.marks[r.sku] = "ok"; delete c.notes[r.sku]; } }); },
+      flag: () => { if (lock) return; this.patch(key, c => { if (c.marks[r.sku] === "flag") delete c.marks[r.sku]; else c.marks[r.sku] = "flag"; }); },
+      noteShow: r.mark === "flag" ? "block" : "none",
+      note: r.note,
+      setNote: e => { const v = e.target.value; this.patch(key, c => { c.notes[r.sku] = v; }); },
+      open: () => this.setState({ sel: r.sku })
+    }));
+  }
+
+  exportSheet(opts) {
+    const me = this.state.me;
+    const rev = opts.rev || {};
+    const flagged = opts.rows.filter(r => r.mark === "flag").length;
+    const off = opts.rows.filter(r => r.off);
+    const exposure = off.reduce((n, r) => n + Math.abs(r.value || 0), 0);
+    const status = rev.status === "approved" ? "Approved" : rev.status === "flagged" ? "Returned for re-count" : "Not yet signed off";
+    const w = window.open("", "_blank", "width=900,height=1000");
+    if (!w) return;
+    const cell = (x, right, bold) => "<td style='padding:5px 7px;border-bottom:1px solid #e6ddcc;" + (right ? "text-align:right;" : "") + (bold ? "font-weight:700;" : "") + "'>" + x + "</td>";
+    const itemRows = opts.rows.map(r => {
+      const bg = r.mark === "flag" ? " style='background:#f6e3d6'" : r.off ? " style='background:#fbf1e8'" : "";
+      return "<tr" + bg + ">" + cell(esc(r.name) + " <span style='color:#6b625a'>(" + esc(r.unit) + ")</span>") +
+        cell(r.beginning == null ? "\u2014" : trim(r.beginning), 1) +
+        cell(r.inQty ? "+" + trim(r.inQty) : "\u2014", 1) +
+        cell(r.ending == null ? "\u2014" : trim(r.ending), 1, 1) +
+        cell(r.usage == null ? "\u2014" : trim(r.usage), 1, 1) +
+        cell(r.expected == null ? "\u2014" : trim(r.expected), 1) +
+        cell(r.gap == null ? "\u2014" : signed(r.gap), 1, r.off ? 1 : 0) +
+        cell(r.value == null || Math.round(r.value) === 0 ? "\u2014" : (r.value > 0 ? "\u2212" : "+") + PESO(Math.abs(r.value)), 1) +
+        cell(r.mark === "flag" ? "FLAGGED \u2014 " + esc(r.note || "no note") : r.mark === "ok" ? "Tallies" : "\u2014") + "</tr>";
+    }).join("");
+    const sales = opts.sales;
+    const salesRows = sales.rows.map(s => "<tr>" + cell(esc(s.name) + " <span style='color:#6b625a'>" + esc(s.cat) + "</span>") + cell(s.qty, 1) + cell(PESO(s.amt), 1) + "</tr>").join("");
+    w.document.write(
+      "<html><head><title>Stock count review</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:ui-sans-serif,system-ui;color:#201e1d;margin:0;font-variant-numeric:tabular-nums}h1{font-size:19px;margin:0 0 3px}h2{font-size:12.5px;margin:18px 0 0;letter-spacing:.04em;text-transform:uppercase}p{margin:0;font-size:11.5px;color:#6b625a}table{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:7px}th{text-align:left;font-weight:700;padding:5px 7px;border-bottom:1.5px solid #201e1d;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase}th.r{text-align:right}.sign{margin-top:20px;border:1px solid #201e1d;padding:12px 14px;font-size:11.5px;line-height:1.6}</style></head><body>" +
+      "<h1>" + esc(opts.title) + "</h1>" +
+      "<p>" + esc(opts.sub) + "</p>" +
+      "<p>" + esc(opts.meta) + " \u00b7 " + opts.rows.length + " items \u00b7 " + off.length + " beyond \u00b15% \u00b7 " + flagged + " flagged \u00b7 variance value " + PESO(exposure) + "</p>" +
+      "<h2>Counted against sales</h2><table><tr><th>Item</th><th class='r'>Begin</th><th class='r'>Trans-In</th><th class='r'>Ending</th><th class='r'>Counted</th><th class='r'>Expected</th><th class='r'>Gap</th><th class='r'>Value</th><th>Manager check</th></tr>" + itemRows + "</table>" +
+      "<h2>Sales by item</h2><table><tr><th>Product</th><th class='r'>Qty</th><th class='r'>Amount</th></tr>" + salesRows +
+      "<tr><td style='padding:5px 7px;font-weight:700'>Total</td><td style='padding:5px 7px;text-align:right;font-weight:700'>" + sales.qty + "</td><td style='padding:5px 7px;text-align:right;font-weight:700'>" + PESO(sales.amt) + "</td></tr></table>" +
+      "<div class='sign'><div style='font-weight:700;letter-spacing:.06em;font-size:9.5px;text-transform:uppercase;color:#6b625a'>Manager sign-off</div>" +
+      "<div style='margin-top:6px'><b>" + status + "</b></div>" +
+      "<div>" + esc(rev.by || (me ? me.name : "\u2014")) + " \u00b7 " + esc(rev.role || (me ? me.role : "")) + "</div>" +
+      "<div>" + esc(rev.at || "\u2014") + "</div>" +
+      "<div style='margin-top:10px;color:#6b625a'>Signature ______________________________</div></div>" +
+      "</body></html>");
+    w.document.close();
+    setTimeout(() => { try { w.focus(); w.print(); } catch (e) {} }, 320);
+  }
+
+  renderVals() {
+    const st = this.state;
+    const DIM = "color-mix(in srgb,var(--color-text) 74%,transparent)";
+    const me = st.me;
+    const branch = ALL_BRANCH(me) ? (BRANCHES.indexOf(st.pick) >= 0 ? st.pick : BRANCHES[0]) : BRANCH_FOR(me);
+    const items = ITEMS_AT(branch);
+    const q = st.query.trim().toLowerCase();
+    const match = r => !q || (r.name + " " + r.sku).toLowerCase().indexOf(q) >= 0;
+
+    const mine = Object.keys(st.submitted)
+      .map(k => Object.assign({ k: k }, st.submitted[k]))
+      .filter(h => h.branch === branch && h.day);
+    const allDays = [...new Set(mine.map(h => h.day))].sort();
+    const daysDesc = allDays.slice().reverse();
+    const day = allDays.indexOf(st.day) >= 0 ? st.day : (daysDesc[0] || dayKey(new Date()));
+    const dayIdx = allDays.indexOf(day);
+
+    // ---- day model
+    const dKey = branch + "|" + day;
+    const sheet = st.counts[dKey] || {};
+    const drecv = st.received[dKey] || {};
+    const drev = st.review[dKey] || {};
+    const dRaw = items.filter(i => num(sheet[i[0]]) != null).map(i => ({
+      sku: i[0], name: i[1], unit: i[2],
+      beginning: this.priorEnd(branch, allDays, dayIdx < 0 ? allDays.length : dayIdx, i[0]),
+      inQty: drecv[i[0]] || 0,
+      submittedEnd: num(sheet[i[0]])
+    }));
+    const dAll = this.reconcile(dRaw, drev, this.expectedDay(branch, day));
+    const dOffCount = dAll.filter(r => r.off).length;
+    const dShown = this.order(dAll.filter(r => match(r) && (!st.offOnly || r.off)), st.sort);
+    const dExposure = dAll.filter(r => r.off).reduce((n, r) => n + Math.abs(r.value || 0), 0);
+    const dWorst = dAll.slice().sort((a, b) => Math.abs(b.value || 0) - Math.abs(a.value || 0))[0];
+    const sales = this.salesAgg(branch, ts => dayKey(new Date(ts)) === day);
+    const flagged = dAll.filter(r => r.mark === "flag").length;
+    const checked = dAll.filter(r => r.mark).length;
+    const dSigned = drev.status === "approved" || drev.status === "flagged";
+    const canSign = CAN_SIGN(me);
+    const lock = dSigned || !canSign;
+
+    // ---- month model
+    const months = [...new Set(mine.map(h => monthOf(h.day)))].sort().reverse();
+    if (!months.length) months.push(monthOf(dayKey(new Date())));
+    const month = months.indexOf(st.month) >= 0 ? st.month : months[0];
+    const days = mine.filter(h => monthOf(h.day) === month).sort((a, b) => (a.day < b.day ? -1 : 1));
+    const firstIdx = days.length ? allDays.indexOf(days[0].day) : 0;
+
+    const recvFor = sku => days.reduce((n, d) => n + ((st.received[d.k] || {})[sku] || 0), 0);
+    const seriesFor = sku => days.map(d => ({ day: d.day, v: this.endingOn(branch, d.day, sku) })).filter(x => x.v != null);
+
+    const mKey = branch + "|" + month;
+    const mrev = st.review[mKey] || {};
+    const mRaw = items.map(i => {
+      const s = seriesFor(i[0]);
+      if (!s.length) return null;
+      return {
+        sku: i[0], name: i[1], unit: i[2], days: s.length + (s.length === 1 ? " day" : " days"),
+        beginning: this.priorEnd(branch, allDays, firstIdx, i[0]),
+        inQty: recvFor(i[0]),
+        submittedEnd: s[s.length - 1].v
+      };
+    }).filter(Boolean);
+    const mAll = this.reconcile(mRaw, mrev, this.expectedMonth(branch, month));
+    const mOffCount = mAll.filter(r => r.off).length;
+    const mShown = this.order(mAll.filter(r => match(r) && (!st.offOnly || r.off)), st.sort);
+    const mExposure = mAll.filter(r => r.off).reduce((n, r) => n + Math.abs(r.value || 0), 0);
+    const mWorst = mAll.slice().sort((a, b) => Math.abs(b.value || 0) - Math.abs(a.value || 0))[0];
+    const mSales = this.salesAgg(branch, ts => monthOf(dayKey(new Date(ts))) === month);
+    const mFlagged = mAll.filter(r => r.mark === "flag").length;
+    const mChecked = mAll.filter(r => r.mark).length;
+    const msigned = mrev.status === "approved" || mrev.status === "flagged";
+    const mlock = msigned || !canSign;
+
+    const sel = mAll.find(p => p.sku === st.sel) || mAll[0] || null;
+    const series = sel ? seriesFor(sel.sku) : [];
+    const peak = series.reduce((m, x) => Math.max(m, x.v), 0) || 1;
+    const totalRecv = days.reduce((n, d) => n + Object.keys(st.received[d.k] || {}).length, 0);
+
+    const isDay = st.tab === "day";
+    const stamp = () => {
+      const n = new Date();
+      let h = n.getHours(); const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
+      return longDay(dayKey(n)) + " \u00b7 " + h + ":" + pad(n.getMinutes()) + " " + ap;
+    };
+    const signKey = (key, status) => this.patch(key, c => { c.status = status; c.by = me ? me.name : ""; c.role = me ? me.role : ""; c.at = stamp(); });
+
+    const statCard = (label, value, sub, rule, size) => ({ label: label, value: value, sub: sub, rule: rule || "var(--color-divider)", size: size || "22px" });
+    const gapPhrase = r => r && r.gap != null ? signed(r.gap) + " " + r.unit + " against sales" : "nothing to compare yet";
+
+    return {
+      isApp: true,
+      signOut: () => this.setState({ logoutOpen: true }),
+      logoutOpen: !!this.state.logoutOpen,
+      cancelLogout: () => this.setState({ logoutOpen: false }),
+      stopLogout: e => e.stopPropagation(),
+      confirmLogout: () => { this.setState({ logoutOpen: false }); GOHOME(); },
+      meName: me ? me.name : "",
+      meRole: me ? me.role : "",
+      meInitials: me ? this.initials(me.name) : "",
+
+      tabDay: () => this.setState({ tab: "day" }),
+      tabMonth: () => this.setState({ tab: "month" }),
+      dayTabBg: isDay ? "var(--color-accent-500)" : "transparent",
+      dayTabFg: isDay ? "#fff" : "color-mix(in srgb,var(--color-neutral-100) 76%,transparent)",
+      dayTabBorder: isDay ? "var(--color-accent-500)" : "rgba(255,255,255,.18)",
+      monTabBg: isDay ? "transparent" : "var(--color-accent-500)",
+      monTabFg: isDay ? "color-mix(in srgb,var(--color-neutral-100) 76%,transparent)" : "#fff",
+      monTabBorder: isDay ? "rgba(255,255,255,.18)" : "var(--color-accent-500)",
+      dayShow: isDay ? "block" : "none",
+      monthShow: isDay ? "none" : "block",
+      dayPickShow: isDay ? "block" : "none",
+      monPickShow: isDay ? "none" : "block",
+
+      day: day,
+      dayOpts: daysDesc.map(d => ({ key: d, label: longDay(d) })),
+      setDay: e => this.setState({ day: e.target.value }),
+
+      month: month,
+      monthLabel: prettyMonth(month),
+      monthOpts: months.map(m => ({ key: m, label: prettyMonth(m) })),
+      setMonth: e => this.setState({ month: e.target.value, sel: null }),
+
+      branch: branch,
+      branchOpts: BRANCHES,
+      branchPickShow: ALL_BRANCH(me) ? "block" : "none",
+      branchFixedShow: ALL_BRANCH(me) ? "none" : "block",
+      setBranch: e => this.setState({ pick: e.target.value, sel: null, day: null }),
+      branchNote: ALL_BRANCH(me) ? "Owner \u00b7 switch branch" : "Your assigned branch",
+
+      kicker: isDay ? "Daily count review" : "Monthly stock report",
+      title: isDay ? longDay(day) + " \u00b7 " + branch : prettyMonth(month) + " \u00b7 " + branch,
+      exportLabel: "Export review as PDF",
+      doExport: () => {
+        if (isDay) this.exportSheet({
+          title: "Daily stock count review",
+          sub: branch + " \u00b7 " + longDay(day),
+          meta: "Counted by " + (st.submitted[dKey] ? st.submitted[dKey].by + " \u00b7 submitted " + st.submitted[dKey].at : "\u2014"),
+          rows: this.order(dAll, st.sort), sales: sales, rev: drev
+        });
+        else this.exportSheet({
+          title: "Monthly stock count review",
+          sub: branch + " \u00b7 " + prettyMonth(month),
+          meta: days.length + (days.length === 1 ? " count submitted" : " counts submitted") + (days.length ? " \u00b7 " + prettyDay(days[0].day) + " \u2013 " + prettyDay(days[days.length - 1].day) : ""),
+          rows: this.order(mAll, st.sort), sales: mSales, rev: mrev
+        });
+      },
+
+      statusShow: (isDay ? dAll.length : mAll.length) ? "flex" : "none",
+      statusText: (isDay ? drev : mrev).status === "approved" ? "Approved" : (isDay ? drev : mrev).status === "flagged" ? "Returned for re-count" : (isDay ? checked : mChecked) ? (isDay ? checked : mChecked) + " of " + (isDay ? dAll.length : mAll.length) + " checked" : "Awaiting review",
+      statusBg: (isDay ? drev : mrev).status === "approved" ? "var(--color-accent-2-200)" : (isDay ? drev : mrev).status === "flagged" ? "var(--color-accent-200)" : "var(--color-neutral-200)",
+      statusFg: (isDay ? drev : mrev).status === "approved" ? "var(--color-accent-2-900)" : (isDay ? drev : mrev).status === "flagged" ? "var(--color-accent-900)" : "var(--color-text)",
+
+      query: st.query,
+      setQuery: e => this.setState({ query: e.target.value }),
+      sortLabel: st.sort === "gap" ? "Sorted: worst gap" : "Sorted: item name",
+      toggleSort: () => this.setState({ sort: st.sort === "gap" ? "name" : "gap" }),
+      toggleOff: () => this.setState({ offOnly: !st.offOnly }),
+      offLabel: st.offOnly ? "Showing gaps only" : "Off tolerance (" + dOffCount + ")",
+      offBg: st.offOnly ? "var(--color-accent-500)" : "transparent",
+      offFg: st.offOnly ? "#fff" : DIM,
+      offBorder: st.offOnly ? "var(--color-accent-600)" : "var(--color-divider)",
+      mOffLabel: st.offOnly ? "Showing gaps only" : "Off tolerance (" + mOffCount + ")",
+      mOffBg: st.offOnly ? "var(--color-accent-500)" : "transparent",
+      mOffFg: st.offOnly ? "#fff" : DIM,
+      mOffBorder: st.offOnly ? "var(--color-accent-600)" : "var(--color-divider)",
+
+      noCountShow: dAll.length ? "none" : "block",
+      dayBodyShow: dAll.length ? "flex" : "none",
+      countedBy: st.submitted[dKey] ? "Counted by " + st.submitted[dKey].by + " \u00b7 submitted " + st.submitted[dKey].at : "",
+      lockEdit: lock,
+      lockNoteShow: !canSign ? "block" : "none",
+      lockNote: "Sign-off is limited to the manager on duty (branch lead or owner).",
+
+      dayStats: [
+        statCard("Variance value", PESO(dExposure), dOffCount + " of " + dAll.length + " items beyond \u00b15%", dOffCount ? "var(--color-accent-500)" : "var(--color-accent-2-500)"),
+        statCard("Largest gap", dWorst ? dWorst.name : "\u2014", gapPhrase(dWorst), "var(--color-divider)", "15px"),
+        statCard("Review", checked + " of " + dAll.length + " checked", flagged ? flagged + " flagged for re-count" : "none flagged", flagged ? "var(--color-accent-500)" : "var(--color-divider)")
+      ],
+      dayRows: this.rowVals(dShown, dKey, lock, DIM),
+      dayEmptyShow: dShown.length ? "none" : "block",
+      dayEmptyText: st.offOnly ? "Every counted item is within \u00b15% of what sales predict." : "No item matches \u201c" + st.query + "\u201d.",
+
+      salesSub: sales.rows.length ? longDay(day) + " \u00b7 from the POS" : "from the POS",
+      salesRows: sales.rows.map(s => ({ name: s.name, cat: s.cat, qty: String(s.qty), amt: PESO(s.amt) })),
+      noSalesShow: sales.rows.length ? "none" : "block",
+      salesTotalShow: sales.rows.length ? "grid" : "none",
+      salesQty: String(sales.qty),
+      salesAmt: PESO(sales.amt),
+
+      signNote: dSigned
+        ? "This day is closed and its endings now stand as the branch's on-hand stock. Reopen it to change an ending figure or a flag."
+        : "Work the gaps top down. Adjust an ending figure if the count was mis-keyed, flag what sales cannot explain, then approve. Approving posts these endings to the branch as on hand.",
+      approveDay: () => { if (lock) return; const at = stamp(); signKey(dKey, "approved"); this.pushOnHand(branch, day, dAll, me, at); },
+      flagDay: () => { if (lock) return; signKey(dKey, "flagged"); },
+      stampShow: dSigned ? "block" : "none",
+      stampName: drev.by ? drev.by + " \u00b7 " + drev.role : "",
+      stampMeta: (drev.status === "approved" ? "Approved" : "Returned for re-count") + " \u00b7 " + (drev.at || ""),
+      reopenShow: canSign ? "inline-block" : "none",
+      reopen: () => this.patch(dKey, c => { c.status = null; c.by = null; c.role = null; c.at = null; }),
+
+      stats: [
+        statCard("Variance value", PESO(mExposure), mOffCount + " of " + mAll.length + " items beyond \u00b15%", mOffCount ? "var(--color-accent-500)" : "var(--color-accent-2-500)"),
+        statCard("Largest gap", mWorst ? mWorst.name : "\u2014", gapPhrase(mWorst), "var(--color-divider)", "15px"),
+        statCard("Days approved", days.filter(d => (st.review[d.k] || {}).status === "approved").length + " of " + days.length, totalRecv + " warehouse receipts logged", "var(--color-divider)")
+      ],
+
+      emptyMonthShow: days.length ? "none" : "block",
+      bodyShow: days.length ? "block" : "none",
+      rows: this.rowVals(mShown, mKey, mlock, DIM),
+      emptyShow: mShown.length ? "none" : "block",
+      monEmptyText: st.offOnly ? "Every counted item is within \u00b15% of what sales predict." : "No item matches \u201c" + st.query + "\u201d.",
+
+      mLockEdit: mlock,
+      mLockNoteShow: !canSign ? "block" : "none",
+      mCountedBy: days.length ? days.length + (days.length === 1 ? " count" : " counts") + " \u00b7 " + prettyDay(days[0].day) + " \u2013 " + prettyDay(days[days.length - 1].day) : "",
+      mSalesSub: prettyMonth(month) + " \u00b7 from the POS",
+      mSalesRows: mSales.rows.map(s => ({ name: s.name, cat: s.cat, qty: String(s.qty), amt: PESO(s.amt) })),
+      mNoSalesShow: mSales.rows.length ? "none" : "block",
+      mSalesTotalShow: mSales.rows.length ? "grid" : "none",
+      mSalesQty: String(mSales.qty),
+      mSalesAmt: PESO(mSales.amt),
+      mSignNote: msigned
+        ? "This month is closed. Reopen it to change an ending figure or a flag."
+        : "Work the gaps top down. Adjust an ending figure if a count was mis-keyed, flag what sales cannot explain, then approve.",
+      mApprove: () => { if (mlock) return; signKey(mKey, "approved"); },
+      mFlagMonth: () => { if (mlock) return; signKey(mKey, "flagged"); },
+      mStampShow: msigned ? "block" : "none",
+      mStampName: mrev.by ? mrev.by + " \u00b7 " + mrev.role : "",
+      mStampMeta: (mrev.status === "approved" ? "Approved" : "Returned for re-count") + " \u00b7 " + (mrev.at || ""),
+      mReopenShow: canSign ? "inline-block" : "none",
+      mReopen: () => this.patch(mKey, c => { c.status = null; c.by = null; c.role = null; c.at = null; }),
+
+      chartTitle: sel ? sel.name : "Movement",
+      chartSub: sel
+        ? "Ending level counted on " + series.length + (series.length === 1 ? " day" : " days") + " \u00b7 " + (sel.gap == null ? "no sales comparison" : signed(sel.gap) + " " + sel.unit + " against sales this month")
+        : "Select an item above",
+      chartBars: series.map(x => ({
+        day: prettyDay(x.day).replace(/^\w+ /, ""),
+        value: trim(x.v),
+        h: Math.max(3, Math.round((x.v / peak) * 100)) + "%",
+        fill: (st.received[branch + "|" + x.day] || {})[sel ? sel.sku : ""] ? "var(--color-accent-2-500)" : "var(--color-accent-500)"
+      })),
+      recvNoteShow: sel && sel.inQty ? "block" : "none",
+      recvNote: sel && sel.inQty ? "Sage bars are days a warehouse delivery landed \u2014 " + trim(sel.inQty) + " " + sel.unit + " received this month." : "",
+
+      monthDayRows: days.slice().reverse().map(d => {
+        const r = st.received[d.k] || {};
+        const n = Object.keys(r).length;
+        const rv = st.review[d.k] || {};
+        return {
+          date: prettyMonth(month).split(" ")[0] + " " + (+d.day.split("-")[2]),
+          by: d.by + " \u00b7 " + d.at,
+          items: String(d.counted),
+          recv: n ? n + (n === 1 ? " item" : " items") : "\u2014",
+          recvFg: n ? "var(--color-accent-2-800)" : DIM,
+          rev: rv.status === "approved" ? "Approved" : rv.status === "flagged" ? "Re-count" : "Pending",
+          revFg: rv.status === "approved" ? "var(--color-accent-2-800)" : rv.status === "flagged" ? "var(--color-accent-800)" : DIM,
+          open: () => this.setState({ tab: "day", day: d.day })
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

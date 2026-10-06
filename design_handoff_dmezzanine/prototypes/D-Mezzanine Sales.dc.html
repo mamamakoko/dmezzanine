@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="organic.css"><style>html,body{margin:0;height:100%;overflow:hidden}#root{height:100%}a{color:var(--color-accent-700);text-decoration:none}a:hover{color:var(--color-accent-800)}*{scrollbar-width:none;-ms-overflow-style:none}*::-webkit-scrollbar{width:0;height:0;display:none}@keyframes tin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}h1,h2,h3,h4{font-family:var(--font-body);font-weight:600;letter-spacing:-.012em}body{font-variant-numeric:tabular-nums}.input{border-radius:4px!important}.btn{font-family:var(--font-body)!important;font-weight:600!important;border-radius:4px!important;letter-spacing:0}</style></helmet>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+<div style="height:100vh;display:grid;grid-template-columns:246px 1fr;background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)">
+
+  <div style="background:var(--color-neutral-900);color:var(--color-neutral-100);display:flex;flex-direction:column;overflow:hidden">
+    <div style="padding:20px 18px 16px;display:flex;align-items:center;gap:11px;flex:none">
+      <img src="logo.png" alt="D' Mezzanine Cafe" style="width:36px;height:36px;border-radius:999px;flex:none;object-fit:cover">
+      <div>
+        <div style="font-family:var(--font-body);font-weight:600;font-size:15px;line-height:1.15">DMC Sales</div>
+        <div style="font-size:10px;letter-spacing:.28em;color:#e0b12a">D’ MEZZANINE CAFE</div>
+      </div>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 10px 16px;display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+        <button onClick="{{ n.go }}" style="display:{{ n.display }};width:100%;text-align:left;border:0;cursor:{{ n.cursor }};background:{{ n.bg }};color:{{ n.fg }};border-radius:4px;padding:{{ n.pad }};font-family:var(--font-body);font-weight:{{ n.fw }};font-size:{{ n.size }};letter-spacing:{{ n.ls }};text-transform:{{ n.tt }};align-items:center;gap:9px;opacity:{{ n.op }}">
+          <span style="width:16px;flex:none;text-align:center;font-size:12px;opacity:.85">{{ n.icon }}</span>
+          <span style="flex:1">{{ n.label }}</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="flex:none;padding:14px 18px 18px;border-top:1px solid rgba(255,255,255,.12);font-size:12px">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div style="width:28px;height:28px;border-radius:999px;background:var(--color-neutral-700);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--font-body);font-weight:600">{{ meInitials }}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ meName }}</div>
+          <div style="opacity:.55;font-size:11px">{{ meRole }}</div>
+        </div>
+      </div>
+      <button onClick="{{ signOut }}" style="margin-top:12px;width:100%;border:1px solid rgba(255,255,255,.14);background:transparent;cursor:pointer;color:color-mix(in srgb,var(--color-neutral-100) 72%,transparent);font-family:var(--font-body);font-size:12.5px;border-radius:4px;padding:8px 10px;text-align:center" style-hover="background:color-mix(in srgb,var(--color-neutral-100) 8%,transparent);color:var(--color-neutral-100)">Exit</button>
+    </div>
+  </div>
+
+  <div style="overflow-y:auto;overflow-x:hidden;position:relative;min-width:0">
+    <div style="position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--color-bg) 92%,transparent);backdrop-filter:blur(8px);padding:22px 32px 16px;border-bottom:1px solid var(--color-divider);display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap">
+      <div style="flex:1 1 220px;min-width:200px">
+        <div style="font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent)">Sales</div>
+        <h2 style="margin:4px 0 0;font-size:23px;line-height:1.1">{{ title }}</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex:1 1 auto;flex-wrap:wrap;justify-content:flex-end">
+        <div style="display:flex;gap:3px;background:var(--color-surface);border:1px solid var(--color-divider);border-radius:4px;padding:3px">
+          <sc-for list="{{ periods }}" as="p" hint-placeholder-count="3">
+            <button onClick="{{ p.go }}" style="border:0;cursor:pointer;border-radius:4px;padding:7px 13px;font-family:var(--font-body);font-weight:600;font-size:12.5px;background:{{ p.bg }};color:{{ p.fg }};white-space:nowrap">{{ p.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px">
+          <input type="date" value="{{ dateFrom }}" onChange="{{ setFrom }}" style="border:1px solid var(--color-divider);background:var(--color-surface);color:var(--color-text);border-radius:4px;padding:7px 8px;font-size:12.5px;font-family:var(--font-body)">
+          <span style="font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">to</span>
+          <input type="date" value="{{ dateTo }}" onChange="{{ setTo }}" style="border:1px solid var(--color-divider);background:var(--color-surface);color:var(--color-text);border-radius:4px;padding:7px 8px;font-size:12.5px;font-family:var(--font-body)">
+          <button onClick="{{ clearDates }}" style="display:{{ dateClearShow }};align-items:center;border:1px solid var(--color-divider);background:var(--color-surface);cursor:pointer;border-radius:4px;padding:7px 10px;font-size:12.5px;font-family:var(--font-body);color:color-mix(in srgb,var(--color-text) 74%,transparent)">Clear</button>
+        </div>
+        <select value="{{ branchFilter }}" onChange="{{ setBranch }}" class="input" style="border-radius:4px;cursor:pointer;width:190px">
+          <sc-for list="{{ branchOpts }}" as="o" hint-placeholder-count="3">
+            <option value="{{ o }}">{{ o }}</option>
+          </sc-for>
+        </select>
+        <button onClick="{{ exportPdf }}" style="border:1px solid var(--color-divider);background:var(--color-surface);cursor:pointer;border-radius:4px;padding:9px 14px;font-family:var(--font-body);font-weight:600;font-size:12.5px;white-space:nowrap">Export PDF</button>
+      </div>
+    </div>
+
+    <div style="padding:26px 32px 60px">
+      <div style="display:{{ overviewShow }};animation:tin .22s ease both">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+            <div style="border:1px solid {{ s.border }};background:{{ s.bg }};border-radius:var(--radius-md);padding:18px 18px 16px">
+              <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:{{ s.labelFg }}">{{ s.label }}</div>
+              <div style="font-family:var(--font-body);font-weight:600;font-size:26px;line-height:1.05;margin-top:8px;color:{{ s.valueFg }}">{{ s.value }}</div>
+              <div style="font-size:12.5px;margin-top:4px;color:{{ s.subFg }}">{{ s.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:18px 20px 14px;margin-top:20px">
+          <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:15.5px">Sales per day</div>
+            <div style="font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ rangeLabel }}</div>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:6px;margin-top:18px">
+            <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-right:8px;border-right:1px solid var(--color-divider)">
+              <div style="flex:none;height:15px"></div>
+              <div style="flex:none;height:140px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;font-size:10.5px;font-variant-numeric:tabular-nums;color:color-mix(in srgb,var(--color-text) 74%,transparent)">
+                <sc-for list="{{ axisTicks }}" as="t" hint-placeholder-count="4">
+                  <div style="line-height:1;white-space:nowrap">{{ t }}</div>
+                </sc-for>
+              </div>
+              <div style="flex:none;height:13px"></div>
+            </div>
+            <sc-for list="{{ dayBars }}" as="d" hint-placeholder-count="7">
+              <div onMouseEnter="{{ d.on }}" onMouseLeave="{{ d.off }}" onClick="{{ d.focus }}" title="View this day only" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+                <div style="flex:none;height:15px;line-height:15px;font-size:11px;font-family:var(--font-body);font-weight:{{ d.labelFw }};color:{{ d.labelFg }};white-space:nowrap;visibility:{{ d.labelVis }}">{{ d.amount }}</div>
+                <div style="flex:none;width:100%;height:140px;display:flex;align-items:flex-end;background-image:repeating-linear-gradient(to top,var(--color-divider) 0 1px,transparent 1px 46.66px)">
+                  <div style="width:100%;height:{{ d.h }};background:{{ d.fill }};border-radius:4px 4px 0 0;min-height:2px"></div>
+                </div>
+                <div style="flex:none;font-size:11px;color:color-mix(in srgb,var(--color-text) 74%,transparent);white-space:nowrap">{{ d.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:{{ emptyShow }};padding:26px 0;text-align:center;font-size:13.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">No sales recorded in this period.</div>
+
+          <div style="display:{{ dayTableShow }};margin-top:18px;border-top:1px solid var(--color-divider);overflow-x:auto">
+            <div style="display:grid;min-width:560px;grid-template-columns:minmax(120px,1.4fr) 82px 110px 110px 110px;gap:10px;padding:11px 0 9px;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);font-weight:700;font-family:var(--font-body)">
+              <div>Day</div><div style="text-align:right">Orders</div><div style="text-align:right">Sales</div><div style="text-align:right">Net of VAT</div><div style="text-align:right">Avg ticket</div>
+            </div>
+            <sc-for list="{{ dayRows }}" as="d" hint-placeholder-count="7">
+              <div onClick="{{ d.focus }}" title="View this day only" style="display:grid;min-width:560px;grid-template-columns:minmax(120px,1.4fr) 82px 110px 110px 110px;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--color-divider);cursor:pointer" style-hover="background:var(--color-neutral-100)">
+                <div style="font-size:13.5px">{{ d.date }}</div>
+                <div style="text-align:right;font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ d.tx }}</div>
+                <div style="text-align:right;font-size:13.5px;font-family:var(--font-body);font-weight:600">{{ d.total }}</div>
+                <div style="text-align:right;font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ d.net }}</div>
+                <div style="text-align:right;font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ d.avg }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+          <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:18px 20px">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:15.5px;margin-bottom:14px">Sales by category</div>
+            <sc-for list="{{ catRows }}" as="c" hint-placeholder-count="5">
+              <div style="display:grid;grid-template-columns:minmax(90px,1.1fr) 1fr 86px;gap:12px;align-items:center;padding:7px 0">
+                <div style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.name }}</div>
+                <div style="height:9px;border-radius:999px;background:var(--color-neutral-200);overflow:hidden">
+                  <div style="height:100%;width:{{ c.w }};background:var(--color-accent);border-radius:999px"></div>
+                </div>
+                <div style="text-align:right;font-size:13px">{{ c.amount }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:18px 20px">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:15.5px;margin-bottom:14px">Payment method</div>
+            <sc-for list="{{ methodRows }}" as="m" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:minmax(90px,1.1fr) 1fr 86px;gap:12px;align-items:center;padding:7px 0">
+                <div style="font-size:13px">{{ m.name }}</div>
+                <div style="height:9px;border-radius:999px;background:var(--color-neutral-200);overflow:hidden">
+                  <div style="height:100%;width:{{ m.w }};background:var(--color-accent-2-700);border-radius:999px"></div>
+                </div>
+                <div style="text-align:right;font-size:13px">{{ m.amount }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:18px 20px;margin-top:16px">
+          <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:15.5px">Sales by item</div>
+            <div style="font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ rangeLabel }}</div>
+          </div>
+          <sc-for list="{{ itemBars }}" as="i" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:minmax(120px,1.4fr) 1fr 56px 92px;gap:12px;align-items:center;padding:7px 0">
+              <div style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ i.name }}</div>
+              <div style="height:9px;border-radius:999px;background:var(--color-neutral-200);overflow:hidden">
+                <div style="height:100%;width:{{ i.w }};background:var(--color-accent);border-radius:999px"></div>
+              </div>
+              <div style="text-align:right;font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent);font-variant-numeric:tabular-nums">{{ i.qty }}</div>
+              <div style="text-align:right;font-size:13px;font-variant-numeric:tabular-nums">{{ i.amount }}</div>
+            </div>
+          </sc-for>
+          <div style="display:{{ emptyShow }};padding:20px 0;text-align:center;font-size:13.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">No sales recorded in this period.</div>
+        </div>
+
+        <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden;margin-top:16px">
+          <div style="display:grid;grid-template-columns:minmax(160px,2fr) 110px 130px 130px;gap:10px;padding:12px 18px;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);background:var(--color-neutral-100);font-weight:700;font-family:var(--font-body)">
+            <div>Branch</div><div style="text-align:right">Transactions</div><div style="text-align:right">Average ticket</div><div style="text-align:right">Sales</div>
+          </div>
+          <sc-for list="{{ branchRows }}" as="b" hint-placeholder-count="2">
+            <div style="display:grid;grid-template-columns:minmax(160px,2fr) 110px 130px 130px;gap:10px;padding:13px 18px;border-top:1px solid var(--color-divider);align-items:center">
+              <div style="font-size:14px">{{ b.name }}</div>
+              <div style="text-align:right;font-size:13px">{{ b.tx }}</div>
+              <div style="text-align:right;font-size:13px">{{ b.avg }}</div>
+              <div style="text-align:right;font-size:13.5px;font-family:var(--font-body);font-weight:600">{{ b.amount }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:{{ vatShow }};animation:tin .22s ease both">
+        <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
+          <div style="background:var(--color-neutral-900);color:var(--color-neutral-100);border-radius:var(--radius-md);padding:18px 20px;flex:0 1 320px;min-width:280px">
+            <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;opacity:.85">VAT summary</div>
+            <div style="font-size:12.5px;opacity:.7;margin-top:2px">{{ rangeLabel }}</div>
+            <div style="height:1px;background:rgba(255,255,255,.14);margin:16px 0"></div>
+            <sc-for list="{{ vatLines }}" as="v" hint-placeholder-count="5">
+              <div style="display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:13.5px">
+                <span style="opacity:.78">{{ v.k }}</span>
+                <span style="font-variant-numeric:tabular-nums">{{ v.v }}</span>
+              </div>
+            </sc-for>
+            <div style="height:1px;background:rgba(255,255,255,.14);margin:14px 0"></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font-size:13.5px">Total amount due</span>
+              <span style="font-family:var(--font-body);font-weight:600;font-size:22px">{{ vatTotal }}</span>
+            </div>
+          </div>
+
+          <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow-x:auto;flex:1 1 420px;min-width:0">
+            <div style="display:grid;min-width:420px;grid-template-columns:minmax(86px,1fr) repeat(4,minmax(74px,1fr));gap:8px;padding:12px 14px;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);background:var(--color-neutral-100);font-weight:700;font-family:var(--font-body)">
+              <div>Day</div><div style="text-align:right">Total sales</div><div style="text-align:right">Net of VAT</div><div style="text-align:right">VAT 12%</div><div style="text-align:right">Senior disc.</div>
+            </div>
+            <sc-for list="{{ vatRows }}" as="r" hint-placeholder-count="7">
+              <div style="display:grid;min-width:420px;grid-template-columns:minmax(86px,1fr) repeat(4,minmax(74px,1fr));gap:8px;padding:12px 14px;border-top:1px solid var(--color-divider)">
+                <div style="font-size:13.5px">{{ r.day }}</div>
+                <div style="text-align:right;font-size:13px">{{ r.gross }}</div>
+                <div style="text-align:right;font-size:13px">{{ r.net }}</div>
+                <div style="text-align:right;font-size:13px">{{ r.vat }}</div>
+                <div style="text-align:right;font-size:13px;color:var(--color-accent-800)">{{ r.disc }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display:{{ toastShow }};position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--color-neutral-900);color:var(--color-neutral-100);padding:11px 18px;border-radius:999px;font-size:13px;z-index:80;box-shadow:var(--shadow-lg)">{{ toast }}</div>
+</sc-if>
+
+
+<sc-if value="{{ logoutOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(32,30,29,.42);display:flex;align-items:center;justify-content:center;z-index:60;padding:24px" onClick="{{ cancelLogout }}">
+  <div onClick="{{ stopLogout }}" style="width:100%;max-width:380px;background:var(--color-surface);border-radius:var(--radius-md);padding:26px;box-shadow:var(--shadow-lg)">
+    <h3 style="margin:0 0 6px;font-size:18px">Exit?</h3>
+    <p style="margin:0 0 22px;font-size:13.5px;line-height:1.55;color:color-mix(in srgb,var(--color-text) 74%,transparent)">You'll go back to the workspace picker. You stay signed in.</p>
+    <div style="display:flex;gap:10px">
+      <button onClick="{{ cancelLogout }}" style="flex:1;border:1px solid var(--color-divider);background:var(--color-bg);cursor:pointer;border-radius:4px;padding:11px;font-family:var(--font-body);font-size:13.5px">Stay here</button>
+      <button onClick="{{ confirmLogout }}" style="flex:1;border:0;cursor:pointer;background:var(--color-accent);color:var(--color-neutral-100);border-radius:4px;padding:11px;font-family:var(--font-body);font-weight:600;font-size:13.5px">Exit</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1366,&quot;height&quot;:860}}">
+const SESSION = () => { try { return JSON.parse(localStorage.getItem("dmz.session") || "null"); } catch (e) { return null; } };
+const GOHOME = () => { try { location.replace("D-Mezzanine%20Landing.dc.html"); } catch (e) {} };
+const PERM_DEFAULTS = {
+  Owner: { pos: 1, inventory: 1, owner: 1, sales: 1, count: 1 },
+  Warehouse: { pos: 0, inventory: 1, owner: 0, sales: 0, count: 0 },
+  Commissary: { pos: 0, inventory: 1, owner: 0, sales: 0, count: 0 },
+  "Branch lead": { pos: 1, inventory: 0, owner: 0, sales: 1, count: 1 },
+  Cashier: { pos: 1, inventory: 0, owner: 0, sales: 0, count: 0 }
+};
+const CAN = (u, page) => {
+  if (!u) return false;
+  if (u.role === "Owner") return true;
+  let over = {};
+  try { over = (JSON.parse(localStorage.getItem("dmz.perms") || "{}") || {})[String(u.email || "").toLowerCase()] || {}; } catch (e) {}
+  return !!Object.assign({}, PERM_DEFAULTS[u.role] || PERM_DEFAULTS.Cashier, over)[page];
+};
+
+const PESO = n => "\u20b1" + Math.round(n || 0).toLocaleString("en-PH");
+const PESO2 = n => "\u20b1" + (Math.round((n || 0) * 100) / 100).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const DAYNAME = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTH = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+const CATALOG = [
+  ["Americano", "Espresso", 110], ["Espresso", "Espresso", 95], ["Cafe Latte", "Espresso", 140],
+  ["Cappuccino", "Espresso", 140], ["Spanish Latte", "Espresso", 155], ["Cafe Mocha", "Espresso", 160],
+  ["Matcha Latte", "Non-Coffee", 165], ["Hot Chocolate", "Non-Coffee", 130], ["Strawberry Milk", "Non-Coffee", 145],
+  ["Lemon Iced Tea", "Non-Coffee", 95], ["Java Chip", "Frappe", 175], ["Caramel Frappe", "Frappe", 170],
+  ["Matcha Frappe", "Frappe", 180], ["Butter Croissant", "Pastries", 95], ["Cinnamon Roll", "Pastries", 105],
+  ["Banana Bread", "Pastries", 85], ["Ube Cheese Pandesal", "Pastries", 90], ["Chicken Adobo Rice", "Rice Meals", 185],
+  ["Beef Tapa Rice", "Rice Meals", 195], ["Pork Sisig Rice", "Rice Meals", 205], ["Tocino Rice", "Rice Meals", 175]
+];
+const BRANCHES = ["DMC-Iriga Branch", "DMC Naga Branch"];
+const METHODS = [["Cash", 0.52], ["E-wallet", 0.26], ["Card", 0.18], ["Split", 0.04]];
+
+const r2 = n => Math.round(n * 100) / 100;
+const PAYSPLIT = recs => { const m = {}; recs.forEach(r => (r.pays && r.pays.length ? r.pays : [{ method: r.method, amt: r.total }]).forEach(p => { const k = (p.method || "Other") + (r.unpaid ? " (unpaid)" : ""); m[k] = (m[k] || 0) + p.amt; })); return Object.keys(m).map(k => ({ name: k, v: r2(m[k]) })).sort((a, b) => b.v - a.v); };
+
+function seededSales() {
+  let s = 20260831;
+  const rnd = () => { s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; };
+  const out = [];
+  const now = new Date();
+  for (let back = 0; back < 45; back++) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - back);
+    const weekend = d.getDay() === 0 || d.getDay() === 6;
+    const tx = Math.round((weekend ? 62 : 44) + rnd() * 18) - (back === 0 ? 26 : 0);
+    for (let i = 0; i < Math.max(4, tx); i++) {
+      const lines = [];
+      const n = 1 + Math.floor(rnd() * 3);
+      for (let k = 0; k < n; k++) {
+        const c = CATALOG[Math.floor(rnd() * CATALOG.length)];
+        const qty = rnd() > 0.82 ? 2 : 1;
+        lines.push({ name: c[0], cat: c[1], qty: qty, total: c[2] * qty });
+      }
+      const gross = lines.reduce((a, l) => a + l.total, 0);
+      const senior = rnd() > 0.93;
+      const net = r2(gross / 1.12);
+      const vat = r2(gross - net);
+      const disc = senior ? r2(net * 0.2) : 0;
+      let m = rnd(), pick = METHODS[0][0], acc = 0;
+      for (let j = 0; j < METHODS.length; j++) { acc += METHODS[j][1]; if (m <= acc) { pick = METHODS[j][0]; break; } }
+      out.push({
+        ts: d.getTime() + (8 + Math.floor(rnd() * 12)) * 3600000,
+        branch: rnd() > 0.34 ? BRANCHES[0] : BRANCHES[1],
+        gross: gross, net: net, vat: senior ? 0 : vat, vatOff: senior ? vat : 0,
+        disc: disc, senior: senior, total: senior ? r2(net - disc) : gross,
+        method: pick, lines: lines
+      });
+    }
+  }
+  return out;
+}
+
+class Component extends DCLogic {
+  state = {
+    me: SESSION(), email: "", pw: "", err: "", pwShow: false,
+    tab: "overview", period: "Today", from: "", to: "", branch: "All branches", toast: null, live: [], hoverDay: null
+  };
+
+  users = [
+    { name: "Rico Cortez", email: "rico@dmezzanine.ph", role: "Owner" },
+    { name: "Joy Bermudo", email: "joy@dmezzanine.ph", role: "Branch lead" },
+    { name: "Marisol Ganda", email: "marisol@dmezzanine.ph", role: "Warehouse" }
+  ];
+
+  _seed = seededSales();
+
+  componentDidMount() {
+    const s = SESSION();
+    if (!s || !CAN(s, "sales")) GOHOME();
+    this.readLive();
+    this._iv = setInterval(() => this.readLive(), 4000);
+  }
+  componentWillUnmount() { clearInterval(this._iv); clearTimeout(this._t); }
+
+  readLive = () => {
+    try {
+      const raw = JSON.parse(localStorage.getItem("dmz.sales") || "[]");
+      if (raw.length !== (this.state.live || []).length) this.setState({ live: raw });
+    } catch (e) {}
+  };
+
+  say = (m) => { clearTimeout(this._t); this.setState({ toast: m }); this._t = setTimeout(() => this.setState({ toast: null }), 2600); };
+  initials = (n) => n.split(" ").map(w => w[0]).join("").slice(0, 2);
+
+  enter = (u) => this.setState({ me: u, err: "", pw: "" });
+
+  signIn = () => {
+    const st = this.state;
+    const u = this.users.filter(x => x.email.toLowerCase() === st.email.trim().toLowerCase())[0];
+    if (!u) return this.setState({ err: "No account with that email." });
+    if (st.pw !== "dmezzanine") return this.setState({ err: "Wrong password." });
+    if (u.role !== "Owner" && u.role !== "Branch lead") return this.setState({ err: "Sales reporting is limited to the owner and branch leads." });
+    this.enter(u);
+  };
+
+  periodStart(p) {
+    const now = new Date();
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (p === "Today") return d.getTime();
+    if (p === "This month") return new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    return d.getTime() - ((d.getDay() + 6) % 7) * 86400000;
+  }
+
+  records() {
+    const st = this.state;
+    const all = (this._seed || []).concat(st.live || []);
+    if (st.from || st.to) {
+      const lo = st.from ? new Date(st.from + "T00:00:00").getTime() : -Infinity;
+      const hi = st.to ? new Date(st.to + "T23:59:59").getTime() : Infinity;
+      return all.filter(r => r.ts >= lo && r.ts <= hi && (st.branch === "All branches" || r.branch === st.branch));
+    }
+    const from = this.periodStart(st.period);
+    return all.filter(r => r.ts >= from && (st.branch === "All branches" || r.branch === st.branch));
+  }
+
+  exportPdf = () => {
+    const st = this.state;
+    const recs = this.records();
+    const g = recs.reduce((a, r) => a + (r.gross != null ? r.gross : r.total), 0);
+    const due = recs.reduce((a, r) => a + r.total, 0);
+    const net = recs.reduce((a, r) => a + r.net, 0);
+    const vat = recs.reduce((a, r) => a + r.vat, 0);
+    const off = recs.reduce((a, r) => a + (r.vatOff || 0), 0);
+    const disc = recs.reduce((a, r) => a + (r.disc || 0), 0);
+    const byDay = {};
+    recs.forEach(r => { const d = new Date(r.ts); const k = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate(); (byDay[k] = byDay[k] || { d: d, t: 0, n: 0, v: 0, dc: 0, tx: 0 }); byDay[k].t += (r.gross != null ? r.gross : r.total); byDay[k].n += r.net; byDay[k].v += r.vat; byDay[k].dc += r.disc || 0; byDay[k].tx++; });
+    const days = Object.keys(byDay).map(k => byDay[k]).sort((a, b) => a.d - b.d);
+    const items = {};
+    recs.forEach(r => r.lines.forEach(l => { const i = items[l.name] = items[l.name] || { qty: 0, amt: 0, cat: l.cat }; i.qty += l.qty; i.amt += l.total; }));
+    const top = Object.keys(items).map(k => ({ name: k, ...items[k] })).sort((a, b) => b.amt - a.amt).slice(0, 10);
+    const catAgg = {}, methodAgg = {};
+    recs.forEach(r => {
+      r.lines.forEach(l => { catAgg[l.cat] = (catAgg[l.cat] || 0) + l.total; });
+    });
+    const catList = Object.keys(catAgg).map(k => ({ name: k, v: catAgg[k] })).sort((a, b) => b.v - a.v);
+    const methodList = PAYSPLIT(recs);
+    const w = window.open("", "_blank", "width=820,height=1000");
+    if (!w) return this.say("Allow pop-ups to export the report");
+    const chartSvg = (() => {
+      if (!days.length) return "";
+      const W = 700, H = 190, padB = 26, padT = 18;
+      const max = days.reduce((m, d) => Math.max(m, d.t), 0) || 1;
+      const slot = W / days.length, bw = Math.min(46, slot * 0.62);
+      const bars = days.map((d, i) => {
+        const h = Math.max(2, Math.round((H - padB - padT) * d.t / max));
+        const x = Math.round(i * slot + (slot - bw) / 2);
+        const y = H - padB - h;
+        return "<rect x='" + x + "' y='" + y + "' width='" + Math.round(bw) + "' height='" + h + "' rx='3' fill='#b4552d'></rect>" +
+          "<text x='" + Math.round(x + bw / 2) + "' y='" + (y - 5) + "' font-size='9.5' fill='#6b625a' text-anchor='middle'>" + PESO(d.t) + "</text>" +
+          "<text x='" + Math.round(x + bw / 2) + "' y='" + (H - padB + 13) + "' font-size='9.5' fill='#6b625a' text-anchor='middle'>" + DAYNAME[d.d.getDay()] + " " + d.d.getDate() + "</text>";
+      }).join("");
+      return "<svg viewBox='0 0 " + W + " " + H + "' width='100%' height='" + H + "' style='margin-top:10px'>" +
+        "<line x1='0' y1='" + (H - padB) + "' x2='" + W + "' y2='" + (H - padB) + "' stroke='#e6ddcc' stroke-width='1'></line>" + bars + "</svg>";
+    })();
+    const hBars = (rows, fill) => {
+      if (!rows.length) return "";
+      const W = 700, rh = 22, labelW = 150, valW = 84;
+      const H = rows.length * rh + 4;
+      const max = rows.reduce((m, r) => Math.max(m, r.v), 0) || 1;
+      const track = W - labelW - valW - 16;
+      const body = rows.map((r, i) => {
+        const y = i * rh + 4;
+        const bw = Math.max(2, Math.round(track * r.v / max));
+        const esc = String(r.name).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+        return "<text x='0' y='" + (y + 11) + "' font-size='10.5' fill='#201e1d'>" + esc + "</text>" +
+          "<rect x='" + labelW + "' y='" + (y + 3) + "' width='" + track + "' height='9' rx='4.5' fill='#efe6d6'></rect>" +
+          "<rect x='" + labelW + "' y='" + (y + 3) + "' width='" + bw + "' height='9' rx='4.5' fill='" + fill + "'></rect>" +
+          "<text x='" + W + "' y='" + (y + 11) + "' font-size='10.5' fill='#6b625a' text-anchor='end'>" + PESO(r.v) + "</text>";
+      }).join("");
+      return "<svg viewBox='0 0 " + W + " " + H + "' width='100%' height='" + H + "' style='margin-top:10px'>" + body + "</svg>";
+    };
+    const row = (c) => "<tr>" + c.map((x, i) => "<td style='padding:6px 8px;border-bottom:1px solid #e6ddcc;" + (i ? "text-align:right" : "") + "'>" + x + "</td>").join("") + "</tr>";
+    w.document.write(
+      "<html><head><title>Sales report</title><style>@page{size:A4;margin:16mm}body{font-family:ui-sans-serif,system-ui;color:#201e1d;margin:0}h1{font-size:20px;margin:0 0 2px}p{margin:0;font-size:12px;color:#6b625a}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}th{text-align:left;font-weight:700;padding:6px 8px;border-bottom:1.5px solid #201e1d;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase}h2{font-size:13px;margin:22px 0 0}</style></head><body>" +
+      "<h1>Sales report</h1><p>" + (st.from || st.to ? (st.from || "\u2026") + " to " + (st.to || "\u2026") : st.period) + " \u00b7 " + st.branch + " \u00b7 " + recs.length + " transactions</p>" +
+      "<h2>Summary</h2><table>" +
+      row(["Total sales", PESO2(g)]) + row(["Amount net of VAT", PESO2(net)]) + row(["VAT 12%", PESO2(vat)]) +
+      row(["VAT exempt (senior/PWD)", PESO2(off)]) + row(["Senior / PWD discounts", PESO2(disc)]) +
+      row(["Total amount due", PESO2(due)]) +
+      row(["Average ticket", PESO2(recs.length ? due / recs.length : 0)]) + "</table>" +
+      "<h2>Per day</h2>" + chartSvg +
+      "<table><tr><th>Day</th><th style='text-align:right'>Tx</th><th style='text-align:right'>Total sales</th><th style='text-align:right'>Net of VAT</th><th style='text-align:right'>VAT</th><th style='text-align:right'>Disc.</th></tr>" +
+      days.map(d => row([DAYNAME[d.d.getDay()] + " " + d.d.getDate() + " " + MONTH[d.d.getMonth()], d.tx, PESO2(d.t), PESO2(d.n), PESO2(d.v), PESO2(d.dc)])).join("") + "</table>" +
+      "<h2>Sales by item</h2>" + hBars(top.slice(0, 8).map(i => ({ name: i.name, v: i.amt })), "#b4552d") +
+      "<h2>Sales by category</h2>" + hBars(catList, "#b4552d") +
+      "<h2>Payment method</h2>" + hBars(methodList, "#5c6b4a") +
+      "<h2>Top items</h2><table><tr><th>Item</th><th style='text-align:right'>Qty</th><th style='text-align:right'>Sales</th></tr>" +
+      top.map(i => row([i.name + " \u00b7 " + i.cat, i.qty, PESO2(i.amt)])).join("") + "</table>" +
+      "</body></html>");
+    w.document.close();
+    w.focus();
+    setTimeout(() => w.print(), 350);
+  };
+
+  renderVals() {
+    const st = this.state;
+    const NEU = "var(--color-neutral-100)";
+    const DIM = "color-mix(in srgb,var(--color-text) 74%,transparent)";
+    const recs = st.me ? this.records() : [];
+    const total = recs.reduce((a, r) => a + r.total, 0);
+    const gross = recs.reduce((a, r) => a + (r.gross != null ? r.gross : r.total), 0);
+    const net = recs.reduce((a, r) => a + r.net, 0);
+    const vat = recs.reduce((a, r) => a + r.vat, 0);
+    const vatOff = recs.reduce((a, r) => a + (r.vatOff || 0), 0);
+    const disc = recs.reduce((a, r) => a + (r.disc || 0), 0);
+    const avg = recs.length ? total / recs.length : 0;
+
+    const byDay = {};
+    recs.forEach(r => {
+      const d = new Date(r.ts);
+      const k = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
+      byDay[k] = byDay[k] || { d: d, total: 0, gross: 0, net: 0, vat: 0, disc: 0, tx: 0 };
+      byDay[k].total += r.total; byDay[k].gross += (r.gross != null ? r.gross : r.total);
+      byDay[k].net += r.net; byDay[k].vat += r.vat; byDay[k].disc += r.disc || 0; byDay[k].tx++;
+    });
+    const days = Object.keys(byDay).map(k => byDay[k]).sort((a, b) => a.d - b.d);
+    const dayMax = days.reduce((m, d) => Math.max(m, d.total), 0) || 1;
+
+    const sum = (key, get) => {
+      const m = {};
+      recs.forEach(r => { const k = get(r); if (k == null) return; m[k] = (m[k] || 0) + r.total; });
+      return Object.keys(m).map(k => ({ name: k, v: m[k] })).sort((a, b) => b.v - a.v);
+    };
+    const catMap = {};
+    const itemMap = {};
+    recs.forEach(r => r.lines.forEach(l => {
+      catMap[l.cat] = (catMap[l.cat] || 0) + l.total;
+      const i = itemMap[l.name] = itemMap[l.name] || { qty: 0, amt: 0, cat: l.cat };
+      i.qty += l.qty; i.amt += l.total;
+    }));
+    const cats = Object.keys(catMap).map(k => ({ name: k, v: catMap[k] })).sort((a, b) => b.v - a.v);
+    const catMax = cats.reduce((m, c) => Math.max(m, c.v), 0) || 1;
+    const methods = PAYSPLIT(recs);
+    const methodMax = methods.reduce((m, c) => Math.max(m, c.v), 0) || 1;
+    const items = Object.keys(itemMap).map(k => Object.assign({ name: k }, itemMap[k]));
+    const best = items.slice().sort((a, b) => b.amt - a.amt).slice(0, 8);
+    const worst = items.slice().sort((a, b) => a.amt - b.amt).slice(0, 8);
+
+    const branchAgg = {};
+    recs.forEach(r => { const b = branchAgg[r.branch] = branchAgg[r.branch] || { total: 0, tx: 0 }; b.total += r.total; b.tx++; });
+
+    const seedAll = this._seed || [];
+    const fmtD = s => { const d = new Date(s + "T00:00:00"); return isNaN(d) ? s : d.getDate() + " " + MONTH[d.getMonth()]; };
+    const rangeText = (st.from || st.to)
+      ? (st.from && st.to ? fmtD(st.from) + " \u2013 " + fmtD(st.to) : st.from ? "From " + fmtD(st.from) : "Up to " + fmtD(st.to))
+      : st.period;
+    const weekFrom = this.periodStart("This week");
+    const weekRecs = seedAll.filter(r => r.ts >= weekFrom);
+
+    return {
+      isLogin: false, isApp: true,
+      email: st.email, pw: st.pw, err: st.err, errShow: st.err ? "block" : "none",
+      pwType: st.pwShow ? "text" : "password",
+      pwToggleLabel: st.pwShow ? "Hide password" : "Show password",
+      togglePw: () => this.setState(s => ({ pwShow: !s.pwShow })),
+      setEmail: e => this.setState({ email: e.target.value, err: "" }),
+      setPw: e => this.setState({ pw: e.target.value, err: "" }),
+      keyGo: e => { if (e.key === "Enter") this.signIn(); },
+      signIn: this.signIn,
+      demoAccounts: this.users.filter(u => u.role === "Owner" || u.role === "Branch lead").map(u => ({
+        name: u.name, email: u.email, role: u.role, initials: this.initials(u.name), use: () => this.enter(u)
+      })),
+      loginPoints: [
+        { n: "01", t: "Daily takings and average ticket" },
+        { n: "02", t: "Item, category and payment mix" },
+        { n: "03", t: "VAT and senior discount breakdown" }
+      ],
+      loginWeek: PESO(weekRecs.reduce((a, r) => a + r.total, 0)),
+      loginTx: String(weekRecs.length),
+      loginBranches: String(BRANCHES.length),
+
+      signOut: () => this.setState({ logoutOpen: true }),
+      logoutOpen: !!this.state.logoutOpen,
+      cancelLogout: () => this.setState({ logoutOpen: false }),
+      stopLogout: e => e.stopPropagation(),
+      confirmLogout: () => { this.setState({ logoutOpen: false }); GOHOME(); },
+      meName: st.me ? st.me.name : "", meRole: st.me ? st.me.role : "",
+      meInitials: st.me ? this.initials(st.me.name) : "",
+
+      nav: [["SALES", null], ["Overview", "overview", "\u25a6"], ["VAT summary", "vat", "\u25a5"]].map(n => {
+        if (!n[1]) return { label: n[0], display: "block", cursor: "default", bg: "transparent", fg: NEU, pad: "16px 12px 6px", fw: "600", size: "10px", ls: ".16em", tt: "uppercase", op: ".42", icon: "", go: () => {} };
+        const on = st.tab === n[1];
+        return {
+          label: n[0], display: "flex", cursor: "pointer", pad: "9px 12px", fw: on ? "600" : "500", size: "13px", ls: "0", tt: "none", op: "1", icon: n[2],
+          bg: on ? "var(--color-accent)" : "transparent",
+          fg: on ? NEU : "color-mix(in srgb,var(--color-neutral-100) 82%,transparent)",
+          go: () => this.setState({ tab: n[1] })
+        };
+      }),
+
+      title: st.tab === "vat" ? "VAT summary" : "Sales overview",
+      overviewShow: st.tab === "overview" ? "block" : "none",
+      vatShow: st.tab === "vat" ? "block" : "none",
+
+      periods: ["Today", "This week", "This month"].map(p => {
+        const on = !st.from && !st.to && st.period === p;
+        return {
+          label: p, bg: on ? "var(--color-accent)" : "transparent",
+          fg: on ? NEU : "var(--color-text)",
+          go: () => this.setState({ period: p, from: "", to: "" })
+        };
+      }),
+      dateFrom: st.from || "", dateTo: st.to || "",
+      setFrom: e => this.setState({ from: e.target.value }),
+      setTo: e => this.setState({ to: e.target.value }),
+      dateClearShow: st.from || st.to ? "inline-flex" : "none",
+      clearDates: () => this.setState({ from: "", to: "" }),
+      branchFilter: st.branch, branchOpts: ["All branches"].concat(BRANCHES),
+      setBranch: e => this.setState({ branch: e.target.value }),
+      exportPdf: this.exportPdf,
+      rangeLabel: rangeText + " \u00b7 " + st.branch,
+
+      stats: [
+        { label: "Total sales", value: PESO(gross), sub: recs.length + " transactions \u00b7 " + PESO(total) + " collected", bg: "var(--color-accent-200)", border: "var(--color-accent-600)", labelFg: "var(--color-accent-900)", valueFg: "var(--color-accent-900)", subFg: "var(--color-accent-800)" },
+        { label: "Average ticket", value: PESO2(avg), sub: "per transaction", bg: "var(--color-surface)", border: "var(--color-divider)", labelFg: DIM, valueFg: "var(--color-text)", subFg: DIM },
+        { label: "Amount net of VAT", value: PESO(net), sub: "VAT " + PESO(vat), bg: "var(--color-surface)", border: "var(--color-divider)", labelFg: DIM, valueFg: "var(--color-text)", subFg: DIM },
+        { label: "Senior / PWD", value: PESO(disc), sub: "discount given", bg: "var(--color-surface)", border: "var(--color-divider)", labelFg: DIM, valueFg: "var(--color-text)", subFg: DIM }
+      ],
+
+      dayBars: days.map((d, i) => ({
+        label: st.period === "This month" ? String(d.d.getDate()) : DAYNAME[d.d.getDay()],
+        focus: () => {
+          const iso = d.d.getFullYear() + "-" + String(d.d.getMonth() + 1).padStart(2, "0") + "-" + String(d.d.getDate()).padStart(2, "0");
+          this.setState({ from: iso, to: iso, hoverDay: null });
+        },
+        on: () => this.setState({ hoverDay: i }),
+        off: () => this.setState({ hoverDay: null }),
+        labelVis: st.hoverDay === i ? "visible" : "hidden",
+        labelFw: "600",
+        labelFg: "var(--color-text)",
+        amount: d.total >= 10000 ? "\u20b1" + Math.round(d.total / 1000) + "k" : d.total >= 1000 ? "\u20b1" + (d.total / 1000).toFixed(1) + "k" : PESO(d.total),
+        h: Math.max(2, Math.round((d.total / dayMax) * 100)) + "%",
+        fill: st.hoverDay === i ? "var(--color-accent-700)" : d.total === dayMax ? "var(--color-accent)" : "var(--color-accent-400)"
+      })),
+      axisTicks: [3, 2, 1, 0].map(i => {
+        const v = (dayMax / 3) * i;
+        return v >= 1000 ? "\u20b1" + (v / 1000).toFixed(v >= 10000 ? 0 : 1) + "k" : "\u20b1" + Math.round(v);
+      }),
+      emptyShow: days.length ? "none" : "block",
+      dayTableShow: days.length ? "block" : "none",
+      dayRows: days.slice().sort((a, b) => b.d - a.d).map(d => ({
+        focus: () => {
+          const iso = d.d.getFullYear() + "-" + String(d.d.getMonth() + 1).padStart(2, "0") + "-" + String(d.d.getDate()).padStart(2, "0");
+          this.setState({ from: iso, to: iso });
+        },
+        date: DAYNAME[d.d.getDay()] + " \u00b7 " + MONTH[d.d.getMonth()] + " " + d.d.getDate(),
+        tx: String(d.tx),
+        total: PESO(d.total),
+        net: PESO(d.net),
+        avg: PESO2(d.tx ? d.total / d.tx : 0)
+      })),
+
+      catRows: cats.map(c => ({ name: c.name, amount: PESO(c.v), w: Math.round((c.v / catMax) * 100) + "%" })),
+      methodRows: methods.map(m => ({ name: m.name, amount: PESO(m.v), w: Math.round((m.v / methodMax) * 100) + "%" })),
+
+      branchRows: Object.keys(branchAgg).sort((a, b) => branchAgg[b].total - branchAgg[a].total).map(k => ({
+        name: k, tx: String(branchAgg[k].tx), avg: PESO2(branchAgg[k].total / branchAgg[k].tx), amount: PESO(branchAgg[k].total)
+      })),
+
+      bestRows: best.map((i, n) => ({ rank: String(n + 1), name: i.name, cat: i.cat, qty: String(i.qty), amount: PESO(i.amt) })),
+      itemBars: (() => {
+        const top8 = best.slice(0, 8);
+        const mx = top8.reduce((m, i) => Math.max(m, i.amt), 0) || 1;
+        return top8.map(i => ({ name: i.name, qty: i.qty + "\u00d7", amount: PESO(i.amt), w: Math.round((i.amt / mx) * 100) + "%" }));
+      })(),
+
+      vatLines: [
+        { k: "Total sales", v: PESO2(gross) },
+        { k: "Amount net of VAT", v: PESO2(net) },
+        { k: "Add VAT 12%", v: PESO2(vat) },
+        { k: "VAT exempt (senior/PWD)", v: "\u2212" + PESO2(vatOff) },
+        { k: "Less 20% discount", v: "\u2212" + PESO2(disc) }
+      ],
+      vatTotal: PESO2(total),
+      vatRows: days.slice().reverse().map(d => ({
+        day: DAYNAME[d.d.getDay()] + " " + d.d.getDate() + " " + MONTH[d.d.getMonth()],
+        gross: PESO2(d.gross), net: PESO2(d.net), vat: PESO2(d.vat), disc: d.disc ? "\u2212" + PESO2(d.disc) : "\u2014"
+      })),
+
+      toast: st.toast || "", toastShow: st.toast ? "block" : "none"
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="organic.css"><style>html,body{margin:0;height:100%;overflow:hidden}#root{height:100%}a{color:var(--color-accent-700);text-decoration:none}a:hover{color:var(--color-accent-800)}*{scrollbar-width:none;-ms-overflow-style:none}*::-webkit-scrollbar{width:0;height:0;display:none}@keyframes tin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}h1,h2,h3,h4{font-family:var(--font-body);font-weight:600;letter-spacing:-.012em}body{font-variant-numeric:tabular-nums}.input{border-radius:4px!important}.btn{font-family:var(--font-body)!important;font-weight:600!important;border-radius:4px!important;letter-spacing:0}</style></helmet>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+<div style="height:100vh;display:grid;grid-template-columns:246px 1fr;background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)">
+
+  <div style="background:var(--color-neutral-900);color:var(--color-neutral-100);display:flex;flex-direction:column;overflow:hidden">
+    <div style="padding:20px 18px 16px;display:flex;align-items:center;gap:11px;flex:none">
+      <img src="logo.png" alt="D' Mezzanine Cafe" style="width:36px;height:36px;border-radius:999px;flex:none;object-fit:cover">
+      <div>
+        <div style="font-family:var(--font-body);font-weight:600;font-size:15px;line-height:1.15">DMC Owner console</div>
+        <div style="font-size:10px;letter-spacing:.28em;color:#e0b12a">D’ MEZZANINE CAFE</div>
+      </div>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 10px 16px;display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="4">
+        <button onClick="{{ n.go }}" style="display:{{ n.display }};width:100%;text-align:left;border:0;cursor:{{ n.cursor }};background:{{ n.bg }};color:{{ n.fg }};border-radius:4px;padding:{{ n.pad }};font-family:var(--font-body);font-weight:{{ n.fw }};font-size:{{ n.size }};letter-spacing:{{ n.ls }};text-transform:{{ n.tt }};align-items:center;gap:9px;opacity:{{ n.op }}">
+          <span style="width:16px;flex:none;text-align:center;font-size:12px;opacity:.85">{{ n.icon }}</span>
+          <span style="flex:1">{{ n.label }}</span>
+          <span style="font-size:11px;font-family:var(--font-body);background:{{ n.badgeBg }};color:{{ n.badgeFg }};padding:1px 7px;border-radius:4px;display:{{ n.badgeShow }}">{{ n.badge }}</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="flex:none;padding:14px 18px 18px;border-top:1px solid rgba(255,255,255,.12);font-size:12px">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div style="width:28px;height:28px;border-radius:999px;background:var(--color-neutral-700);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--font-body);font-weight:600">{{ meInitials }}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ meName }}</div>
+          <div style="opacity:.55;font-size:11px">{{ meRole }}</div>
+        </div>
+      </div>
+      <button onClick="{{ signOut }}" style="margin-top:12px;width:100%;border:1px solid rgba(255,255,255,.14);background:transparent;cursor:pointer;color:color-mix(in srgb,var(--color-neutral-100) 72%,transparent);font-family:var(--font-body);font-size:12.5px;border-radius:4px;padding:8px 10px;text-align:center" style-hover="background:color-mix(in srgb,var(--color-neutral-100) 8%,transparent);color:var(--color-neutral-100)">Exit</button>
+    </div>
+  </div>
+
+  <div style="overflow-y:auto;overflow-x:hidden;position:relative;min-width:0">
+    <div style="position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--color-bg) 92%,transparent);backdrop-filter:blur(8px);padding:22px 32px 16px;border-bottom:1px solid var(--color-divider);display:flex;align-items:flex-end;gap:20px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ crumb }}</div>
+        <h2 style="margin:4px 0 0;font-size:23px;line-height:1.1">{{ title }}</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex:none">
+        <input class="input" placeholder="Search name or email" value="{{ q }}" onInput="{{ setQ }}" style="width:230px;border-radius:4px;display:{{ searchShow }}">
+        <button class="btn btn-primary" onClick="{{ openInvite }}" style="border-radius:4px;display:{{ inviteShow }};white-space:nowrap">Invite a user</button>
+      </div>
+    </div>
+
+    <div style="padding:26px 32px 60px">
+      <sc-if value="{{ isUsersTab }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:tin .22s ease both">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="3">
+            <div style="border:1px solid {{ s.border }};background:{{ s.bg }};border-radius:var(--radius-md);padding:18px 18px 16px">
+              <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:{{ s.labelFg }}">{{ s.label }}</div>
+              <div style="font-family:var(--font-body);font-weight:600;font-size:27px;line-height:1.05;margin-top:8px;color:{{ s.valueFg }}">{{ s.value }}</div>
+              <div style="font-size:12.5px;margin-top:4px;color:{{ s.subFg }}">{{ s.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:var(--color-surface);border-radius:var(--radius-md);border:1px solid var(--color-divider);overflow:hidden">
+          <div style="display:grid;grid-template-columns:minmax(150px,1.5fr) minmax(84px,132px) minmax(96px,160px) minmax(80px,132px) minmax(120px,210px);gap:10px;padding:12px 18px;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);background:var(--color-neutral-100);font-weight:700;font-family:var(--font-body)">
+            <div>User</div><div>Role</div><div>Location</div><div>Last login</div><div style="justify-self:end">Access</div>
+          </div>
+          <sc-for list="{{ userRows }}" as="u" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:minmax(150px,1.5fr) minmax(84px,132px) minmax(96px,160px) minmax(80px,132px) minmax(120px,210px);gap:10px;align-items:center;padding:12px 18px;border-top:1px solid var(--color-divider);opacity:{{ u.op }}">
+              <div style="display:flex;align-items:center;gap:11px">
+                <div style="width:34px;height:34px;border-radius:999px;background:{{ u.avBg }};color:{{ u.avFg }};display:flex;align-items:center;justify-content:center;font-family:var(--font-body);font-weight:600;font-size:13px;flex:none">{{ u.initials }}</div>
+                <div style="min-width:0;overflow:hidden">
+                  <div style="font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ u.name }}</div>
+                  <div style="font-size:11.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ u.email }}</div>
+                </div>
+              </div>
+              <div><span style="font-size:11.5px;padding:3px 9px;border-radius:4px;background:{{ u.roleBg }};color:{{ u.roleFg }}">{{ u.role }}</span></div>
+              <div style="font-size:12.5px">{{ u.loc }}</div>
+              <div style="font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.last }}</div>
+              <div style="justify-self:end;display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+                <button onClick="{{ u.secondary }}" style="border:1px solid var(--color-divider);background:var(--color-bg);cursor:pointer;border-radius:4px;padding:6px 12px;font-size:12px">{{ u.secondaryLabel }}</button>
+                <button onClick="{{ u.toggle }}" style="border:0;cursor:pointer;border-radius:4px;padding:7px 13px;font-size:12px;font-family:var(--font-body);font-weight:600;background:{{ u.togBg }};color:{{ u.togFg }}">{{ u.togLabel }}</button>
+              </div>
+            </div>
+          </sc-for>
+          <div style="display:{{ emptyShow }};padding:34px;text-align:center;font-size:13.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">No user matches that search.</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isRolesTab }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:tin .22s ease both;background:var(--color-surface);border-radius:var(--radius-md);border:1px solid var(--color-divider);overflow-x:auto">
+        <div style="display:grid;min-width:640px;grid-template-columns:minmax(170px,1.4fr) repeat(5,minmax(76px,1fr));gap:8px;padding:12px 18px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);background:var(--color-neutral-100);font-weight:700;font-family:var(--font-body)">
+          <div>User</div>
+          <sc-for list="{{ permCols }}" as="c" hint-placeholder-count="5">
+            <div style="text-align:center;text-wrap:pretty">{{ c }}</div>
+          </sc-for>
+        </div>
+        <div style="display:{{ permEmptyShow }};padding:34px;text-align:center;font-size:13.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">No user matches “{{ q }}”.</div>
+        <sc-for list="{{ permRows }}" as="p" hint-placeholder-count="5">
+          <div style="display:grid;min-width:640px;grid-template-columns:minmax(170px,1.4fr) repeat(5,minmax(76px,1fr));gap:8px;align-items:center;padding:11px 18px;border-top:1px solid var(--color-divider);opacity:{{ p.op }}">
+            <div style="display:flex;align-items:center;gap:10px;min-width:0">
+              <div style="width:30px;height:30px;border-radius:999px;background:{{ p.avBg }};color:{{ p.avFg }};display:flex;align-items:center;justify-content:center;font-family:var(--font-body);font-weight:600;font-size:12px;flex:none">{{ p.initials }}</div>
+              <div style="min-width:0">
+                <div style="font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.name }}</div>
+                <div style="font-size:11.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ p.role }}</div>
+              </div>
+            </div>
+            <sc-for list="{{ p.cells }}" as="c" hint-placeholder-count="5">
+              <label style="display:flex;align-items:center;justify-content:center;cursor:{{ c.cursor }}" title="{{ c.hint }}">
+                <input type="checkbox" checked="{{ c.on }}" disabled="{{ c.dis }}" onChange="{{ c.toggle }}" style="width:19px;height:19px;accent-color:var(--color-accent);cursor:{{ c.cursor }}">
+              </label>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div style="padding:13px 18px;border-top:1px solid var(--color-divider);font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">Ticks are set from each person’s role, and any change you make here is kept as an exception for that person. The owner keeps every page, including this one.</div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isBranchesTab }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:tin .22s ease both;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+        <sc-for list="{{ branchCards }}" as="b" hint-placeholder-count="3">
+          <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:20px;display:flex;flex-direction:column;gap:2px">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="flex:1">
+                <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ b.kind }}</div>
+                <h4 style="margin:3px 0 0;font-size:16px">{{ b.name }}</h4>
+              </div>
+              <span style="font-size:11.5px;padding:3px 9px;border-radius:4px;background:{{ b.tagBg }};color:{{ b.tagFg }};white-space:nowrap">{{ b.tag }}</span>
+            </div>
+            <div style="font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent);margin-top:8px">{{ b.addr }}</div>
+            <div style="display:flex;gap:24px;margin-top:16px">
+              <div><div style="font-family:var(--font-body);font-weight:600;font-size:18px">{{ b.items }}</div><div style="font-size:11.5px;opacity:.55">SKUs tracked</div></div>
+              <div><div style="font-family:var(--font-body);font-weight:600;font-size:18px">{{ b.staff }}</div><div style="font-size:11.5px;opacity:.55">Staff</div></div>
+            </div>
+            <div style="height:1px;background:var(--color-divider);margin:16px 0 12px"></div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="flex:1;font-size:12.5px"><span style="opacity:.55">Manager</span> {{ b.manager }}</div>
+              <button onClick="{{ b.settings }}" style="border:1px solid var(--color-divider);background:var(--color-bg);cursor:pointer;border-radius:4px;padding:6px 12px;font-size:12px">Settings</button>
+            </div>
+          </div>
+        </sc-for>
+        <button onClick="{{ openBranch }}" style="border:1.5px dashed var(--color-accent-400);background:transparent;cursor:pointer;border-radius:var(--radius-md);padding:20px;min-height:210px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--color-accent-700)">
+          <div style="width:44px;height:44px;border-radius:999px;background:var(--color-accent-200);display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1">+</div>
+          <div style="font-family:var(--font-body);font-weight:600;font-size:15px">Add a location</div>
+          <div style="font-size:12px;opacity:.7;text-align:center;max-width:24ch">New branches inherit the warehouse item list</div>
+        </button>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isLogTab }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:tin .22s ease both;display:flex;flex-wrap:wrap;align-items:center;column-gap:14px;row-gap:10px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);margin-right:2px">Date</span>
+          <sc-for list="{{ logDateChips }}" as="c" hint-placeholder-count="3">
+            <button onClick="{{ c.pick }}" style="border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }};cursor:pointer;border-radius:4px;padding:6px 11px;font-size:12.5px;white-space:nowrap">{{ c.label }}</button>
+          </sc-for>
+          <div style="display:flex;align-items:center;gap:5px">
+            <input type="date" value="{{ logFrom }}" onChange="{{ logSetFrom }}" style="border:1px solid var(--color-divider);background:var(--color-surface);color:var(--color-text);border-radius:4px;padding:5px 7px;font-size:12px;font-family:var(--font-body)">
+            <span style="font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">to</span>
+            <input type="date" value="{{ logTo }}" onChange="{{ logSetTo }}" style="border:1px solid var(--color-divider);background:var(--color-surface);color:var(--color-text);border-radius:4px;padding:5px 7px;font-size:12px;font-family:var(--font-body)">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);margin-right:2px">Category</span>
+          <sc-for list="{{ logKindChips }}" as="c" hint-placeholder-count="5">
+            <button onClick="{{ c.pick }}" style="border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }};cursor:pointer;border-radius:4px;padding:6px 11px;font-size:12.5px;white-space:nowrap">{{ c.label }}</button>
+          </sc-for>
+        </div>
+        <div style="margin-left:auto;font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent);font-variant-numeric:tabular-nums">{{ logCount }}</div>
+      </div>
+      <div style="animation:tin .22s ease both;background:var(--color-surface);border-radius:var(--radius-md);border:1px solid var(--color-divider);overflow:hidden">
+        <sc-for list="{{ logRows }}" as="l" hint-placeholder-count="10">
+          <div onClick="{{ l.open }}" style="display:grid;grid-template-columns:126px 26px 1fr 150px;gap:14px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--color-divider);cursor:pointer" style-hover="background:var(--color-bg)">
+            <div style="font-size:12px;color:color-mix(in srgb,var(--color-text) 74%,transparent);font-variant-numeric:tabular-nums">{{ l.when }}</div>
+            <div style="width:26px;height:26px;border-radius:999px;background:{{ l.dotBg }};color:{{ l.dotFg }};display:flex;align-items:center;justify-content:center;font-size:12px">{{ l.icon }}</div>
+            <div>
+              <div style="font-size:13.5px">{{ l.what }}</div>
+              <div style="font-size:11.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ l.detail }}</div>
+            </div>
+            <div style="justify-self:end;font-size:12.5px">{{ l.who }}</div>
+          </div>
+        </sc-for>
+        <div style="display:{{ logEmptyShow }};padding:38px 18px;text-align:center;font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">No activity matches these filters.</div>
+      </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+
+<sc-if value="{{ logDetailOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(32,30,29,.42);display:flex;align-items:center;justify-content:center;z-index:50;padding:24px" onClick="{{ closeLogDetail }}">
+  <div onClick="{{ stop }}" style="width:100%;max-width:480px;background:var(--color-surface);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);animation:tin .2s ease both;overflow:hidden">
+    <div style="display:flex;align-items:flex-start;gap:13px;padding:22px 26px 18px;border-bottom:1px solid var(--color-divider)">
+      <div style="flex:none;width:34px;height:34px;border-radius:999px;background:{{ ldDotBg }};color:{{ ldDotFg }};display:flex;align-items:center;justify-content:center;font-size:15px">{{ ldIcon }}</div>
+      <div style="min-width:0;flex:1">
+        <h3 style="margin:0 0 3px;font-size:17px;line-height:1.25">{{ ldWhat }}</h3>
+        <div style="font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ ldKind }} · {{ ldRef }}</div>
+      </div>
+    </div>
+    <div style="padding:20px 26px 8px;display:flex;flex-direction:column;gap:0">
+      <sc-for list="{{ ldFields }}" as="f" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:112px 1fr;gap:14px;padding:11px 0;border-bottom:1px solid var(--color-divider)">
+          <div style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);padding-top:2px">{{ f.k }}</div>
+          <div style="font-size:13.5px;font-variant-numeric:tabular-nums;text-wrap:pretty">{{ f.v }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;justify-content:flex-end;padding:18px 26px 22px">
+      <button onClick="{{ closeLogDetail }}" style="border:1px solid var(--color-divider);background:var(--color-bg);cursor:pointer;border-radius:4px;padding:10px 20px;font-size:13.5px">Close</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ branchModalOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(32,30,29,.42);display:flex;align-items:center;justify-content:center;z-index:60;padding:24px;overflow-y:auto" onClick="{{ closeBranch }}">
+  <div onClick="{{ stop }}" style="width:100%;max-width:430px;background:var(--color-surface);border-radius:var(--radius-md);padding:26px;box-shadow:var(--shadow-lg);animation:tin .2s ease both">
+    <h3 style="margin:0 0 5px;font-size:18px">{{ branchModalTitle }}</h3>
+    <p style="margin:0 0 20px;font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ branchModalSub }}</p>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <sc-for list="{{ branchFields }}" as="f" hint-placeholder-count="5">
+        <div class="field">
+          <label>{{ f.label }}</label>
+          <input class="input" placeholder="{{ f.ph }}" value="{{ f.value }}" onInput="{{ f.set }}" style="width:100%;border-radius:4px;display:{{ f.inputShow }}">
+          <div style="display:{{ f.optsShow }};gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ f.opts }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.pick }}" style="border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }};cursor:pointer;border-radius:4px;padding:7px 13px;font-size:12.5px">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:24px">
+      <button onClick="{{ closeBranch }}" style="flex:none;border:1px solid var(--color-divider);background:var(--color-bg);cursor:pointer;border-radius:4px;padding:11px 18px;font-size:13.5px">Cancel</button>
+      <button onClick="{{ saveBranch }}" class="btn btn-primary" style="flex:1;padding:12px;font-size:14px;opacity:{{ branchModalOp }}">{{ branchModalCta }}</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ inviteOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(32,30,29,.42);display:flex;align-items:center;justify-content:center;z-index:60;padding:24px" onClick="{{ closeInvite }}">
+  <div onClick="{{ stop }}" style="width:100%;max-width:420px;background:var(--color-surface);border-radius:var(--radius-md);padding:26px;box-shadow:var(--shadow-lg);animation:tin .2s ease both">
+    <h3 style="margin:0 0 5px;font-size:18px">Invite a user</h3>
+    <p style="margin:0 0 20px;font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">They get an email with a first-time password and till PIN, both changeable after sign-in.</p>
+    <div class="field" style="margin-bottom:13px">
+      <label>Full name</label>
+      <input class="input" value="{{ fName }}" onInput="{{ setFName }}" placeholder="e.g. Paolo Rivas" style="width:100%;border-radius:4px">
+    </div>
+    <div class="field" style="margin-bottom:13px">
+      <label>Work email</label>
+      <input class="input" value="{{ fEmail }}" onInput="{{ setFEmail }}" placeholder="name@dmezzanine.ph" style="width:100%;border-radius:4px">
+    </div>
+    <div class="field" style="margin-bottom:13px">
+      <label>Role</label>
+      <select class="input" value="{{ fRole }}" onChange="{{ setFRole }}" style="width:100%;border-radius:4px;cursor:pointer">
+        <sc-for list="{{ roleOpts }}" as="o" hint-placeholder-count="5">
+          <option value="{{ o }}">{{ o }}</option>
+        </sc-for>
+      </select>
+    </div>
+    <div class="field" style="margin-bottom:22px">
+      <label>Location</label>
+      <select class="input" value="{{ fLoc }}" onChange="{{ setFLoc }}" style="width:100%;border-radius:4px;cursor:pointer">
+        <sc-for list="{{ locOpts }}" as="o" hint-placeholder-count="4">
+          <option value="{{ o }}">{{ o }}</option>
+        </sc-for>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onClick="{{ closeInvite }}" style="flex:1;border:1px solid var(--color-divider);background:var(--color-bg);cursor:pointer;border-radius:4px;padding:11px;font-size:13.5px">Cancel</button>
+      <button onClick="{{ sendInvite }}" class="btn btn-primary" style="flex:1;padding:12px;font-size:14px">Send invite</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ revokeOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(32,30,29,.42);display:flex;align-items:center;justify-content:center;z-index:60;padding:24px" onClick="{{ closeRevoke }}">
+  <div onClick="{{ stop }}" style="width:100%;max-width:400px;background:var(--color-surface);border-radius:var(--radius-md);padding:26px;box-shadow:var(--shadow-lg);animation:tin .2s ease both">
+    <h3 style="margin:0 0 6px;font-size:18px">Revoke {{ revokeName }}?</h3>
+    <p style="margin:0 0 6px;font-size:13.5px">{{ revokeWho }}</p>
+    <p style="margin:0 0 22px;font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent);text-wrap:pretty">They are signed out of the till and back office immediately. You can grant access again at any time.</p>
+    <div style="display:flex;gap:10px">
+      <button onClick="{{ closeRevoke }}" style="flex:1;border:1px solid var(--color-divider);background:var(--color-bg);cursor:pointer;border-radius:4px;padding:11px;font-size:13.5px">Cancel</button>
+      <button onClick="{{ doRevoke }}" style="flex:1;border:0;cursor:pointer;border-radius:4px;padding:12px;font-size:14px;font-family:var(--font-body);font-weight:600;background:var(--color-accent);color:var(--color-neutral-100)">Revoke access</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sentOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(32,30,29,.42);display:flex;align-items:center;justify-content:center;z-index:60;padding:24px" onClick="{{ closeSent }}">
+  <div onClick="{{ stop }}" style="width:100%;max-width:430px;background:var(--color-surface);border-radius:var(--radius-md);padding:26px;box-shadow:var(--shadow-lg);animation:tin .2s ease both">
+    <h3 style="margin:0 0 5px;font-size:18px">Invite sent</h3>
+    <p style="margin:0 0 20px;font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent);text-wrap:pretty">Emailed to {{ sentEmail }}. Shown here once, so note them down if you need to read them out.</p>
+    <div style="display:grid;gap:10px">
+      <div style="display:flex;align-items:center;gap:12px;background:var(--color-bg);border:1px solid var(--color-divider);border-radius:4px;padding:13px 15px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent)">First-time password</div>
+          <div style="margin-top:3px;font-family:var(--font-body);font-weight:600;font-size:16px;letter-spacing:.04em">{{ sentPw }}</div>
+        </div>
+        <button onClick="{{ copyPw }}" style="flex:none;border:1px solid var(--color-divider);background:var(--color-surface);cursor:pointer;border-radius:4px;padding:7px 12px;font-family:var(--font-body);font-size:12.5px" style-hover="border-color:var(--color-accent)">Copy</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;background:var(--color-bg);border:1px solid var(--color-divider);border-radius:4px;padding:13px 15px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent)">Till PIN</div>
+          <div style="margin-top:3px;font-family:var(--font-body);font-weight:600;font-size:16px;letter-spacing:.22em;font-variant-numeric:tabular-nums">{{ sentPin }}</div>
+        </div>
+        <button onClick="{{ copyPin }}" style="flex:none;border:1px solid var(--color-divider);background:var(--color-surface);cursor:pointer;border-radius:4px;padding:7px 12px;font-family:var(--font-body);font-size:12.5px" style-hover="border-color:var(--color-accent)">Copy</button>
+      </div>
+    </div>
+    <p style="margin:14px 0 22px;font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ sentWho }}</p>
+    <button onClick="{{ closeSent }}" class="btn btn-primary" style="width:100%;padding:12px;font-size:14px">Done</button>
+  </div>
+</div>
+</sc-if>
+
+<div style="display:{{ toastShow }};position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--color-neutral-900);color:var(--color-neutral-100);padding:11px 18px;border-radius:999px;font-size:13px;z-index:80;box-shadow:var(--shadow-lg)">{{ toast }}</div>
+</sc-if>
+
+
+<sc-if value="{{ logoutOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(32,30,29,.42);display:flex;align-items:center;justify-content:center;z-index:60;padding:24px" onClick="{{ cancelLogout }}">
+  <div onClick="{{ stopLogout }}" style="width:100%;max-width:380px;background:var(--color-surface);border-radius:var(--radius-md);padding:26px;box-shadow:var(--shadow-lg)">
+    <h3 style="margin:0 0 6px;font-size:18px">Exit?</h3>
+    <p style="margin:0 0 22px;font-size:13.5px;line-height:1.55;color:color-mix(in srgb,var(--color-text) 74%,transparent)">You'll go back to the workspace picker. You stay signed in.</p>
+    <div style="display:flex;gap:10px">
+      <button onClick="{{ cancelLogout }}" style="flex:1;border:1px solid var(--color-divider);background:var(--color-bg);cursor:pointer;border-radius:4px;padding:11px;font-family:var(--font-body);font-size:13.5px">Stay here</button>
+      <button onClick="{{ confirmLogout }}" style="flex:1;border:0;cursor:pointer;background:var(--color-accent);color:var(--color-neutral-100);border-radius:4px;padding:11px;font-family:var(--font-body);font-weight:600;font-size:13.5px">Exit</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1366,&quot;height&quot;:820}}">
+const SESSION = () => { try { return JSON.parse(localStorage.getItem("dmz.session") || "null"); } catch (e) { return null; } };
+const GOHOME = () => { try { location.replace("D-Mezzanine%20Landing.dc.html"); } catch (e) {} };
+const PERM_DEFAULTS = {
+  Owner: { pos: 1, inventory: 1, owner: 1, sales: 1, count: 1 },
+  Warehouse: { pos: 0, inventory: 1, owner: 0, sales: 0, count: 0 },
+  Commissary: { pos: 0, inventory: 1, owner: 0, sales: 0, count: 0 },
+  "Branch lead": { pos: 1, inventory: 0, owner: 0, sales: 1, count: 1 },
+  Cashier: { pos: 1, inventory: 0, owner: 0, sales: 0, count: 0 },
+  Staff: { pos: 1, inventory: 0, owner: 0, sales: 0, count: 0 }
+};
+const CAN = (u, page) => {
+  if (!u) return false;
+  if (u.role === "Owner") return true;
+  let over = {};
+  try { over = (JSON.parse(localStorage.getItem("dmz.perms") || "{}") || {})[String(u.email || "").toLowerCase()] || {}; } catch (e) {}
+  return !!Object.assign({}, PERM_DEFAULTS[u.role] || PERM_DEFAULTS.Cashier, over)[page];
+};
+
+const PWCHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+const GEN_PW = () => { let o = ""; for (let i = 0; i < 10; i++) o += PWCHARS[Math.floor(Math.random() * PWCHARS.length)]; return o; };
+const GEN_PIN = () => String(Math.floor(1000 + Math.random() * 9000));
+
+const PAGES = [
+  ["pos", "POS"], ["inventory", "Inventory"], ["owner", "Owner console"],
+  ["sales", "Sales"], ["count", "Stock count"]
+];
+const ROLE_DEFAULTS = {
+  Owner: { pos: 1, inventory: 1, owner: 1, sales: 1, count: 1 },
+  Warehouse: { pos: 0, inventory: 1, owner: 0, sales: 0, count: 0 },
+  Commissary: { pos: 0, inventory: 1, owner: 0, sales: 0, count: 0 },
+  "Branch lead": { pos: 1, inventory: 0, owner: 0, sales: 1, count: 1 },
+  Cashier: { pos: 1, inventory: 0, owner: 0, sales: 0, count: 0 },
+  Staff: { pos: 1, inventory: 0, owner: 0, sales: 0, count: 0 }
+};
+
+class Component extends DCLogic {
+  componentDidMount() {
+    const s = SESSION();
+    if (!s || !CAN(s, "owner")) return GOHOME();
+    try { this.setState({ perms: JSON.parse(localStorage.getItem("dmz.perms") || "{}") || {} }); } catch (e) {}
+    try {
+      const b = JSON.parse(localStorage.getItem("dmz.branches") || "null");
+      if (b && b.length) this.setState({ branches: b });
+      else localStorage.setItem("dmz.branches", JSON.stringify(this.state.branches));
+    } catch (e) {}
+  }
+
+  permsFor(u) {
+    if (u.role === "Owner") return ROLE_DEFAULTS.Owner;
+    const key = String(u.email || "").toLowerCase();
+    return Object.assign({}, ROLE_DEFAULTS[u.role] || ROLE_DEFAULTS.Cashier, (this.state.perms || {})[key] || {});
+  }
+
+  state = {
+    perms: {},
+    me: SESSION(), email: "", pw: "", err: "", pwShow: false, googleOpen: false,
+    tab: "users", q: "", toast: null,
+    invite: false, form: { role: "Warehouse", loc: "All locations" },
+    users: [
+      { id: 1, name: "Rico Cortez", email: "rico@dmezzanine.ph", role: "Owner", loc: "All locations", last: "Just now", active: true },
+      { id: 2, name: "Marisol Ganda", email: "marisol@dmezzanine.ph", role: "Warehouse", loc: "Warehouse · Iriga", last: "Today, 7:12 AM", active: true },
+      { id: 3, name: "Deng Alvarez", email: "deng@dmezzanine.ph", role: "Commissary", loc: "Commissary", last: "Yesterday, 4:40 PM", active: true },
+      { id: 4, name: "Joy Bermudo", email: "joy@dmezzanine.ph", role: "Branch lead", loc: "DMC-Iriga Branch", last: "Today, 6:55 AM", active: true },
+      { id: 5, name: "Paolo Rivas", email: "paolo@dmezzanine.ph", role: "Cashier", loc: "DMC-Iriga Branch", last: "Never", active: false, pending: true },
+      { id: 6, name: "Joy Bermudo", email: "joy@dmezzanine.ph", role: "Branch lead", loc: "DMC-Iriga Branch", last: "Today, 6:58 AM", active: true },
+      { id: 7, name: "Tonio Rees", email: "tonio@dmezzanine.ph", role: "Staff", loc: "DMC-Iriga Branch", last: "Today, 7:20 AM", active: true },
+      { id: 8, name: "Lia Sabado", email: "lia@dmezzanine.ph", role: "Cashier", loc: "DMC-Iriga Branch", last: "Yesterday, 8:05 PM", active: true },
+      { id: 9, name: "Ben Uy", email: "ben@dmezzanine.ph", role: "Commissary", loc: "Commissary", last: "Today, 6:30 AM", active: true },
+      { id: 10, name: "Nora Diaz", email: "nora@dmezzanine.ph", role: "Warehouse", loc: "Warehouse · Iriga", last: "Yesterday, 4:10 PM", active: true }
+    ],
+    bmodal: null, bform: {}, bedit: null,
+    logSel: null, logDate: "All dates", logKind: "All", logFrom: "", logTo: "",
+    branches: [
+      { id: 1, kind: "Warehouse", name: "Warehouse · Iriga", addr: "Gen. Luna St, San Nicolas, Iriga City", manager: "Marisol Ganda", items: 12, staff: 3, status: "Open", core: true },
+      { id: 2, kind: "Commissary", name: "Commissary", addr: "Same compound, second bay", manager: "Deng Alvarez", items: 8, staff: 4, status: "Open", core: true },
+      { id: 3, kind: "Branch", name: "DMC-Iriga Branch", addr: "2F Mezzanine, Villa Building, Iriga City", manager: "Joy Bermudo", items: 34, staff: 7, status: "Open" }
+    ],
+    log: [
+      ["Today, 6:58 AM", "count", "Stock count submitted — 28 items", "DMC-Iriga Branch · 3 variances", "Joy Bermudo"],
+      ["Today, 8:10 AM", "stock", "Stock received — 6 lines", "PO-2041 from Naga Packaging", "Marisol Ganda"],
+      ["Today, 7:12 AM", "user", "Signed in", "Warehouse dashboard", "Marisol Ganda"],
+      ["Yesterday, 6:20 PM", "req", "Transfer approved", "Commissary → Branch, 9 lines", "Rico Cortez"],
+      ["Yesterday, 5:02 PM", "stock", "Count adjusted", "Fresh milk 30 → 26 L", "Marisol Ganda"],
+      ["Yesterday, 2:15 PM", "user", "Invite sent", "paolo@dmezzanine.ph as Cashier", "Rico Cortez"],
+      ["Yesterday, 9:14 PM", "count", "Stock count submitted — 28 items", "DMC-Iriga Branch · no variances", "Joy Bermudo"],
+      ["Aug 18, 11:30 AM", "req", "Branch order raised", "18 lines to Warehouse", "Joy Bermudo"]
+    ]
+  };
+
+  doToggle = (u) => {
+    this.setState(s => ({ users: s.users.map(x => x.id === u.id ? Object.assign({}, x, { active: !x.active, pending: false, last: x.active ? x.last : "Never" }) : x), revoke: null }));
+    this.logIt("user", u.active ? "Access revoked" : "Access granted", u.email + " \u00b7 " + u.role);
+    this.say(u.active ? "Access revoked for " + u.name : "Access granted to " + u.name);
+  };
+
+  logIt = (kind, what, detail) => this.setState(s => ({ log: [["Just now", kind, what, detail, s.me ? s.me.name : "System"]].concat(s.log) }));
+  setB = k => e => { const v = e.target.value; this.setState(s => ({ bform: Object.assign({}, s.bform, { [k]: v }) })); };
+  pickB = (k, v) => () => this.setState(s => ({ bform: Object.assign({}, s.bform, { [k]: v }) }));
+
+  saveBranch = () => {
+    const f = this.state.bform || {};
+    if (!f.name) return;
+    const persist = s => { try { localStorage.setItem("dmz.branches", JSON.stringify(s.branches)); } catch (e) {} return s; };
+    if (this.state.bmodal === "edit") {
+      const id = this.state.bedit;
+      if (f.status === "Archived") {
+        this.setState(s => persist({ branches: s.branches.filter(x => x.id !== id), bmodal: null, bform: {}, bedit: null }));
+        this.logIt("stock", "Location archived — " + f.name, "Stock history retained");
+        return this.say(f.name + " archived");
+      }
+      this.setState(s => persist({ branches: s.branches.map(x => x.id === id ? Object.assign({}, x, { name: f.name, kind: f.kind, addr: f.addr, manager: f.manager, status: f.status }) : x), bmodal: null, bform: {}, bedit: null }));
+      this.logIt("stock", "Location updated — " + f.name, f.status + " · " + (f.manager || "Unassigned"));
+      return this.say(f.name + " updated");
+    }
+    this.setState(s => persist({ branches: s.branches.concat([{ id: Date.now(), kind: f.kind || "Branch", name: f.name, addr: f.addr || "Address to follow", manager: f.manager || "Unassigned", items: 34, staff: 0, status: "Open" }]), bmodal: null, bform: {} }));
+    this.logIt("stock", (f.kind || "Branch") + " added — " + f.name, "Inherited the warehouse item list");
+    this.say(f.name + " added");
+  };
+
+  say = (m) => { clearTimeout(this._t); this.setState({ toast: m }); this._t = setTimeout(() => this.setState({ toast: null }), 2600); };
+  initials = (n) => n.split(" ").map(w => w[0]).join("").slice(0, 2);
+
+  enter = (u) => this.setState(s => ({ me: u, err: "", pw: "", googleOpen: false, users: s.users.map(x => x.id === u.id ? Object.assign({}, x, { last: "Just now" }) : x) }));
+
+  signIn = () => {
+    const st = this.state;
+    const u = st.users.filter(x => x.email.toLowerCase() === st.email.trim().toLowerCase())[0];
+    if (!u) return this.setState({ err: "No account with that email." });
+    if (st.pw !== "dmezzanine") return this.setState({ err: "Wrong password." });
+    if (u.role !== "Owner") return this.setState({ err: "This console is for the owner account only." });
+    if (!u.active) return this.setState({ err: "Access for this account has been revoked." });
+    this.enter(u);
+  };
+
+  renderVals() {
+    const st = this.state;
+    const NEU = "var(--color-neutral-100)";
+    const DIM = "color-mix(in srgb,var(--color-text) 74%,transparent)";
+    const roleTone = {
+      Owner: ["var(--color-accent-200)", "var(--color-accent-900)"],
+      Warehouse: ["var(--color-accent-2-200)", "var(--color-accent-2-900)"],
+      Commissary: ["var(--color-accent-2-200)", "var(--color-accent-2-900)"],
+      "Branch lead": ["var(--color-neutral-200)", "var(--color-neutral-800)"],
+      Cashier: ["var(--color-neutral-200)", "var(--color-neutral-800)"],
+      Staff: ["var(--color-neutral-200)", "var(--color-neutral-800)"]
+    };
+    const q = st.q.trim().toLowerCase();
+    const visible = st.users.filter(u => !q || (u.name + " " + u.email + " " + u.role).toLowerCase().includes(q));
+    const f = st.form || {};
+    const active = st.users.filter(u => u.active).length;
+    const pending = st.users.filter(u => u.pending).length;
+    const owner = st.users.filter(u => u.role === "Owner")[0];
+
+    const navDef = [
+      ["USER CONTROL", null],
+      ["Users & access", "users", "\u265f", pending || 0],
+      ["Page access", "roles", "\u25a5"],
+      ["SYSTEM", null],
+      ["Locations", "branches", "\u25a5"],
+      ["Activity log", "log", "\u25f7"]
+    ];
+
+    const logIcons = { stock: ["\u25a7", "var(--color-neutral-200)", "var(--color-neutral-800)"], req: ["\u21c5", "var(--color-accent-2-200)", "var(--color-accent-2-900)"], user: ["\u26b7", "var(--color-neutral-200)", "var(--color-neutral-800)"], count: ["\u25a4", "var(--color-neutral-200)", "var(--color-neutral-800)"] };
+    const logKindLabel = { stock: "Stock movement", req: "Request / transfer", user: "User management", count: "Stock count" };
+    const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    const stampDate = w => {
+      const now = new Date();
+      if (/^(Today|Just now)/.test(w)) return iso(now);
+      if (/^Yesterday/.test(w)) { const d = new Date(now); d.setDate(d.getDate() - 1); return iso(d); }
+      const m = w.match(/^([A-Z][a-z]{2})\s+(\d{1,2})/);
+      if (m) { const p = new Date(m[1] + " " + m[2] + ", " + now.getFullYear()); if (!isNaN(p)) return iso(p); }
+      return "";
+    };
+    const logDateF = st.logDate || "All dates", logKindF = st.logKind || "All";
+    const logFiltered = (st.log || []).map((l, i) => ({ l: l, i: i })).filter(x => {
+      const w = x.l[0];
+      let okDate = true;
+      if (st.logFrom || st.logTo) {
+        const d = stampDate(w);
+        okDate = !!d && (!st.logFrom || d >= st.logFrom) && (!st.logTo || d <= st.logTo);
+      } else if (logDateF !== "All dates") {
+        okDate = logDateF === "Today" ? /^(Today|Just now)/.test(w) : /^Yesterday/.test(w);
+      }
+      return okDate && (logKindF === "All" || x.l[1] === logKindF);
+    });
+    const ld = st.logSel === null || st.logSel === undefined ? null : (st.log || [])[st.logSel] || null;
+    const ldIc = ld ? (logIcons[ld[1]] || logIcons.stock) : ["", "transparent", "inherit"];
+    const bf = st.bform || {};
+    const branchFieldDefs = [
+      { label: "Type", key: "kind", opts: ["Branch", "Warehouse", "Commissary"] },
+      { label: "Name", ph: "e.g. DMC-Naga Branch", key: "name" },
+      { label: "Address", ph: "Street, city", key: "addr" },
+      { label: "Manager", ph: "Who runs it", key: "manager" }
+    ].concat(st.bmodal === "edit" ? [{ label: "Status", key: "status", opts: ["Open", "Closed", "Archived"] }] : []);
+
+    return {
+      isLogin: false, isApp: true,
+      email: st.email, pw: st.pw, err: st.err, errShow: st.err ? "block" : "none",
+      pwType: st.pwShow ? "text" : "password",
+      pwToggleLabel: st.pwShow ? "Hide password" : "Show password",
+      togglePw: () => this.setState(s => ({ pwShow: !s.pwShow })),
+      setEmail: e => this.setState({ email: e.target.value, err: "" }),
+      setPw: e => this.setState({ pw: e.target.value, err: "" }),
+      keyGo: e => { if (e.key === "Enter") this.signIn(); },
+      signIn: this.signIn,
+      googleShow: st.googleOpen ? "block" : "none",
+      googlePick: () => this.setState(s => ({ googleOpen: !s.googleOpen, err: "" })),
+      demoAccounts: owner ? [{ name: owner.name, email: owner.email, role: owner.role, initials: this.initials(owner.name), use: () => this.enter(owner) }] : [],
+      loginPoints: [
+        { n: "01", t: "Grant or revoke back-office access" },
+        { n: "02", t: "Invite staff and resend invitations" },
+        { n: "03", t: "Review what each role can reach" }
+      ],
+      statActive: String(active), statPending: String(pending), statRoles: String(Object.keys(roleTone).length),
+
+      signOut: () => this.setState({ logoutOpen: true }),
+      logoutOpen: !!this.state.logoutOpen,
+      cancelLogout: () => this.setState({ logoutOpen: false }),
+      stopLogout: e => e.stopPropagation(),
+      confirmLogout: () => { this.setState({ logoutOpen: false }); GOHOME(); },
+      meName: st.me ? st.me.name : "", meRole: st.me ? st.me.role : "",
+      meInitials: st.me ? this.initials(st.me.name) : "",
+
+      nav: navDef.map(n => {
+        if (!n[1]) return { label: n[0], display: "block", cursor: "default", bg: "transparent", fg: NEU, pad: "16px 12px 6px", fw: "600", size: "10px", ls: ".16em", tt: "uppercase", op: ".42", icon: "", badge: "", badgeShow: "none", badgeBg: "transparent", badgeFg: NEU, go: () => {} };
+        const on = st.tab === n[1];
+        return {
+          label: n[0], display: "flex", cursor: "pointer", pad: "9px 12px", fw: on ? "600" : "500", size: "13px", ls: "0", tt: "none", op: "1", icon: n[2] || "",
+          bg: on ? "var(--color-accent)" : "transparent",
+          fg: on ? NEU : "color-mix(in srgb,var(--color-neutral-100) 82%,transparent)",
+          badge: n[3] ? String(n[3]) : "", badgeShow: n[3] ? "inline-block" : "none",
+          badgeBg: on ? "rgba(255,255,255,.25)" : "var(--color-accent-700)", badgeFg: NEU,
+          go: () => this.setState({ tab: n[1] })
+        };
+      }),
+
+      crumb: st.tab === "branches" || st.tab === "log" ? "System" : "User control",
+      title: { roles: "Page access", branches: "Locations", log: "Activity log" }[st.tab] || "Users & access",
+      isUsersTab: st.tab === "users", isRolesTab: st.tab === "roles",
+      isBranchesTab: st.tab === "branches", isLogTab: st.tab === "log",
+
+      branchCards: (st.branches || []).map(b => ({
+        kind: b.kind, name: b.name, addr: b.addr, manager: b.manager, items: String(b.items),
+        staff: String(st.users.filter(u => u.loc === b.name && u.active).length),
+        tag: b.status, tagBg: b.status === "Open" ? "var(--color-accent-2-200)" : "var(--color-neutral-200)", tagFg: b.status === "Open" ? "var(--color-accent-2-900)" : "var(--color-neutral-800)",
+        settings: () => this.setState({ bmodal: "edit", bedit: b.id, bform: { name: b.name, kind: b.kind, addr: b.addr, manager: b.manager, status: b.status } })
+      })),
+      openBranch: () => this.setState({ bmodal: "add", bedit: null, bform: { kind: "Branch" } }),
+      branchModalOpen: !!st.bmodal,
+      branchModalTitle: st.bmodal === "edit" ? "Location settings" : "Add a location",
+      branchModalSub: st.bmodal === "edit" ? "Rename, reassign or archive this location." : "A new location starts with the warehouse item list.",
+      branchModalCta: st.bmodal === "edit" ? "Save changes" : "Add location",
+      branchModalOp: bf.name ? "1" : ".5",
+      closeBranch: () => this.setState({ bmodal: null, bform: {}, bedit: null }),
+      saveBranch: this.saveBranch,
+      branchFields: branchFieldDefs.map(f => ({
+        label: f.label, ph: f.ph || "", value: bf[f.key] || "",
+        inputShow: f.opts ? "none" : "block", optsShow: f.opts ? "flex" : "none",
+        set: this.setB(f.key),
+        opts: (f.opts || []).map(o => ({ label: o, pick: this.pickB(f.key, o),
+          bg: bf[f.key] === o ? "var(--color-accent)" : "var(--color-bg)", fg: bf[f.key] === o ? NEU : "var(--color-text)",
+          border: bf[f.key] === o ? "var(--color-accent)" : "var(--color-divider)" }))
+      })),
+
+      logFrom: st.logFrom || "", logTo: st.logTo || "",
+      logSetFrom: e => this.setState({ logFrom: e.target.value }),
+      logSetTo: e => this.setState({ logTo: e.target.value }),
+      logDateChips: ["All dates", "Today", "Yesterday"].map(d => { const on = !st.logFrom && !st.logTo && logDateF === d; return { label: d, bg: on ? "var(--color-neutral-900)" : "var(--color-surface)", fg: on ? NEU : "var(--color-text)", border: on ? "var(--color-neutral-900)" : "var(--color-divider)", pick: () => this.setState({ logDate: d, logFrom: "", logTo: "" }) }; }),
+      logKindChips: [["All", "All"], ["Stock", "stock"], ["Requests", "req"], ["Users", "user"], ["Counts", "count"]].map(k => { const on = logKindF === k[1]; return { label: k[0], bg: on ? "var(--color-neutral-900)" : "var(--color-surface)", fg: on ? NEU : "var(--color-text)", border: on ? "var(--color-neutral-900)" : "var(--color-divider)", pick: () => this.setState({ logKind: k[1] }) }; }),
+      logCount: String(logFiltered.length) + (logFiltered.length === 1 ? " entry" : " entries"),
+      logEmptyShow: logFiltered.length ? "none" : "block",
+      logRows: logFiltered.map(x => { const l = x.l, ic = logIcons[l[1]] || logIcons.stock; return { when: l[0], icon: ic[0], dotBg: ic[1], dotFg: ic[2], what: l[2], detail: l[3], who: l[4], open: () => this.setState({ logSel: x.i }) }; }),
+      logDetailOpen: ld !== null,
+      closeLogDetail: () => this.setState({ logSel: null }),
+      ldIcon: ldIc[0], ldDotBg: ldIc[1], ldDotFg: ldIc[2],
+      ldWhat: ld ? ld[2] : "", ldKind: ld ? (logKindLabel[ld[1]] || "Event") : "",
+      ldRef: ld ? "LOG-" + String(4100 + (st.log || []).length - st.logSel) : "",
+      ldFields: ld ? [
+        { k: "Timestamp", v: ld[0] },
+        { k: "Event type", v: logKindLabel[ld[1]] || "Event" },
+        { k: "Details", v: ld[3] },
+        { k: "Performed by", v: ld[4] },
+        { k: "Reference", v: "LOG-" + String(4100 + (st.log || []).length - st.logSel) },
+        { k: "Source", v: "Owner console" }
+      ] : [],
+      revokeOpen: !!st.revoke,
+      revokeName: st.revoke ? st.revoke.name : "",
+      revokeWho: st.revoke ? st.revoke.role + " \u00b7 " + st.revoke.loc : "",
+      closeRevoke: () => this.setState({ revoke: null }),
+      doRevoke: () => this.doToggle(st.revoke),
+      searchShow: st.tab === "users" || st.tab === "roles" ? "inline-flex" : "none",
+      inviteShow: st.tab === "users" ? "inline-flex" : "none",
+      q: st.q, setQ: e => this.setState({ q: e.target.value }),
+      emptyShow: visible.length ? "none" : "block",
+
+      stats: [
+        { label: "Active users", value: String(active), sub: "can sign in today", bg: "var(--color-surface)", border: "var(--color-divider)", labelFg: DIM, valueFg: "var(--color-text)", subFg: DIM },
+        { label: "Invites pending", value: String(pending), sub: pending ? "awaiting first sign-in" : "nothing waiting", bg: pending ? "var(--color-accent-200)" : "var(--color-surface)", border: pending ? "var(--color-accent-600)" : "var(--color-divider)", labelFg: pending ? "var(--color-accent-900)" : DIM, valueFg: pending ? "var(--color-accent-900)" : "var(--color-text)", subFg: pending ? "var(--color-accent-800)" : DIM },
+        { label: "Revoked", value: String(st.users.filter(u => !u.active && !u.pending).length), sub: "access switched off", bg: "var(--color-surface)", border: "var(--color-divider)", labelFg: DIM, valueFg: "var(--color-text)", subFg: DIM }
+      ],
+
+      userRows: visible.map(u => {
+        const rt = roleTone[u.role] || roleTone.Cashier;
+        return {
+          name: u.name, email: u.email, role: u.role, loc: u.loc,
+          last: u.pending ? "Invite pending" : u.last,
+          initials: this.initials(u.name), op: u.active ? "1" : ".6",
+          avBg: u.active ? "var(--color-accent-200)" : "var(--color-neutral-200)",
+          avFg: u.active ? "var(--color-accent-900)" : "var(--color-neutral-800)",
+          roleBg: rt[0], roleFg: rt[1],
+          secondaryLabel: u.pending ? "Resend invite" : "Reset password",
+          secondary: () => this.say(u.pending ? "Invite resent to " + u.email : "Reset link sent to " + u.email),
+          togLabel: u.active ? "Revoke" : "Grant",
+          togBg: u.active ? "var(--color-neutral-200)" : "var(--color-accent-2-700)",
+          togFg: u.active ? "var(--color-neutral-800)" : NEU,
+          toggle: () => u.active ? this.setState({ revoke: u }) : this.doToggle(u)
+        };
+      }),
+
+      permCols: PAGES.map(p => p[1]),
+      permEmptyShow: visible.length ? "none" : "block",
+      permRows: visible.map(u => {
+        const perms = this.permsFor(u);
+        return {
+          name: u.name, role: u.role, initials: this.initials(u.name), op: u.active ? "1" : ".6",
+          avBg: u.active ? "var(--color-accent-200)" : "var(--color-neutral-200)",
+          avFg: u.active ? "var(--color-accent-900)" : "var(--color-neutral-800)",
+          cells: PAGES.map(p => {
+            const fixed = u.role === "Owner";
+            return {
+              on: !!perms[p[0]], dis: fixed,
+              cursor: fixed ? "default" : "pointer",
+              hint: u.name + " \u00b7 " + p[1] + (fixed ? " (owner always has access)" : ""),
+              toggle: () => {
+                if (fixed) return;
+                const key = String(u.email || "").toLowerCase();
+                this.setState(s => {
+                  const next = Object.assign({}, s.perms, { [key]: Object.assign({}, this.permsFor(u), { [p[0]]: perms[p[0]] ? 0 : 1 }) });
+                  try { localStorage.setItem("dmz.perms", JSON.stringify(next)); } catch (e) {}
+                  return { perms: next };
+                });
+                this.say((perms[p[0]] ? "Removed " : "Granted ") + p[1] + " for " + u.name);
+              }
+            };
+          })
+        };
+      }),
+
+      inviteOpen: !!st.invite,
+      openInvite: () => this.setState({ invite: true, form: { role: "Warehouse", loc: "All locations" } }),
+      closeInvite: () => this.setState({ invite: false }),
+      stop: e => e.stopPropagation(),
+      fName: f.name || "", fEmail: f.email || "", fRole: f.role || "Warehouse", fLoc: f.loc || "All locations",
+      setFName: e => { const v = e.target.value; this.setState(s => ({ form: Object.assign({}, s.form, { name: v }) })); },
+      setFEmail: e => { const v = e.target.value; this.setState(s => ({ form: Object.assign({}, s.form, { email: v }) })); },
+      setFRole: e => { const v = e.target.value; this.setState(s => ({ form: Object.assign({}, s.form, { role: v }) })); },
+      setFLoc: e => { const v = e.target.value; this.setState(s => ({ form: Object.assign({}, s.form, { loc: v }) })); },
+      roleOpts: ["Owner", "Warehouse", "Commissary", "Branch lead", "Cashier", "Staff"],
+      locOpts: ["All locations"].concat((st.branches || []).filter(b => b.status !== "Archived").map(b => b.name)),
+      sendInvite: () => {
+        if (!f.name || !f.email) return this.say("Name and email are required");
+        const role = f.role || "Warehouse", loc = f.loc || "All locations";
+        const pw = GEN_PW(), pin = GEN_PIN();
+        this.setState(s => ({
+          users: s.users.concat([{ id: Date.now(), name: f.name, email: f.email, role: role, loc: loc, last: "Never", active: false, pending: true, mustReset: true }]),
+          invite: false, form: { role: "Warehouse", loc: "All locations" },
+          sent: { name: f.name, email: f.email, role: role, loc: loc, pw: pw, pin: pin }
+        }));
+        this.logIt("user", "Invite sent", f.email + " as " + role + " \u00b7 first-time password and PIN issued");
+      },
+
+      sentOpen: !!st.sent,
+      sentEmail: st.sent ? st.sent.email : "",
+      sentPw: st.sent ? st.sent.pw : "",
+      sentPin: st.sent ? st.sent.pin : "",
+      sentWho: st.sent ? st.sent.name + " \u00b7 " + st.sent.role + " \u00b7 " + st.sent.loc : "",
+      copyPw: () => { try { navigator.clipboard.writeText(st.sent.pw); } catch (e) {} this.say("Password copied"); },
+      copyPin: () => { try { navigator.clipboard.writeText(st.sent.pin); } catch (e) {} this.say("PIN copied"); },
+      closeSent: () => this.setState({ sent: null }),
+
+      toast: st.toast || "", toastShow: st.toast ? "block" : "none"
+    };
+  }
+}
+
+</script>
+</body>
+</html>

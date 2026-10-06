@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics=""><link rel="stylesheet" href="organic.css"><style>html,body{margin:0;height:100%;overflow:hidden}#root{height:100%}a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-800)}h1,h2,h3,h4{font-family:var(--font-body);font-weight:600;letter-spacing:-.012em}@keyframes drift1{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-38px,42px,0) scale(1.06)}100%{transform:translate3d(0,0,0) scale(1)}}@keyframes drift2{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(46px,-34px,0) scale(1.05)}100%{transform:translate3d(0,0,0) scale(1)}}@media (prefers-reduced-motion:reduce){[data-drift]{animation:none!important}}@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}.ph{background-image:repeating-linear-gradient(135deg,rgba(32,30,29,.10) 0 6px,rgba(32,30,29,0) 6px 12px)}</style></helmet>
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+<div style="height:100vh;display:grid;grid-template-columns:1.05fr 1fr;grid-template-rows:100%;background:var(--color-bg)">
+  <div style="color:var(--color-neutral-100);padding:44px 48px 36px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;min-height:0;background-color:var(--color-neutral-900)">
+    <div data-drift="1" style="position:absolute;right:-160px;top:-120px;width:560px;height:560px;border-radius:999px;background:radial-gradient(circle at 50% 50%, rgba(224,177,42,.20), transparent 68%);animation:drift1 26s ease-in-out infinite;will-change:transform"></div>
+    <div data-drift="2" style="position:absolute;right:60px;bottom:-220px;width:420px;height:420px;border-radius:999px;background:radial-gradient(circle at 50% 50%, rgba(198,113,57,.16), transparent 70%);animation:drift2 34s ease-in-out infinite;will-change:transform"></div>
+    <div style="position:relative">
+      <div style="display:flex;align-items:center;gap:14px">
+        <img src="logo.png" alt="D' Mezzanine Cafe" style="width:52px;height:52px;border-radius:999px;flex:none;object-fit:cover">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-family:var(--font-body);font-weight:600;font-size:18px;line-height:1;letter-spacing:.05em">D’ MEZZANINE</div>
+          <div style="font-size:11.5px;line-height:1;letter-spacing:.34em;font-weight:700;color:#e0b12a">CAFE</div>
+        </div>
+      </div>
+      <a href="D-Mezzanine%20Landing.dc.html" style="margin-top:28px;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;border:1px solid color-mix(in srgb,var(--color-neutral-100) 34%,transparent);font-family:var(--font-body);font-weight:600;font-size:13.5px;color:var(--color-neutral-100);text-decoration:none" style-hover="background:var(--color-accent);border-color:var(--color-accent);color:var(--color-bg)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m11 18-6-6 6-6"></path></svg>
+        All workspaces
+      </a>
+      <div style="display:flex;align-items:center;gap:10px;margin:26px 0 12px">
+        <div style="height:2px;width:34px;background:#e0b12a"></div>
+        <div style="font-size:11.5px;letter-spacing:.28em;color:#e0b12a;font-weight:700">MARKETING</div>
+      </div>
+      <h1 style="margin:0 0 12px;font-family:var(--font-body);font-weight:600;font-size:clamp(32px,4vw,52px);line-height:1.08;letter-spacing:-.015em;max-width:14ch">{{ greeting }}</h1>
+      <p style="margin:0;max-width:36ch;font-size:15px;line-height:1.6;color:color-mix(in srgb,var(--color-neutral-100) 70%,transparent)">Take an order over the phone or on the road, then send it to the branch that will make it.</p>
+    </div>
+    <div style="position:relative;display:flex;gap:32px;font-size:13px;color:color-mix(in srgb,var(--color-neutral-100) 70%,transparent)">
+      <div><div style="font-family:var(--font-body);font-weight:600;font-size:26px;color:var(--color-neutral-100)">{{ clock }}</div>Local time</div>
+      <div><div style="font-family:var(--font-body);font-weight:600;font-size:26px;color:var(--color-neutral-100)">{{ branchCount }}</div>Branches taking orders</div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:center;padding:24px;min-height:0;overflow-y:auto">
+    <div style="width:100%;max-width:400px">
+      <div style="background:var(--color-surface);border-radius:var(--radius-md);padding:24px;box-shadow:var(--shadow-lg)">
+        <div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);margin-bottom:14px">Signed in</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+          <div style="width:40px;height:40px;flex:none;border-radius:999px;background:var(--color-accent);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-family:var(--font-body);font-weight:600;font-size:14px">{{ agentInitials }}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:16px">{{ agentFull }}</div>
+            <div style="font-size:12.5px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">{{ agentArea }}</div>
+          </div>
+        </div>
+        <div style="display:{{ okShow }}">
+          <button onClick="{{ enter }}" style="width:100%;height:52px;cursor:pointer;border:0;border-radius:4px;background:var(--color-accent);color:var(--color-bg);font-family:var(--font-body);font-weight:600;font-size:16px" style-hover="background:var(--color-accent-600)">Start taking orders</button>
+          <p style="margin:14px 0 0;font-size:12px;line-height:1.45;color:color-mix(in srgb,var(--color-text) 74%,transparent)">Your session carries over from the main system.</p>
+        </div>
+        <div style="display:{{ gateShow }}">
+          <div style="border:1px solid var(--color-divider);border-radius:4px;padding:14px;background:var(--color-bg)">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:15px;margin-bottom:6px">{{ gateTitle }}</div>
+            <p style="margin:0;font-size:12.5px;line-height:1.5;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ gateNote }}</p>
+          </div>
+          <a href="D-Mezzanine%20Landing.dc.html" style="margin-top:12px;display:flex;align-items:center;justify-content:center;height:48px;border-radius:4px;background:var(--color-neutral-900);color:var(--color-neutral-100);font-family:var(--font-body);font-weight:600;font-size:15px;text-decoration:none" style-hover="background:var(--color-neutral-800)">Back to the main system</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isOrder }}" hint-placeholder-val="{{ false }}">
+<div style="height:100vh;display:flex;flex-direction:column;background:var(--color-bg)">
+  <div style="display:flex;align-items:center;gap:18px;padding:12px 20px;background:var(--color-neutral-900);color:var(--color-neutral-100)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="logo.png" alt="D' Mezzanine Cafe" style="width:34px;height:34px;border-radius:999px;flex:none;object-fit:cover">
+      <div>
+        <div style="font-family:var(--font-body);font-weight:600;font-size:15px;line-height:1.15">D’ Mezzanine Cafe</div>
+        <div style="font-size:10.5px;letter-spacing:.16em;color:#e0b12a">MARKETING</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;margin-left:14px">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="2">
+        <button onClick="{{ n.go }}" style="cursor:pointer;border:0;border-radius:4px;padding:9px 18px;font-family:var(--font-body);font-weight:600;font-size:14px;background:{{ n.bg }};color:{{ n.fg }}">{{ n.label }}</button>
+      </sc-for>
+    </div>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:13px;color:color-mix(in srgb,var(--color-neutral-100) 70%,transparent)">{{ clock }}</div>
+      <div style="font-size:13px;font-family:var(--font-body);font-weight:600">{{ agentName }}</div>
+      <button onClick="{{ logout }}" style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 16px;border-radius:4px;background:transparent;border:1px solid rgba(255,255,255,.22);color:color-mix(in srgb,var(--color-neutral-100) 82%,transparent);font-family:var(--font-body);font-weight:600;font-size:13.5px" style-hover="background:var(--color-accent-2-700)"><span>Exit</span><span style="font-size:14px">⎋</span></button>
+    </div>
+  </div>
+
+  <div style="flex:1;min-height:0;display:flex">
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;padding:16px 20px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent)">Sending to</div>
+        <sc-for list="{{ branches }}" as="b" hint-placeholder-count="2">
+          <button onClick="{{ b.pick }}" style="cursor:pointer;border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.fg }};border-radius:4px;padding:9px 16px;min-height:44px;font-family:var(--font-body);font-weight:600;font-size:13.5px">{{ b.label }}</button>
+        </sc-for>
+        <div style="flex:1"></div>
+        <div style="font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ branchNote }}</div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <sc-for list="{{ cats }}" as="c" hint-placeholder-count="5">
+          <button onClick="{{ c.pick }}" style="cursor:pointer;border:0;border-bottom:2px solid {{ c.line }};background:transparent;color:{{ c.fg }};padding:8px 4px;margin-right:10px;font-family:var(--font-body);font-weight:600;font-size:14.5px">{{ c.label }}</button>
+        </sc-for>
+        <div style="flex:1"></div>
+        <input class="input" style="border-radius:4px;width:190px" placeholder="Search menu" value="{{ search }}" onChange="{{ setSearch }}">
+      </div>
+
+      <div style="flex:1;overflow:auto;padding:10px 10px 8px;margin:-10px -10px 0">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:14px">
+          <sc-for list="{{ items }}" as="m" hint-placeholder-count="8">
+            <button onClick="{{ m.add }}" style="position:relative;cursor:pointer;text-align:left;padding:0;overflow:hidden;border-radius:var(--radius-md);border:1px solid var(--color-divider);background:var(--color-neutral-100);box-shadow:var(--shadow-sm)">
+              <div class="ph" style="position:relative;height:104px;background-color:var(--color-surface);background-image:{{ m.photoCss }};background-size:cover;background-position:center;display:flex;align-items:flex-end;padding:8px">
+                <sc-if value="{{ m.noPhoto }}" hint-placeholder-val="{{ true }}"><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;background:var(--color-neutral-100);padding:2px 6px;border-radius:4px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">photo set in POS menu</span></sc-if>
+              </div>
+              <div style="padding:12px 14px 14px">
+                <div style="font-family:var(--font-body);font-weight:600;font-size:16px;line-height:1.15">{{ m.name }}</div>
+                <div style="font-size:11.5px;margin-top:3px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ m.note }}</div>
+              </div>
+              <div onClick="{{ m.info }}" title="Item details" style="position:absolute;top:8px;left:8px;width:34px;height:34px;border-radius:999px;border:1px solid var(--color-divider);background:var(--color-neutral-100);color:color-mix(in srgb,var(--color-text) 74%,transparent);font-family:var(--font-body);font-weight:600;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2" style-hover="border-color:var(--color-accent);color:var(--color-accent-700)">?</div>
+              <sc-if value="{{ m.inCart }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:8px;right:8px;min-width:26px;height:26px;padding:0 7px;border-radius:999px;background:var(--color-accent);color:var(--color-bg);font-family:var(--font-body);font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center">{{ m.qty }}</div>
+              </sc-if>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ noItems }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:34px 8px;text-align:center;font-size:14px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ noItemsNote }}</div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="width:420px;flex:none;background:var(--color-neutral-100);border-left:1px solid var(--color-divider);display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;padding:16px 20px 12px;border-bottom:1px solid var(--color-divider)">
+        <div style="display:flex;gap:4px;padding:4px;background:var(--color-surface);border-radius:4px">
+          <sc-for list="{{ services }}" as="s" hint-placeholder-count="2">
+            <button onClick="{{ s.pick }}" style="flex:1;cursor:pointer;border:0;border-radius:4px;padding:10px;font-family:var(--font-body);font-weight:600;font-size:14px;background:{{ s.bg }};color:{{ s.fg }}">{{ s.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:14px 20px">
+        <div class="field" style="margin-bottom:12px">
+          <label>Customer or company</label>
+          <input class="input" style="border-radius:4px;width:100%" value="{{ custName }}" onChange="{{ setCustName }}" placeholder="e.g. Sunrise Dental Clinic">
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:12px">
+          <div class="field" style="flex:1;min-width:0">
+            <label>Contact number</label>
+            <input class="input" style="border-radius:4px;width:100%" value="{{ custPhone }}" onChange="{{ setCustPhone }}" placeholder="0917 000 0000" inputmode="tel">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:12px">
+          <label>{{ addressLabel }}</label>
+          <input class="input" style="border-radius:4px;width:100%" value="{{ custAddr }}" onChange="{{ setCustAddr }}" placeholder="{{ addressHint }}">
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:12px">
+          <div class="field" style="flex:1;min-width:0">
+            <label>Needed on</label>
+            <input class="input" style="border-radius:4px;width:100%" type="date" value="{{ wantDate }}" onChange="{{ setWantDate }}">
+          </div>
+          <div class="field" style="width:132px;flex:none">
+            <label>Time</label>
+            <input class="input" style="border-radius:4px;width:100%" type="time" value="{{ wantTime }}" onChange="{{ setWantTime }}">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:16px">
+          <label>Order notes</label>
+          <input class="input" style="border-radius:4px;width:100%" value="{{ note }}" onChange="{{ setNote }}" placeholder="Packed per 6, invoice to accounting">
+        </div>
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent)">Items</div>
+          <div style="font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ cartCountLabel }}</div>
+        </div>
+        <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:18px 8px 22px;text-align:center;color:color-mix(in srgb,var(--color-text) 74%,transparent)">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:16px;color:var(--color-text)">No items yet</div>
+            <div style="font-size:13px">Tap the menu to build the order.</div>
+          </div>
+        </sc-if>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ cart }}" as="l" hint-placeholder-count="0">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--color-bg);border:1px solid var(--color-divider)">
+              <div style="flex:1;min-width:0">
+                <div style="font-family:var(--font-body);font-weight:600;font-size:14.5px">{{ l.name }}</div>
+                <div style="font-size:11.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ l.cat }}</div>
+              </div>
+              <button onClick="{{ l.dec }}" style="width:34px;height:34px;flex:none;cursor:pointer;border:1px solid var(--color-divider);background:var(--color-neutral-100);border-radius:4px;font-family:var(--font-body);font-weight:600;font-size:16px">−</button>
+              <input class="input" style="border-radius:4px;width:56px;text-align:center;font-variant-numeric:tabular-nums" value="{{ l.qtyText }}" onChange="{{ l.setQty }}" inputmode="numeric">
+              <button onClick="{{ l.inc }}" style="width:34px;height:34px;flex:none;cursor:pointer;border:1px solid var(--color-divider);background:var(--color-neutral-100);border-radius:4px;font-family:var(--font-body);font-weight:600;font-size:16px">+</button>
+              <button onClick="{{ l.remove }}" title="Remove" style="width:34px;height:34px;flex:none;cursor:pointer;border:1px solid var(--color-divider);background:transparent;border-radius:4px;color:color-mix(in srgb,var(--color-text) 74%,transparent);font-size:15px">×</button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex:0 0 auto;padding:14px 20px 16px;border-top:1px solid var(--color-divider);background:var(--color-neutral-100)">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+          <span style="font-family:var(--font-body);font-weight:600;font-size:15px">{{ sendToLabel }}</span>
+          <span style="font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ whenLabel }}</span>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ clearOrder }}" style="cursor:pointer;border:1px solid var(--color-divider);background:var(--color-bg);border-radius:4px;padding:12px 18px;font-family:var(--font-body);font-weight:600;font-size:14px">Clear</button>
+          <button onClick="{{ openSend }}" class="btn btn-primary" style="font-family:var(--font-body);font-weight:600;border-radius:4px;flex:1;padding:12px;font-size:15px">Send order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isSent }}" hint-placeholder-val="{{ false }}">
+<div style="height:100vh;display:flex;flex-direction:column;background:var(--color-bg)">
+  <div style="display:flex;align-items:center;gap:18px;padding:12px 20px;background:var(--color-neutral-900);color:var(--color-neutral-100)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="logo.png" alt="D' Mezzanine Cafe" style="width:34px;height:34px;border-radius:999px;flex:none;object-fit:cover">
+      <div>
+        <div style="font-family:var(--font-body);font-weight:600;font-size:15px;line-height:1.15">D’ Mezzanine Cafe</div>
+        <div style="font-size:10.5px;letter-spacing:.16em;color:#e0b12a">MARKETING</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;margin-left:14px">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="2">
+        <button onClick="{{ n.go }}" style="cursor:pointer;border:0;border-radius:4px;padding:9px 18px;font-family:var(--font-body);font-weight:600;font-size:14px;background:{{ n.bg }};color:{{ n.fg }}">{{ n.label }}</button>
+      </sc-for>
+    </div>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:13px;color:color-mix(in srgb,var(--color-neutral-100) 70%,transparent)">{{ clock }}</div>
+      <div style="font-size:13px;font-family:var(--font-body);font-weight:600">{{ agentName }}</div>
+      <button onClick="{{ logout }}" style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 16px;border-radius:4px;background:transparent;border:1px solid rgba(255,255,255,.22);color:color-mix(in srgb,var(--color-neutral-100) 82%,transparent);font-family:var(--font-body);font-weight:600;font-size:13.5px" style-hover="background:var(--color-accent-2-700)"><span>Exit</span><span style="font-size:14px">⎋</span></button>
+    </div>
+  </div>
+
+  <div style="flex:1;overflow:auto;padding:26px 30px">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:4px">
+      <h2 style="margin:0">Orders I sent</h2>
+      <div style="flex:1"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <sc-for list="{{ sentFilters }}" as="f" hint-placeholder-count="4">
+          <button onClick="{{ f.pick }}" style="cursor:pointer;border:1px solid {{ f.border }};background:{{ f.bg }};color:{{ f.fg }};border-radius:4px;padding:8px 14px;font-family:var(--font-body);font-weight:600;font-size:13px">{{ f.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <p class="text-muted" style="margin-bottom:22px">The branch sees each order as a notification on its till. Status updates as they accept it and work through it.</p>
+
+    <sc-if value="{{ sentEmpty }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:40px 8px;text-align:center;color:color-mix(in srgb,var(--color-text) 74%,transparent);font-size:14px">Nothing here yet. Orders you send show up with their branch status.</div>
+    </sc-if>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;align-items:start">
+      <sc-for list="{{ sentOrders }}" as="o" hint-placeholder-count="0">
+        <div style="padding:18px;border-radius:var(--radius-md);border:1px solid {{ o.border }};background:var(--color-neutral-100);box-shadow:var(--shadow-sm)">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">
+            <div style="font-family:var(--font-body);font-weight:600;font-size:20px">{{ o.no }}</div>
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 13px;border-radius:4px;background:{{ o.statusBg }};color:{{ o.statusFg }};font-family:var(--font-body);font-weight:600;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap">
+              <span style="width:8px;height:8px;border-radius:999px;background:currentColor;flex:none"></span>{{ o.status }}
+            </span>
+          </div>
+          <div style="font-family:var(--font-body);font-weight:600;font-size:15px">{{ o.customer }}</div>
+          <div style="font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent);margin-bottom:12px">{{ o.branch }} · {{ o.service }} · {{ o.when }}</div>
+          <div style="display:flex;flex-direction:column;gap:3px;font-size:13.5px;max-height:160px;overflow:auto;overscroll-behavior:contain">
+            <sc-for list="{{ o.lines }}" as="ln" hint-placeholder-count="2">
+              <div>{{ ln.qty }}× {{ ln.name }}</div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ o.hasNote }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:10px;padding:8px 11px;border-radius:var(--radius-sm);background:var(--color-accent-100);font-size:12.5px">{{ o.note }}</div>
+          </sc-if>
+          <sc-if value="{{ o.hasReply }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:10px;padding:8px 11px;border-radius:var(--radius-sm);background:var(--color-surface);font-size:12.5px"><strong>{{ o.replyWho }}</strong> {{ o.reply }}</div>
+          </sc-if>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--color-divider);font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">
+            <span>{{ o.sentLabel }}</span>
+            <span onClick="{{ o.reorder }}" role="button" style="cursor:pointer;border-radius:4px;padding:0 15px;min-height:40px;display:inline-flex;align-items:center;font-family:var(--font-body);font-weight:600;font-size:13px;border:1px solid var(--color-divider);background:var(--color-neutral-100);color:var(--color-text)" style-hover="background:var(--color-accent-100);border-color:var(--color-accent)">Copy to new order</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isClients }}" hint-placeholder-val="{{ false }}">
+<div style="height:100vh;display:flex;flex-direction:column;background:var(--color-bg)">
+  <div style="display:flex;align-items:center;gap:18px;padding:12px 20px;background:var(--color-neutral-900);color:var(--color-neutral-100)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="logo.png" alt="D' Mezzanine Cafe" style="width:34px;height:34px;border-radius:999px;flex:none;object-fit:cover">
+      <div>
+        <div style="font-family:var(--font-body);font-weight:600;font-size:15px;line-height:1.15">D’ Mezzanine Cafe</div>
+        <div style="font-size:10.5px;letter-spacing:.16em;color:#e0b12a">MARKETING</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;margin-left:14px">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="3">
+        <button onClick="{{ n.go }}" style="cursor:pointer;border:0;border-radius:4px;padding:9px 18px;font-family:var(--font-body);font-weight:600;font-size:14px;background:{{ n.bg }};color:{{ n.fg }}">{{ n.label }}</button>
+      </sc-for>
+    </div>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:13px;color:color-mix(in srgb,var(--color-neutral-100) 70%,transparent)">{{ clock }}</div>
+      <div style="font-size:13px;font-family:var(--font-body);font-weight:600">{{ agentName }}</div>
+      <button onClick="{{ logout }}" style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 16px;border-radius:4px;background:transparent;border:1px solid rgba(255,255,255,.22);color:color-mix(in srgb,var(--color-neutral-100) 82%,transparent);font-family:var(--font-body);font-weight:600;font-size:13.5px" style-hover="background:var(--color-accent-2-700)"><span>Exit</span><span style="font-size:14px">⎋</span></button>
+    </div>
+  </div>
+  <iframe src="D-Mezzanine%20Client%20Map.html" title="Client map" style="flex:1;min-height:0;width:100%;border:0;display:block"></iframe>
+</div>
+</sc-if>
+
+<sc-if value="{{ infoOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeInfo }}" style="position:fixed;inset:0;background:color-mix(in srgb,#201e1d 45%,transparent);display:flex;align-items:center;justify-content:center;padding:30px;z-index:72">
+  <div onClick="{{ stopProp }}" style="width:420px;max-width:100%;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:26px 28px;animation:tin .16s ease-out">
+    <sc-if value="{{ infoHasPhoto }}" hint-placeholder-val="{{ false }}">
+      <div style="height:196px;margin:0 0 18px;border-radius:var(--radius-sm);background-color:var(--color-surface);background-image:{{ infoPhotoCss }};background-size:cover;background-position:center"></div>
+    </sc-if>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
+      <h3 style="margin:0">{{ infoName }}</h3>
+    </div>
+    <p style="margin:0 0 6px;font-size:13.5px">{{ infoNote }}</p>
+    <p style="margin:0 0 20px;font-size:12.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ infoCat }} · {{ infoAvail }}</p>
+    <button onClick="{{ closeInfo }}" class="btn btn-secondary btn-block" style="font-family:var(--font-body);font-weight:600;border-radius:4px;padding:12px">Close</button>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ aoOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ aoCancel }}" style="position:fixed;inset:0;background:color-mix(in srgb,#201e1d 45%,transparent);display:flex;align-items:center;justify-content:center;padding:30px;z-index:72">
+  <div onClick="{{ stopProp }}" style="width:440px;max-width:100%;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:26px 28px;animation:tin .16s ease-out">
+    <h3 style="margin:0 0 2px">{{ aoName }}</h3>
+    <p style="margin:0 0 18px;font-size:13.5px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ aoNote }}</p>
+    <div style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 74%,transparent);margin-bottom:9px">Add-ons</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px">
+      <sc-for list="{{ aoOpts }}" as="o" hint-placeholder-count="3">
+        <button onClick="{{ o.pick }}" style="cursor:pointer;border-radius:4px;padding:0 16px;min-height:44px;font-family:var(--font-body);font-weight:600;font-size:13.5px;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button>
+      </sc-for>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
+      <span style="flex:1;font-size:14px">Quantity</span>
+      <button onClick="{{ aoDec }}" style="width:44px;height:44px;cursor:pointer;border:1px solid var(--color-divider);background:var(--color-neutral-100);border-radius:4px;font-size:18px">−</button>
+      <span style="min-width:32px;text-align:center;font-family:var(--font-body);font-weight:600;font-size:17px;font-variant-numeric:tabular-nums">{{ aoQty }}</span>
+      <button onClick="{{ aoInc }}" style="width:44px;height:44px;cursor:pointer;border:1px solid var(--color-divider);background:var(--color-neutral-100);border-radius:4px;font-size:18px">+</button>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onClick="{{ aoCancel }}" class="btn btn-secondary" style="font-family:var(--font-body);font-weight:600;border-radius:4px;flex:1;padding:13px">Cancel</button>
+      <button onClick="{{ aoAdd }}" class="btn btn-primary" style="font-family:var(--font-body);font-weight:600;border-radius:4px;flex:1;padding:13px">{{ aoAddLabel }}</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sendOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:color-mix(in srgb,#201e1d 45%,transparent);display:flex;align-items:center;justify-content:center;padding:26px;z-index:70" onClick="{{ closeSend }}">
+  <div onClick="{{ stopProp }}" style="width:560px;max-width:100%;max-height:88vh;overflow:auto;overscroll-behavior:contain;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:26px 28px;animation:tin .16s ease-out">
+    <h3 style="margin:0 0 4px">Send to {{ sendBranch }}</h3>
+    <p class="text-muted" style="margin:0 0 18px;font-size:13.5px">The branch gets a notification on its till and confirms from there.</p>
+    <div style="padding:14px 18px;border-radius:var(--radius-md);background:var(--color-surface);margin-bottom:16px">
+      <div style="font-family:var(--font-body);font-weight:600;font-size:16px">{{ sendCustomer }}</div>
+      <div style="font-size:13px;color:color-mix(in srgb,var(--color-text) 74%,transparent)">{{ sendMeta }}</div>
+    </div>
+    <div style="padding:6px 18px 12px;border-radius:var(--radius-md);background:var(--color-surface);margin-bottom:18px">
+      <sc-for list="{{ cart }}" as="l" hint-placeholder-count="2">
+        <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--color-divider);font-size:14px">
+          <span style="font-family:var(--font-body);font-weight:600;min-width:42px;font-variant-numeric:tabular-nums">{{ l.qty }}×</span>
+          <span style="flex:1;min-width:0">{{ l.name }}<sc-if value="{{ l.hasMods }}" hint-placeholder-val="{{ false }}"><span style="color:color-mix(in srgb,var(--color-text) 74%,transparent)"> · {{ l.mods }}</span></sc-if></span>
+        </div>
+      </sc-for>
+      <div style="display:flex;justify-content:space-between;padding-top:10px;font-family:var(--font-body);font-weight:600;font-size:14px">
+        <span>{{ cartCountLabel }}</span>
+        <span>{{ sendWhen }}</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onClick="{{ closeSend }}" style="cursor:pointer;border:1px solid var(--color-divider);background:var(--color-bg);border-radius:4px;padding:14px 20px;font-family:var(--font-body);font-weight:600;font-size:14px">Back</button>
+      <button onClick="{{ confirmSend }}" class="btn btn-primary" style="font-family:var(--font-body);font-weight:600;border-radius:4px;flex:1;padding:14px;font-size:15px">Send to branch</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ toastShow }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:120;background:var(--color-neutral-900);color:var(--color-neutral-100);padding:13px 22px;border-radius:4px;box-shadow:var(--shadow-lg);font-family:var(--font-body);font-weight:600;font-size:14px;animation:tin .16s ease-out">{{ toastText }}</div>
+</sc-if>
+
+
+<sc-if value="{{ logoutOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(32,30,29,.42);display:flex;align-items:center;justify-content:center;z-index:60;padding:24px" onClick="{{ cancelLogout }}">
+  <div onClick="{{ stopLogout }}" style="width:100%;max-width:380px;background:var(--color-surface);border-radius:var(--radius-md);padding:26px;box-shadow:var(--shadow-lg)">
+    <h3 style="margin:0 0 6px;font-size:18px">Exit?</h3>
+    <p style="margin:0 0 22px;font-size:13.5px;line-height:1.55;color:color-mix(in srgb,var(--color-text) 74%,transparent)">You'll be signed out of Marketing. Orders already sent stay with the branch.</p>
+    <div style="display:flex;gap:10px">
+      <button onClick="{{ cancelLogout }}" style="flex:1;border:1px solid var(--color-divider);background:var(--color-bg);cursor:pointer;border-radius:4px;padding:11px;font-family:var(--font-body);font-size:13.5px">Stay here</button>
+      <button onClick="{{ confirmLogout }}" style="flex:1;border:0;cursor:pointer;background:var(--color-accent);color:var(--color-neutral-100);border-radius:4px;padding:11px;font-family:var(--font-body);font-weight:600;font-size:13.5px">Exit</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:800}}">
+const INBOX_KEY = "dmz.inbox";
+const MSEQ_KEY = "dmz.mktSeq";
+
+const PESO = n => "\u20b1" + Math.round(n || 0).toLocaleString("en-PH");
+const PHOTO_KEY = "dmz.menuphotos";
+const LOADPHOTOS = () => { try { return JSON.parse(localStorage.getItem(PHOTO_KEY) || "{}"); } catch (e) { return {}; } };
+
+const MENU = [
+  { id: "amr", name: "Americano", price: 110, cat: "Espresso", note: "Double shot, hot or iced" },
+  { id: "esp", name: "Espresso", price: 95, cat: "Espresso", note: "Kalinga single origin" },
+  { id: "lat", name: "Cafe Latte", price: 140, cat: "Espresso", note: "Steamed milk, light foam" },
+  { id: "cap", name: "Cappuccino", price: 140, cat: "Espresso", note: "Dry foam, cocoa dust" },
+  { id: "spa", name: "Spanish Latte", price: 155, cat: "Espresso", note: "Condensed milk" },
+  { id: "moc", name: "Cafe Mocha", price: 160, cat: "Espresso", note: "Dark chocolate" },
+  { id: "mat", name: "Matcha Latte", price: 165, cat: "Non-Coffee", note: "Ceremonial grade" },
+  { id: "cho", name: "Hot Chocolate", price: 130, cat: "Non-Coffee", note: "70% tablea" },
+  { id: "stw", name: "Strawberry Milk", price: 145, cat: "Non-Coffee", note: "Fresh puree" },
+  { id: "tea", name: "Lemon Iced Tea", price: 95, cat: "Non-Coffee", note: "By the pitcher for bulk" },
+  { id: "jav", name: "Java Chip", price: 175, cat: "Frappe", note: "Blended, cookie crumb" },
+  { id: "car", name: "Caramel Frappe", price: 170, cat: "Frappe", note: "Salted caramel drizzle" },
+  { id: "mfr", name: "Matcha Frappe", price: 180, cat: "Frappe", note: "Blended with oat" },
+  { id: "cro", name: "Butter Croissant", price: 95, cat: "Pastries", note: "Baked 6am daily" },
+  { id: "cin", name: "Cinnamon Roll", price: 105, cat: "Pastries", note: "Cream cheese glaze" },
+  { id: "ban", name: "Banana Bread", price: 85, cat: "Pastries", note: "Walnut top" },
+  { id: "ube", name: "Ube Cheese Pandesal", price: 90, cat: "Pastries", note: "Two pieces" },
+  { id: "ado", name: "Chicken Adobo Rice", price: 185, cat: "Rice Meals", note: "Garlic rice, egg" },
+  { id: "tap", name: "Beef Tapa Rice", price: 195, cat: "Rice Meals", note: "Atchara on the side" },
+  { id: "sis", name: "Pork Sisig Rice", price: 205, cat: "Rice Meals", note: "Calamansi, chili" },
+  { id: "toc", name: "Tocino Rice", price: 175, cat: "Rice Meals", note: "Sweet cured pork" }
+];
+const CATS = ["Espresso", "Non-Coffee", "Frappe", "Pastries", "Rice Meals"];
+const CATLABEL = c => c === "Frappe" ? "Frapp\u00e9" : c;
+
+const BRANCHES = (() => {
+  try {
+    const b = JSON.parse(localStorage.getItem("dmz.branches") || "null");
+    const names = (b || []).filter(x => x && x.kind === "Branch" && x.name).map(x => x.name);
+    if (names.length) return names;
+  } catch (e) {}
+  return ["DMC-Iriga Branch", "DMC-Naga Branch"];
+})();
+
+// What each branch can actually make. Seeded here, kept in storage so the back office
+// can change a branch's line-up later without touching this page.
+const AVAIL_KEY = "dmz.branchMenu";
+const AVAIL = (() => {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(AVAIL_KEY) || "null"); } catch (e) {}
+  if (saved) return saved;
+  const seed = {};
+  BRANCHES.forEach((b, i) => {
+    seed[b] = i === 0 ? MENU.map(m => m.id) : MENU.filter(m => m.cat !== "Rice Meals" && m.id !== "mfr").map(m => m.id);
+  });
+  try { localStorage.setItem(AVAIL_KEY, JSON.stringify(seed)); } catch (e) {}
+  return seed;
+})();
+const MENU_KEY = "dmz.menuByBranch";
+const LOADMENUS = () => { try { const v = JSON.parse(localStorage.getItem(MENU_KEY) || "{}"); return v && typeof v === "object" ? v : {}; } catch (e) { return {}; } };
+const MENU_OF = br => { const v = LOADMENUS()[br]; return v && Array.isArray(v.menu) ? v : null; };
+const MENU_FOR = br => {
+  const v = MENU_OF(br);
+  if (v) return v.menu.filter(m => m.avail !== false).map(m => ({ id: m.id, name: m.name, price: m.price, cat: m.cat, note: m.note || "" }));
+  const ids = AVAIL[br] || MENU.map(m => m.id);
+  return MENU.filter(m => ids.indexOf(m.id) >= 0);
+};
+// Add-ons come from the Owner's list in the POS back office; only those the item offers
+// and the branch hasn't switched off are shown. No prices here — the till applies them.
+const AO_DEFAULT = ["Extra shot", "Vanilla", "Whipped cream", "Decaf"];
+const AO_FOR = (br, id) => {
+  let list = null, off = [];
+  try { list = JSON.parse(localStorage.getItem("dmz.addons") || "null"); } catch (e) {}
+  try { off = (JSON.parse(localStorage.getItem("dmz.addonsOff") || "{}") || {})[br] || []; } catch (e) {}
+  if (!Array.isArray(list)) {
+    const v = MENU_OF(br); const it = v && v.menu.find(x => x.id === id);
+    return it && it.mods ? AO_DEFAULT.slice() : [];
+  }
+  return list.filter(a => (a.items || []).indexOf(id) >= 0 && off.indexOf(a.id) < 0).map(a => a.name);
+};
+const MENU_ALL_FOR = br => { const v = MENU_OF(br); return v ? v.menu : MENU; };
+const CATS_FOR = br => { const v = MENU_OF(br); return v && v.cats ? v.cats : CATS; };
+const ALLMENU = () => { const out = MENU.slice(); const all = LOADMENUS(); Object.keys(all).forEach(b => ((all[b] && all[b].menu) || []).forEach(m => { const i = out.findIndex(x => x.id === m.id); if (i >= 0) out[i] = m; else out.push(m); })); return out; };
+
+const AGENTS = [
+  { name: "Rico Cortes", area: "Events and catering" },
+  { name: "Marisol Vera", area: "Corporate accounts \u00b7 Iriga" },
+  { name: "Deng Ramos", area: "Schools and clinics \u00b7 Naga" }
+];
+
+const LOADINBOX = () => { try { return JSON.parse(localStorage.getItem(INBOX_KEY) || "[]"); } catch (e) { return []; } };
+const SAVEINBOX = list => { try { localStorage.setItem(INBOX_KEY, JSON.stringify(list.slice(-200))); } catch (e) {} };
+const NEXTNO = () => {
+  let max = 500;
+  try {
+    LOADINBOX().forEach(o => { const n = parseInt(String(o.no).replace(/\D/g, ""), 10); if (n > max) max = n; });
+    const s = parseInt(localStorage.getItem(MSEQ_KEY) || "0", 10);
+    if (s > max) max = s;
+  } catch (e) {}
+  return "M-" + (max + 1);
+};
+
+const PAD = n => (n < 10 ? "0" : "") + n;
+const TODAY = (() => { const d = new Date(); return d.getFullYear() + "-" + PAD(d.getMonth() + 1) + "-" + PAD(d.getDate()); })();
+const MON3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const NICEDATE = iso => {
+  if (!iso) return "";
+  const p = String(iso).split("-");
+  if (p.length < 3) return iso;
+  return MON3[+p[1] - 1] + " " + (+p[2]);
+};
+const NICETIME = t => {
+  if (!t) return "";
+  const p = String(t).split(":");
+  let h = +p[0];
+  const ap = h < 12 ? "AM" : "PM";
+  h = h % 12; if (h === 0) h = 12;
+  return h + ":" + (p[1] || "00") + " " + ap;
+};
+const STATUS_COLOR = s => {
+  if (s === "Declined") return { bg: "var(--color-accent-2-800)", fg: "var(--color-neutral-100)", border: "var(--color-accent-2-400)" };
+  if (s === "Ready" || s === "Served") return { bg: "var(--color-neutral-800)", fg: "var(--color-neutral-100)", border: "var(--color-divider)" };
+  if (s === "Accepted" || s === "Preparing") return { bg: "var(--color-accent)", fg: "var(--color-bg)", border: "var(--color-accent-300)" };
+  return { bg: "var(--color-surface)", fg: "var(--color-text)", border: "var(--color-divider)" };
+};
+
+const ROLE_MARKETING = { Owner: 1, Warehouse: 0, Commissary: 0, "Branch lead": 1, Cashier: 0 };
+const SESSION = () => { try { return JSON.parse(localStorage.getItem("dmz.session") || "null"); } catch (e) { return null; } };
+const CANMARKET = u => {
+  if (!u) return false;
+  if (u.role === "Owner") return true;
+  let over = {};
+  try { over = (JSON.parse(localStorage.getItem("dmz.perms") || "{}") || {})[String(u.email).toLowerCase()] || {}; } catch (e) {}
+  return !!(over.marketing !== undefined ? over.marketing : ROLE_MARKETING[u.role]);
+};
+
+class Component extends DCLogic {
+  state = {
+    screen: "login", me: SESSION(), agent: AGENTS[0].name,
+    now: new Date(),
+    branch: BRANCHES[0], cat: "Espresso", search: "",
+    service: "Pickup",
+    custName: "", custPhone: "", custAddr: "", wantDate: TODAY, wantTime: "10:00", note: "",
+    cart: [], sendOpen: false, sentFilter: "All",
+    photos: LOADPHOTOS(), infoId: "",
+    inbox: LOADINBOX(),
+    toast: ""
+  };
+
+  componentDidMount() {
+    this._menuSync = e => { if (e.key === MENU_KEY) this.forceUpdate(); };
+    window.addEventListener("storage", this._menuSync);
+    const me = SESSION();
+    if (me) this.setState({ me, agent: me.name, screen: CANMARKET(me) ? "order" : "login" });
+    this.tick = setInterval(() => this.setState({ now: new Date() }), 20000);
+    this.sync = setInterval(() => {
+      const fresh = LOADINBOX();
+      if (JSON.stringify(fresh) !== JSON.stringify(this.state.inbox)) this.setState({ inbox: fresh });
+      const ph = LOADPHOTOS();
+      if (Object.keys(ph).join() !== Object.keys(this.state.photos || {}).join()) this.setState({ photos: ph });
+    }, 3000);
+  }
+  componentWillUnmount() { clearInterval(this.tick); clearInterval(this.sync); window.removeEventListener("storage", this._menuSync); }
+
+  toast(t) {
+    clearTimeout(this.tt);
+    this.setState({ toast: t });
+    this.tt = setTimeout(() => this.setState({ toast: "" }), 2600);
+  }
+
+  addItem(m, addons, qty) {
+    const aos = (addons || []).slice();
+    const key = m.id + "|" + aos.join(",");
+    const n = qty || 1;
+    const cart = this.state.cart.slice();
+    const i = cart.findIndex(l => (l.key || l.id + "|") === key);
+    if (i >= 0) cart[i] = Object.assign({}, cart[i], { qty: cart[i].qty + n });
+    else cart.push({ key: key, id: m.id, name: m.name, cat: m.cat, qty: n, addons: aos });
+    this.setState({ cart: cart, aoPick: null });
+  }
+
+  setQty(key, qty) {
+    const cart = this.state.cart.map(l => (l.key || l.id + "|") === key ? Object.assign({}, l, { qty: qty }) : l).filter(l => l.qty > 0);
+    this.setState({ cart: cart });
+  }
+
+  send() {
+    const st = this.state;
+    const no = NEXTNO();
+    const entry = {
+      id: no + "|" + Date.now(), no: no, ts: Date.now(), branch: st.branch,
+      agent: st.agent, service: st.service,
+      customer: st.custName.trim(), phone: st.custPhone.trim(), address: st.custAddr.trim(),
+      wantDate: st.wantDate, wantTime: st.wantTime, note: st.note.trim(),
+      lines: st.cart.map(l => ({ id: l.id, name: l.name, qty: l.qty, addons: l.addons || [], mods: (l.addons || []).join(" \u00b7 ") })),
+      status: "Sent", seen: false, reply: "", replyBy: ""
+    };
+    const list = LOADINBOX().concat([entry]);
+    SAVEINBOX(list);
+    try { localStorage.setItem(MSEQ_KEY, String(parseInt(no.replace(/\D/g, ""), 10))); } catch (e) {}
+    this.setState({
+      inbox: list, sendOpen: false, cart: [], note: "",
+      custName: "", custPhone: "", custAddr: ""
+    });
+    this.toast(no + " sent to " + st.branch);
+  }
+
+  renderVals() {
+    const st = this.state;
+    const menu = MENU_FOR(st.branch);
+    const q = st.search.trim().toLowerCase();
+    const shown = menu.filter(m => (q ? (m.name + " " + m.note).toLowerCase().indexOf(q) >= 0 : m.cat === st.cat));
+    const cartCount = st.cart.reduce((n, l) => n + l.qty, 0);
+    const mine = st.inbox.filter(o => o.agent === st.agent).slice().reverse();
+    const filtered = st.sentFilter === "All" ? mine
+      : st.sentFilter === "Waiting" ? mine.filter(o => o.status === "Sent" || o.status === "Seen")
+      : st.sentFilter === "Accepted" ? mine.filter(o => o.status === "Accepted" || o.status === "Preparing" || o.status === "Ready" || o.status === "Served")
+      : mine.filter(o => o.status === "Declined");
+    const h = st.now.getHours();
+    const missing = !st.custName.trim() ? "Add the customer name" : !st.cart.length ? "Add at least one item" : "";
+
+    return {
+      isLogin: st.screen === "login", isOrder: st.screen === "order", isSent: st.screen === "sent", isClients: st.screen === "clients",
+      greeting: (h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening") + ", " + st.agent.split(" ")[0] + ".",
+      clock: st.now.toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" }),
+      branchCount: BRANCHES.length,
+      agentName: st.agent.split(" ")[0],
+      stopProp: e => { if (e && e.stopPropagation) e.stopPropagation(); },
+
+      agentFull: st.me ? st.me.name : "No one signed in",
+      agentInitials: st.me ? st.me.name.split(" ").map(x => x[0]).join("") : "—",
+      agentArea: st.me ? st.me.role + (st.me.loc && st.me.loc !== "All locations" ? " \u00b7 " + st.me.loc : "") : "Sign in on the main system",
+      okShow: st.me && CANMARKET(st.me) ? "block" : "none",
+      gateShow: st.me && CANMARKET(st.me) ? "none" : "block",
+      gateTitle: st.me ? "No access to Marketing" : "Not signed in",
+      gateNote: st.me
+        ? st.me.name.split(" ")[0] + " is signed in as " + st.me.role + ". That role does not include the Marketing workspace — ask an owner to grant access."
+        : "Sign in on the main system first, then open the Marketing workspace from there.",
+      enter: () => this.setState({ screen: "order" }),
+      logout: () => this.setState({ logoutOpen: true }),
+      logoutOpen: !!this.state.logoutOpen,
+      cancelLogout: () => this.setState({ logoutOpen: false }),
+      stopLogout: e => e.stopPropagation(),
+      confirmLogout: () => { this.setState({ logoutOpen: false }); this.setState({ screen: "login" }); },
+
+      nav: [
+        { label: "New order", key: "order" },
+        { label: mine.length ? "Sent orders \u00b7 " + mine.length : "Sent orders", key: "sent" },
+        { label: "Client map", key: "clients" }
+      ].map(n => ({
+        label: n.label,
+        bg: st.screen === n.key ? "var(--color-accent)" : "transparent",
+        fg: st.screen === n.key ? "var(--color-bg)" : "color-mix(in srgb,var(--color-neutral-100) 76%,transparent)",
+        go: () => this.setState({ screen: n.key })
+      })),
+
+      branches: BRANCHES.map(b => ({
+        label: b,
+        bg: st.branch === b ? "var(--color-accent)" : "var(--color-neutral-100)",
+        fg: st.branch === b ? "var(--color-bg)" : "var(--color-text)",
+        border: st.branch === b ? "var(--color-accent)" : "var(--color-divider)",
+        pick: () => {
+          const keep = MENU_FOR(b).map(m => m.id);
+          const dropped = st.cart.filter(l => keep.indexOf(l.id) < 0);
+          this.setState({ branch: b, cart: st.cart.filter(l => keep.indexOf(l.id) >= 0) });
+          if (dropped.length) this.toast(b + " does not make " + dropped.map(d => d.name).join(", "));
+        }
+      })),
+      branchNote: menu.length + " of " + MENU_ALL_FOR(st.branch).length + " items available at " + st.branch,
+
+      cats: CATS_FOR(st.branch).map(c => ({
+        label: CATLABEL(c),
+        fg: st.cat === c ? "var(--color-text)" : "color-mix(in srgb,var(--color-text) 60%,transparent)",
+        line: st.cat === c ? "var(--color-accent)" : "transparent",
+        pick: () => this.setState({ cat: c, search: "" })
+      })),
+      search: st.search,
+      setSearch: e => this.setState({ search: e.target.value }),
+      items: shown.map(m => {
+        const lines = st.cart.filter(l => l.id === m.id);
+        const line = lines.length ? { qty: lines.reduce((n, l) => n + l.qty, 0) } : null;
+        const aos = AO_FOR(st.branch, m.id);
+        const ph = st.photos && st.photos[m.id];
+        return {
+          name: m.name, note: m.note, catLabel: CATLABEL(m.cat),
+          photoCss: ph ? 'url("' + ph + '")' : "none", noPhoto: !ph,
+          inCart: !!line, qty: line ? line.qty : 0,
+          add: () => aos.length ? this.setState({ aoPick: { id: m.id, sel: [], qty: 1 } }) : this.addItem(m),
+          info: e => { if (e && e.stopPropagation) e.stopPropagation(); this.setState({ infoId: m.id }); }
+        };
+      }),
+      infoOpen: !!st.infoId,
+      infoName: (ALLMENU().find(m => m.id === st.infoId) || {}).name || "",
+      infoNote: (ALLMENU().find(m => m.id === st.infoId) || {}).note || "",
+      infoCat: CATLABEL((ALLMENU().find(m => m.id === st.infoId) || {}).cat || ""),
+      infoPhotoCss: st.infoId && st.photos && st.photos[st.infoId] ? 'url("' + st.photos[st.infoId] + '")' : "none",
+      infoHasPhoto: !!(st.infoId && st.photos && st.photos[st.infoId]),
+      infoAvail: st.infoId && MENU_FOR(st.branch).some(m => m.id === st.infoId) ? "Available at " + st.branch : "Not carried at " + st.branch,
+      closeInfo: () => this.setState({ infoId: "" }),
+      noItems: shown.length === 0,
+      noItemsNote: q ? "Nothing matches that search at " + st.branch + "." : st.branch + " does not carry " + CATLABEL(st.cat) + ".",
+
+      services: ["Pickup", "Delivery"].map(s => ({
+        label: s,
+        bg: st.service === s ? "var(--color-accent)" : "transparent",
+        fg: st.service === s ? "var(--color-bg)" : "var(--color-text)",
+        pick: () => this.setState({ service: s })
+      })),
+      addressLabel: st.service === "Delivery" ? "Delivery address" : "Pickup contact or office",
+      addressHint: st.service === "Delivery" ? "Unit, street, barangay" : "Who collects it, and where from",
+      custName: st.custName, setCustName: e => this.setState({ custName: e.target.value }),
+      custPhone: st.custPhone, setCustPhone: e => this.setState({ custPhone: e.target.value }),
+      custAddr: st.custAddr, setCustAddr: e => this.setState({ custAddr: e.target.value }),
+      wantDate: st.wantDate, setWantDate: e => this.setState({ wantDate: e.target.value }),
+      wantTime: st.wantTime, setWantTime: e => this.setState({ wantTime: e.target.value }),
+      note: st.note, setNote: e => this.setState({ note: e.target.value }),
+
+      cart: st.cart.map(l => { const k = l.key || l.id + "|"; return {
+        name: l.name, cat: CATLABEL(l.cat) + ((l.addons || []).length ? " \u00b7 " + l.addons.join(", ") : ""),
+        mods: (l.addons || []).length ? l.addons.join(", ") : "", hasMods: !!(l.addons || []).length,
+        qty: l.qty, qtyText: String(l.qty),
+        inc: () => this.setQty(k, l.qty + 1),
+        dec: () => this.setQty(k, l.qty - 1),
+        setQty: e => { const n = parseInt(String(e.target.value).replace(/\D/g, ""), 10); this.setQty(k, isNaN(n) ? 0 : n); },
+        remove: () => this.setQty(k, 0)
+      }; }),
+      ...(() => {
+        const p = st.aoPick;
+        if (!p) return { aoOpen: false };
+        const item = MENU_FOR(st.branch).find(x => x.id === p.id) || ALLMENU().find(x => x.id === p.id) || { id: p.id, name: "", cat: "" };
+        const set = patch => this.setState({ aoPick: Object.assign({}, p, patch) });
+        return {
+          aoOpen: true, aoName: item.name, aoNote: item.note || "", aoQty: String(p.qty),
+          aoOpts: AO_FOR(st.branch, p.id).map(n => { const on = p.sel.indexOf(n) >= 0; return {
+            label: n, pick: () => set({ sel: on ? p.sel.filter(x => x !== n) : p.sel.concat([n]) }),
+            border: on ? "var(--color-accent)" : "var(--color-divider)", bg: on ? "var(--color-accent-200)" : "var(--color-neutral-100)", fg: on ? "var(--color-accent-800)" : "var(--color-text)"
+          }; }),
+          aoInc: () => set({ qty: p.qty + 1 }), aoDec: () => set({ qty: Math.max(1, p.qty - 1) }),
+          aoCancel: () => this.setState({ aoPick: null }),
+          aoAdd: () => this.addItem(item, p.sel, p.qty),
+          aoAddLabel: "Add " + p.qty + " to order"
+        };
+      })(),
+      cartEmpty: st.cart.length === 0,
+      cartCountLabel: cartCount + (cartCount === 1 ? " item" : " items"),
+      sendToLabel: "To " + st.branch,
+      whenLabel: NICEDATE(st.wantDate) + " \u00b7 " + NICETIME(st.wantTime),
+      clearOrder: () => this.setState({ cart: [], note: "", custName: "", custPhone: "", custAddr: "" }),
+      openSend: () => {
+        if (missing) return this.toast(missing);
+        this.setState({ sendOpen: true });
+      },
+      closeSend: () => this.setState({ sendOpen: false }),
+      confirmSend: () => this.send(),
+      sendOpen: st.sendOpen,
+      sendBranch: st.branch,
+      sendCustomer: st.custName.trim() || "Walk-in customer",
+      sendMeta: [st.service, st.custPhone.trim(), st.custAddr.trim()].filter(Boolean).join(" \u00b7 "),
+      sendWhen: NICEDATE(st.wantDate) + " \u00b7 " + NICETIME(st.wantTime),
+
+      sentFilters: ["All", "Waiting", "Accepted", "Declined"].map(f => ({
+        label: f,
+        bg: st.sentFilter === f ? "var(--color-accent)" : "var(--color-neutral-100)",
+        fg: st.sentFilter === f ? "var(--color-bg)" : "var(--color-text)",
+        border: st.sentFilter === f ? "var(--color-accent)" : "var(--color-divider)",
+        pick: () => this.setState({ sentFilter: f })
+      })),
+      sentEmpty: filtered.length === 0,
+      sentOrders: filtered.map(o => {
+        const c = STATUS_COLOR(o.status);
+        return {
+          no: o.no, customer: o.customer || "Walk-in customer", branch: o.branch, service: o.service,
+          when: NICEDATE(o.wantDate) + " \u00b7 " + NICETIME(o.wantTime),
+          status: o.status, statusBg: c.bg, statusFg: c.fg, border: c.border,
+          lines: o.lines.map(l => ({ qty: l.qty, name: l.name })),
+          hasNote: !!o.note, note: o.note,
+          hasReply: !!o.reply, reply: o.reply, replyWho: (o.replyBy || "Branch") + ":",
+          sentLabel: "Sent " + new Date(o.ts).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" }),
+          reorder: () => this.setState({
+            screen: "order", branch: o.branch, service: o.service,
+            custName: o.customer, custPhone: o.phone, custAddr: o.address, note: o.note,
+            cart: o.lines.map(l => {
+              const m = ALLMENU().find(x => x.id === l.id) || { cat: "Other", name: l.name };
+              return { id: l.id, name: l.name, cat: m.cat, qty: l.qty };
+            })
+          })
+        };
+      }),
+
+      toastShow: !!st.toast, toastText: st.toast
+    };
+  }
+}
+
+</script>
+</body>
+</html>
