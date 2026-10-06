@@ -77,6 +77,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Orders this user sent as a marketing agent.
+     *
+     * @return HasMany<MarketingOrder, $this>
+     */
+    public function marketingOrders(): HasMany
+    {
+        return $this->hasMany(MarketingOrder::class, 'agent_id');
+    }
+
+    /**
      * Per-user page access that replaces the role's default for that area.
      *
      * @return HasMany<UserPermissionOverride, $this>

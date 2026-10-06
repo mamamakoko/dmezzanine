@@ -37,6 +37,8 @@ export interface UnpaidOrder {
     no: number;
     ticket: number | null;
     tab_name: string | null;
+    /** "Tab for Mr. Santos", "Marketing M-501 · Sunrise Dental", or "Sent from the Branch Menu". */
+    label: string;
     total: number;
     created_at: string;
 }

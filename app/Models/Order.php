@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * A sale, or an order sent to the cashier from the Branch Menu. Prices include VAT; a senior/PWD order
@@ -166,6 +167,16 @@ class Order extends Model
     public function isRefund(): bool
     {
         return $this->refund_of !== null;
+    }
+
+    /**
+     * The marketing order this was made from, when the branch accepted one from its inbox.
+     *
+     * @return HasOne<MarketingOrder, $this>
+     */
+    public function marketingOrder(): HasOne
+    {
+        return $this->hasOne(MarketingOrder::class);
     }
 
     /**

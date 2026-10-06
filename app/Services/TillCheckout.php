@@ -30,7 +30,8 @@ class TillCheckout
     public const TICKETS = 25;
 
     /**
-     * Take an order. A till order is paid (or put on a tab) now; a Branch Menu order goes to the cashier unpaid.
+     * Take an order. A till order is paid (or put on a tab) now; a Branch Menu order, or a marketing order
+     * the branch accepted, goes on the queue unpaid for the cashier to settle.
      *
      * @param  array{service: string, ticket: int, note?: ?string, senior?: bool, lines: list<array{menu_item_id: int, qty: int, size?: ?string, milk?: ?string, addon_ids?: ?list<int>}>, split?: bool, payment_method_id?: ?int, tendered?: ?string, tab_name?: ?string, parts?: ?list<array{payment_method_id: int, amount: string}>}  $data
      */
@@ -48,7 +49,7 @@ class TillCheckout
             $payment = $source === OrderSource::Till
                 ? $this->resolvePayment($branch, $staff, $totals->total, $data, allowTab: true)
                 : ['payments' => [], 'tab' => null];
-            $unpaid = $source === OrderSource::BranchMenu || $payment['tab'] !== null;
+            $unpaid = $source !== OrderSource::Till || $payment['tab'] !== null;
 
             $branch->increment('last_order_no');
 

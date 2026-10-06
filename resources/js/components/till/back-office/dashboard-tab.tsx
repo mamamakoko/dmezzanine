@@ -136,7 +136,7 @@ export function DashboardTab({ data, branchName }: { data: TabData<'dash'>; bran
                     <AttentionRow
                         key={`unpaid-${order.id}`}
                         what={`#${order.no}${order.ticket ? ` · Ticket ${pad2(order.ticket)}` : ''} — ${peso(order.total)} unpaid`}
-                        meta={order.tab_name ? `Tab for ${order.tab_name}` : 'Sent from the Branch Menu'}
+                        meta={order.label}
                         tag="Unpaid"
                         action="Open sales"
                         onAction={() => openBackOffice('sales')}

@@ -8,6 +8,9 @@ use App\Http\Controllers\BackOffice\MenuItemController;
 use App\Http\Controllers\BackOffice\PaymentMethodController;
 use App\Http\Controllers\BackOffice\RefundController;
 use App\Http\Controllers\BranchMenuOrderController;
+use App\Http\Controllers\ClientMapController;
+use App\Http\Controllers\MarketingController;
+use App\Http\Controllers\MarketingInboxController;
 use App\Http\Controllers\PosOrderController;
 use App\Http\Controllers\PosUnlockController;
 use App\Http\Controllers\StockCountController;
@@ -42,6 +45,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('orders', [PosOrderController::class, 'store'])->name('orders.store');
             Route::post('orders/{order}/settle', [PosOrderController::class, 'settle'])->name('orders.settle');
             Route::patch('orders/{order}/status', [PosOrderController::class, 'updateStatus'])->name('orders.status');
+            Route::post('inbox/{marketingOrder}/accept', [MarketingInboxController::class, 'accept'])->name('inbox.accept');
+            Route::post('inbox/{marketingOrder}/decline', [MarketingInboxController::class, 'decline'])->name('inbox.decline');
 
             /*
              * The back office inside the till. Policies check the staff member who unlocked it.
@@ -79,6 +84,25 @@ Route::middleware(['auth'])->group(function () {
     });
 
     /*
+     * Marketing: orders taken off-site for a branch (no prices anywhere), and the client map. Anyone in
+     * Marketing records clients; the legend, areas and branch pins are the Owner's.
+     */
+    Route::middleware('can:'.PermissionArea::Marketing->value)->prefix('marketing')->name('marketing')->group(function () {
+        Route::get('/', [MarketingController::class, 'show']);
+        Route::post('orders', [MarketingController::class, 'store'])->name('.orders.store');
+
+        Route::get('clients', [ClientMapController::class, 'show'])->name('.clients');
+        Route::post('clients', [ClientMapController::class, 'storeClient'])->name('.clients.store');
+        Route::put('clients/{client}', [ClientMapController::class, 'updateClient'])->name('.clients.update');
+        Route::delete('clients/{client}', [ClientMapController::class, 'destroyClient'])->name('.clients.destroy');
+        Route::put('client-types', [ClientMapController::class, 'saveTypes'])->name('.client-types.save');
+        Route::post('areas', [ClientMapController::class, 'storeArea'])->name('.areas.store');
+        Route::put('areas/{clientArea}', [ClientMapController::class, 'updateArea'])->name('.areas.update');
+        Route::delete('areas/{clientArea}', [ClientMapController::class, 'destroyArea'])->name('.areas.destroy');
+        Route::put('branches/{branch}/location', [ClientMapController::class, 'moveBranch'])->name('.branches.location');
+    });
+
+    /*
      * Daily stock count and the manager's stock report. Approving a day posts its endings as the
      * branch's on hand, which the till shows.
      */
@@ -102,7 +126,6 @@ Route::middleware(['auth'])->group(function () {
      * workspaces are built in later stages; until then each shows a placeholder.
      */
     $workspaces = [
-        'marketing' => PermissionArea::Marketing,
         'inventory' => PermissionArea::Inventory,
         'owner' => PermissionArea::Owner,
         'sales' => PermissionArea::Sales,

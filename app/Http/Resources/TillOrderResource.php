@@ -48,6 +48,14 @@ class TillOrderResource extends JsonResource
             'senior' => $this->senior,
             'cashier' => $this->cashier?->name,
             'created_at' => $this->created_at->toIso8601String(),
+            'marketing' => $this->whenLoaded('marketingOrder', fn () => $this->marketingOrder ? [
+                'no' => $this->marketingOrder->number(),
+                'customer' => $this->marketingOrder->customer,
+                'phone' => $this->marketingOrder->phone,
+                'address' => $this->marketingOrder->address,
+                'wanted' => $this->marketingOrder->wantedLabel(),
+                'service' => $this->marketingOrder->service->label(),
+            ] : null),
             'lines' => $this->lines->map(fn (OrderLine $line) => [
                 'qty' => $line->qty,
                 'name' => $line->name,

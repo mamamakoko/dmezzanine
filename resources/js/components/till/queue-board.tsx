@@ -12,7 +12,8 @@ interface QueueBoardProps {
 
 /**
  * The orders the kitchen is working on: Preparing → Ready → Served. A card heats from white to red the
- * longer it sits in Preparing. Unpaid orders (Branch Menu orders and tabs) stay until they are settled.
+ * longer it sits in Preparing. Unpaid orders (Branch Menu and marketing orders, and tabs) stay until they are
+ * settled.
  */
 export function QueueBoard({ orders, now, onAdvance, onSettle, onPrintTicket }: QueueBoardProps) {
     if (orders.length === 0) {
@@ -41,6 +42,7 @@ export function QueueBoard({ orders, now, onAdvance, onSettle, onPrintTicket }: 
                                     <div className="text-text/74 text-[12.5px]">
                                         {order.service} · {minutes === 0 ? 'just now' : `${minutes} min ago`}
                                         {order.source === 'branch_menu' && ' · from Branch Menu'}
+                                        {order.marketing && ` · ${order.marketing.no} from marketing`}
                                     </div>
                                 </div>
                                 <span
@@ -62,14 +64,28 @@ export function QueueBoard({ orders, now, onAdvance, onSettle, onPrintTicket }: 
                                 ))}
                             </div>
 
-                            {order.note && <div className="bg-accent-2-100 mb-3 rounded-[8px] px-3 py-2 text-[12.5px]">{order.note}</div>}
+                            {order.marketing ? (
+                                <div className="bg-accent-100 mb-3 rounded-[8px] px-3 py-2 text-[12.5px]">
+                                    <strong className="font-semibold">{order.marketing.customer}</strong> · {order.marketing.service} · needed{' '}
+                                    {order.marketing.wanted}
+                                    {[order.marketing.phone, order.marketing.address].filter(Boolean).length > 0 && (
+                                        <div className="text-text/74">
+                                            {[order.marketing.phone, order.marketing.address].filter(Boolean).join(' · ')}
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                order.note && <div className="bg-accent-2-100 mb-3 rounded-[8px] px-3 py-2 text-[12.5px]">{order.note}</div>
+                            )}
 
                             <div className="mt-auto flex items-center justify-between gap-2 text-[13px]">
                                 <span className={order.unpaid ? 'text-accent-700 font-semibold' : 'text-text/74'}>
                                     {order.unpaid
                                         ? order.tab_name
                                             ? `Unpaid · tab for ${order.tab_name}`
-                                            : 'Unpaid'
+                                            : order.marketing
+                                              ? `Unpaid · ${order.marketing.customer}`
+                                              : 'Unpaid'
                                         : (order.payments ?? []).map((p) => p.method).join(' + ')}
                                 </span>
                                 <span className="font-semibold tabular-nums">{peso(order.total ?? 0)}</span>

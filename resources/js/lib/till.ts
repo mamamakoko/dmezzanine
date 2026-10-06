@@ -81,13 +81,15 @@ export interface TillOrder {
     ticket: number;
     service: string;
     status: OrderStatus;
-    source: 'till' | 'branch_menu';
+    source: 'till' | 'branch_menu' | 'marketing';
     unpaid: boolean;
     tab_name: string | null;
     note: string | null;
     senior: boolean;
     cashier: string | null;
     created_at: string;
+    /** The marketing order it came from, when the branch accepted one from its inbox. */
+    marketing?: { no: string; customer: string; phone: string | null; address: string | null; wanted: string; service: string } | null;
     lines: TillOrderLine[];
     gross?: number;
     vat_exempt?: number;

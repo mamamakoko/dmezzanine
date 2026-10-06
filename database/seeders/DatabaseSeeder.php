@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             PaymentMethodSeeder::class,
             BranchStockSeeder::class,
             BranchStockItemSeeder::class,
+            ClientTypeSeeder::class,
         ]);
     }
 }

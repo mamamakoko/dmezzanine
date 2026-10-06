@@ -11,11 +11,11 @@ class UserSeeder extends Seeder
 {
     /**
      * The Owner's account and the demo staff from the Landing prototype (where the Owner was Rico Cortez),
-     * all with the password "dmezzanine". Till PINs must be
-     * unique among the people who can unlock a branch's till (its POS staff and the Owner), because the
-     * PIN alone identifies who is unlocking.
+     * all with the password "dmezzanine". Till PINs must be unique among the people who can unlock a
+     * branch's till (its POS staff and the Owner), because the PIN alone identifies who is unlocking.
+     * Marketing agents don't use the till, so they have no PIN; they are the officers on the client map.
      *
-     * @var list<array{name: string, email: string, role: string, branch: ?string, pin: string}>
+     * @var list<array{name: string, email: string, role: string, branch: ?string, pin: ?string}>
      */
     public const USERS = [
         ['name' => 'John Francis Lomeda', 'email' => 'kokoylemonada@gmail.com', 'role' => 'Owner', 'branch' => null, 'pin' => '9999'],
@@ -23,6 +23,8 @@ class UserSeeder extends Seeder
         ['name' => 'Deng Alvarez', 'email' => 'deng@dmezzanine.ph', 'role' => 'Commissary', 'branch' => 'Commissary', 'pin' => '1234'],
         ['name' => 'Joy Bermudo', 'email' => 'joy@dmezzanine.ph', 'role' => 'Branch lead', 'branch' => 'DMC-Iriga Branch', 'pin' => '5678'],
         ['name' => 'Paolo Rivas', 'email' => 'paolo@dmezzanine.ph', 'role' => 'Cashier', 'branch' => 'DMC-Iriga Branch', 'pin' => '1234'],
+        ['name' => 'Bea Santos', 'email' => 'bea@dmezzanine.ph', 'role' => 'Marketing', 'branch' => null, 'pin' => null],
+        ['name' => 'Carlo Reyes', 'email' => 'carlo@dmezzanine.ph', 'role' => 'Marketing', 'branch' => null, 'pin' => null],
     ];
 
     /**

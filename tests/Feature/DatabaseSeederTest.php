@@ -33,11 +33,13 @@ test('seeds demo users with their role, location, password and till PIN', functi
         ['deng@dmezzanine.ph', 'Commissary', 'Commissary'],
         ['joy@dmezzanine.ph', 'Branch lead', 'DMC-Iriga Branch'],
         ['paolo@dmezzanine.ph', 'Cashier', 'DMC-Iriga Branch'],
+        ['bea@dmezzanine.ph', 'Marketing', null],
+        ['carlo@dmezzanine.ph', 'Marketing', null],
     ])
-        ->and($users->map(fn (User $user) => Hash::check(
+        ->and($users->map(fn (User $user) => $user->pin_hash === null ? null : Hash::check(
             ['kokoylemonada@gmail.com' => '9999', 'joy@dmezzanine.ph' => '5678'][$user->email] ?? '1234',
             $user->pin_hash,
-        ))->all())->toBe([true, true, true, true, true]);
+        ))->all())->toBe([true, true, true, true, true, null, null]);
     $users->each(function (User $user) {
         expect(Hash::check('dmezzanine', $user->password))->toBeTrue()
             ->and($user->active)->toBeTrue();
@@ -145,7 +147,7 @@ test('does not duplicate records when seeded twice', function () {
 
     $this->seed();
 
-    expect(User::count())->toBe(5)
+    expect(User::count())->toBe(7)
         ->and(Branch::count())->toBe(4)
         ->and(StockItem::count())->toBe(32)
         ->and(MenuItem::count())->toBe(21)

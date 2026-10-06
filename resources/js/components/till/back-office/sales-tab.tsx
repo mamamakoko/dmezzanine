@@ -122,7 +122,7 @@ export function SalesTab({ data, branchName, toast }: { data: TabData<'sales'>; 
                                     {order.ticket ? ` · Ticket ${pad2(order.ticket)}` : ''}
                                 </span>
                                 <span className="text-[15px] font-semibold tabular-nums">{peso(order.total)}</span>
-                                <span className="text-text/74 text-xs">{order.tab_name ? `tab for ${order.tab_name}` : 'from the Branch Menu'}</span>
+                                <span className="text-text/74 text-xs">{order.label}</span>
                             </div>
                         ))}
                     </div>

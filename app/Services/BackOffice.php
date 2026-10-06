@@ -270,11 +270,16 @@ class BackOffice
      */
     private function unpaidOrders(Branch $branch): array
     {
-        return $branch->orders()->where('unpaid', true)->latest('id')->get()->map(fn (Order $order) => [
+        return $branch->orders()->where('unpaid', true)->with('marketingOrder')->latest('id')->get()->map(fn (Order $order) => [
             'id' => $order->id,
             'no' => $order->no,
             'ticket' => $order->ticket,
             'tab_name' => $order->tab_name,
+            'label' => match (true) {
+                $order->tab_name !== null => "Tab for {$order->tab_name}",
+                $order->marketingOrder !== null => "Marketing {$order->marketingOrder->number()} · {$order->marketingOrder->customer}",
+                default => 'Sent from the Branch Menu',
+            },
             'total' => (float) $order->total,
             'created_at' => $order->created_at->toIso8601String(),
         ])->all();

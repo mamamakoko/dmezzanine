@@ -20,6 +20,11 @@ class Role extends Model
     public const BRANCH_LEAD = 'Branch lead';
 
     /**
+     * Marketing agents; they are the officers on the client map.
+     */
+    public const MARKETING = 'Marketing';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

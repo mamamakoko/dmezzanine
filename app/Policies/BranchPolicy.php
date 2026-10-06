@@ -21,6 +21,14 @@ class BranchPolicy
     }
 
     /**
+     * Move the branch's pin on the client map ("Change location"): the Owner only.
+     */
+    public function moveOnMap(User $user, Branch $branch): Response
+    {
+        return $this->ownerOnly($user);
+    }
+
+    /**
      * Count the branch's stock or read its stock report: the branch's own staff (with the area open to
      * them) or the Owner. Signing a day off needs manage().
      */

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Enums\DrinkSize;
+use App\Enums\MarketingOrderStatus;
 use App\Enums\Milk;
+use App\Http\Resources\MarketingOrderResource;
 use App\Http\Resources\TillOrderResource;
 use App\Models\Addon;
 use App\Models\Branch;
@@ -72,7 +74,7 @@ class TillController extends Controller
         }
 
         $receiptOrder = $request->session()->has('receipt_order_id')
-            ? $branch->orders()->with(['lines.addons', 'payments', 'cashier'])->find($request->session()->get('receipt_order_id'))
+            ? $branch->orders()->with(['lines.addons', 'payments', 'cashier', 'marketingOrder'])->find($request->session()->get('receipt_order_id'))
             : null;
 
         return Inertia::render('till/index', [
@@ -86,7 +88,15 @@ class TillController extends Controller
             ...$this->menu($branch, $orderOnly),
             'paymentMethods' => $orderOnly ? [] : $this->paymentMethods($branch),
             'queue' => $orderOnly || $staff === null ? [] : TillOrderResource::collection(
-                $branch->orders()->onQueue()->with(['lines.addons', 'payments', 'cashier'])->latest('id')->get(),
+                $branch->orders()->onQueue()->with(['lines.addons', 'payments', 'cashier', 'marketingOrder'])->latest('id')->get(),
+            )->resolve(),
+            'inbox' => $orderOnly || $staff === null ? [] : MarketingOrderResource::collection(
+                $branch->marketingOrders()
+                    ->where(fn ($query) => $query->where('status', MarketingOrderStatus::Sent)->orWhere('created_at', '>=', now()->subDays(3)))
+                    ->with(['branch', 'agent', 'repliedBy', 'order', 'lines'])
+                    ->latest('id')
+                    ->limit(40)
+                    ->get(),
             )->resolve(),
             'receipt' => $receiptOrder === null ? null : ($orderOnly
                 ? TillOrderResource::make($receiptOrder)->withoutPrices()

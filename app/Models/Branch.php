@@ -136,6 +136,16 @@ class Branch extends Model
     }
 
     /**
+     * Orders marketing has sent to this branch's inbox.
+     *
+     * @return HasMany<MarketingOrder, $this>
+     */
+    public function marketingOrders(): HasMany
+    {
+        return $this->hasMany(MarketingOrder::class);
+    }
+
+    /**
      * @return HasMany<StockReceipt, $this>
      */
     public function stockReceipts(): HasMany

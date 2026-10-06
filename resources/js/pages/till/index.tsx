@@ -1,4 +1,5 @@
 import { BackOffice } from '@/components/till/back-office/back-office';
+import { InboxSheet } from '@/components/till/inbox-sheet';
 import { MenuBoard } from '@/components/till/menu-board';
 import { ModifierSheet } from '@/components/till/modifier-sheet';
 import { OrderPanel, SERVICES, type Service } from '@/components/till/order-panel';
@@ -11,6 +12,7 @@ import { ConfirmDialog, Toast } from '@/components/till/sheet';
 import { TopBar, type TillScreen } from '@/components/till/top-bar';
 import { useToast } from '@/hooks/use-toast';
 import { openBackOffice, type BackOfficeData } from '@/lib/back-office';
+import { type MarketingOrderView } from '@/lib/marketing';
 import {
     connectPrinter,
     disconnectPrinter,
@@ -60,6 +62,8 @@ interface TillPageProps {
     paymentMethods?: TillPaymentMethod[];
     queue?: TillOrder[];
     receipt?: TillOrder | null;
+    /** Orders marketing sent to this branch: waiting ones and those answered in the last few days. */
+    inbox?: MarketingOrderView[];
     /** Whether the staff member at the till runs this branch's back office (its lead or the Owner). */
     canManageBranch?: boolean;
     /** The open back-office tab's data, when the back office is open. */
@@ -135,9 +139,10 @@ function Till(props: ReadyTillProps & { now: Date }) {
     const [printerName, setPrinterName] = useState<string | null>(null);
     const [confirm, setConfirm] = useState<{ kind: 'exit' | 'void' } | { kind: 'serve'; order: TillOrder } | null>(null);
     const [printAsk, setPrintAsk] = useState<{ kind: SlipKind; order: TillOrder } | null>(null);
+    const [inboxOpen, setInboxOpen] = useState(false);
     const [toast, showToast] = useToast();
 
-    usePoll(15000, { only: orderOnly ? ['openTickets', 'nextOrderNo'] : ['openTickets', 'nextOrderNo', 'queue'] });
+    usePoll(15000, { only: orderOnly ? ['openTickets', 'nextOrderNo'] : ['openTickets', 'nextOrderNo', 'queue', 'inbox'] });
 
     // Another till may take the selected ticket; move on to the next free one.
     useEffect(() => {
@@ -332,6 +337,9 @@ function Till(props: ReadyTillProps & { now: Date }) {
             <TopBar
                 branchName={branch.name}
                 clock={clockLabel(now)}
+                inbox={
+                    orderOnly ? null : { waiting: props.inbox.filter((order) => order.status === 'sent').length, onOpen: () => setInboxOpen(true) }
+                }
                 screens={
                     orderOnly
                         ? []
@@ -484,6 +492,34 @@ function Till(props: ReadyTillProps & { now: Date }) {
                     setPrintAsk(null);
                 }}
             />
+
+            {inboxOpen && (
+                <InboxSheet
+                    orders={props.inbox}
+                    processing={processing}
+                    onClose={() => setInboxOpen(false)}
+                    onAccept={(order) =>
+                        router.post(
+                            route('pos.inbox.accept', order.id),
+                            {},
+                            {
+                                ...visitOptions(() => showToast(`${order.no} accepted — it's on the queue`)),
+                                preserveState: true,
+                            },
+                        )
+                    }
+                    onDecline={(order) =>
+                        router.post(
+                            route('pos.inbox.decline', order.id),
+                            {},
+                            {
+                                ...visitOptions(() => showToast(`${order.no} declined · ${order.agent?.split(' ')[0] ?? 'the agent'} notified`)),
+                                preserveState: true,
+                            },
+                        )
+                    }
+                />
+            )}
 
             <Toast message={toast} />
         </div>
