@@ -116,4 +116,30 @@ class Branch extends Model
     {
         return $this->hasMany(BranchStock::class);
     }
+
+    /**
+     * The items this branch counts each day, by station.
+     *
+     * @return HasMany<BranchStockItem, $this>
+     */
+    public function stockItems(): HasMany
+    {
+        return $this->hasMany(BranchStockItem::class);
+    }
+
+    /**
+     * @return HasMany<StockCount, $this>
+     */
+    public function stockCounts(): HasMany
+    {
+        return $this->hasMany(StockCount::class);
+    }
+
+    /**
+     * @return HasMany<StockReceipt, $this>
+     */
+    public function stockReceipts(): HasMany
+    {
+        return $this->hasMany(StockReceipt::class);
+    }
 }

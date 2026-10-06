@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             AddonSeeder::class,
             PaymentMethodSeeder::class,
             BranchStockSeeder::class,
+            BranchStockItemSeeder::class,
         ]);
     }
 }

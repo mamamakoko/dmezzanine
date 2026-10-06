@@ -9,6 +9,7 @@ import { ReceiptSheet } from '@/components/till/receipt-sheet';
 import { SendSheet } from '@/components/till/send-sheet';
 import { ConfirmDialog, Toast } from '@/components/till/sheet';
 import { TopBar, type TillScreen } from '@/components/till/top-bar';
+import { useToast } from '@/hooks/use-toast';
 import { openBackOffice, type BackOfficeData } from '@/lib/back-office';
 import {
     connectPrinter,
@@ -41,7 +42,7 @@ import {
 import { type SharedData } from '@/types';
 import { type VisitOptions } from '@inertiajs/core';
 import { Head, Link, router, usePage, usePoll } from '@inertiajs/react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface TillPageProps {
     orderOnly: boolean;
@@ -531,19 +532,4 @@ function useNow(): Date {
     }, []);
 
     return now;
-}
-
-function useToast(): [string, (message: string) => void] {
-    const [message, setMessage] = useState('');
-    const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-    const show = useCallback((next: string) => {
-        clearTimeout(timer.current);
-        setMessage(next);
-        timer.current = setTimeout(() => setMessage(''), 2600);
-    }, []);
-
-    useEffect(() => () => clearTimeout(timer.current), []);
-
-    return [message, show];
 }

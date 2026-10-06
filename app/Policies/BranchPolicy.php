@@ -19,4 +19,17 @@ class BranchPolicy
     {
         return $this->manageBranch($user, $branch->id);
     }
+
+    /**
+     * Count the branch's stock or read its stock report: the branch's own staff (with the area open to
+     * them) or the Owner. Signing a day off needs manage().
+     */
+    public function viewStock(User $user, Branch $branch): Response
+    {
+        if ($user->active && ($user->isOwner() || $user->branch_id === $branch->id)) {
+            return Response::allow();
+        }
+
+        return Response::denyAsNotFound();
+    }
 }

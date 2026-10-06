@@ -15,7 +15,6 @@ use App\Models\PaymentMethod;
 use App\Models\PaymentMethodLog;
 use App\Models\StockItem;
 use App\Models\User;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
@@ -57,7 +56,7 @@ class BackOffice
      */
     private function dashboard(Branch $branch): array
     {
-        [$start, $end] = $this->day(today(config('app.business_timezone'))->toDateString());
+        [$start, $end] = BusinessDay::bounds(BusinessDay::today());
         $today = $branch->orders()->whereNull('refund_of')->where('unpaid', false)->whereBetween('created_at', [$start, $end]);
 
         return [
@@ -196,18 +195,18 @@ class BackOffice
             ->limit(self::SALES_LIMIT);
 
         if ($filters['from'] ?? null) {
-            $query->where('created_at', '>=', $this->day($filters['from'])[0]);
+            $query->where('created_at', '>=', BusinessDay::bounds($filters['from'])[0]);
         }
 
         if ($filters['to'] ?? null) {
-            $query->where('created_at', '<=', $this->day($filters['to'])[1]);
+            $query->where('created_at', '<=', BusinessDay::bounds($filters['to'])[1]);
         }
 
-        [$todayStart, $todayEnd] = $this->day(today(config('app.business_timezone'))->toDateString());
+        [$todayStart, $todayEnd] = BusinessDay::bounds(BusinessDay::today());
 
         return [
             'filters' => ['from' => $filters['from'] ?? null, 'to' => $filters['to'] ?? null],
-            'today' => today(config('app.business_timezone'))->toDateString(),
+            'today' => BusinessDay::today(),
             'limit' => self::SALES_LIMIT,
             'receipts' => $query->get()->map(fn (Order $order) => $this->receipt($order))->all(),
             'todayTotals' => [
@@ -291,17 +290,5 @@ class BackOffice
         return StockItem::orderBy('name')->get()
             ->map(fn (StockItem $item) => ['id' => $item->id, 'name' => $item->name, 'unit' => $item->unit, 'cost' => (float) $item->cost])
             ->all();
-    }
-
-    /**
-     * The start and end of a business day, in the stored (UTC) time.
-     *
-     * @return array{0: Carbon, 1: Carbon}
-     */
-    private function day(string $date): array
-    {
-        $day = Carbon::parse($date, config('app.business_timezone'));
-
-        return [$day->copy()->startOfDay()->utc(), $day->copy()->endOfDay()->utc()];
     }
 }

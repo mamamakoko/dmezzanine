@@ -1,5 +1,6 @@
 import { Panel } from '@/components/till/back-office/ui';
-import { escapeHtml, openBackOffice, printReport, qtyLabel, type StockRow, type TabData } from '@/lib/back-office';
+import { openBackOffice, qtyLabel, type StockRow, type TabData } from '@/lib/back-office';
+import { escapeHtml, printReport } from '@/lib/report';
 import { pad2, peso } from '@/lib/till';
 import { cn } from '@/lib/utils';
 

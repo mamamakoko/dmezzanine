@@ -1,6 +1,7 @@
 import { Panel, SectionLabel, useBackOfficeAction } from '@/components/till/back-office/ui';
 import { choiceClass, Sheet } from '@/components/till/sheet';
-import { escapeHtml, openBackOffice, printReport, type Receipt, type TabData } from '@/lib/back-office';
+import { openBackOffice, type Receipt, type TabData } from '@/lib/back-office';
+import { escapeHtml, printReport } from '@/lib/report';
 import { orderTotals, pad2, peso, peso2 } from '@/lib/till';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';

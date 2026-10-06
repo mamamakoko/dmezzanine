@@ -10,6 +10,8 @@ use App\Http\Controllers\BackOffice\RefundController;
 use App\Http\Controllers\BranchMenuOrderController;
 use App\Http\Controllers\PosOrderController;
 use App\Http\Controllers\PosUnlockController;
+use App\Http\Controllers\StockCountController;
+use App\Http\Controllers\StockReportController;
 use App\Http\Controllers\TillController;
 use App\Http\Middleware\EnsureTillIsUnlocked;
 use Illuminate\Support\Facades\Route;
@@ -77,6 +79,25 @@ Route::middleware(['auth'])->group(function () {
     });
 
     /*
+     * Daily stock count and the manager's stock report. Approving a day posts its endings as the
+     * branch's on hand, which the till shows.
+     */
+    Route::middleware('can:'.PermissionArea::Count->value)->group(function () {
+        Route::get('stock-count', [StockCountController::class, 'show'])->name('count');
+        Route::put('stock-count/{branch}/lines/{stockItem}', [StockCountController::class, 'updateLine'])->name('count.lines.update');
+        Route::post('stock-count/{branch}/submit', [StockCountController::class, 'submit'])->name('count.submit');
+    });
+
+    Route::middleware('can:'.PermissionArea::Report->value)->prefix('stock-report')->group(function () {
+        Route::get('/', [StockReportController::class, 'show'])->name('report');
+        Route::patch('lines/{stockCountLine}', [StockReportController::class, 'updateLine'])->name('report.lines.update');
+        Route::post('sheets/{stockCount}/approve', [StockReportController::class, 'approve'])->name('report.sheets.approve');
+        Route::post('sheets/{stockCount}/return', [StockReportController::class, 'returnForRecount'])->name('report.sheets.return');
+        Route::post('sheets/{stockCount}/reopen', [StockReportController::class, 'reopen'])->name('report.sheets.reopen');
+        Route::put('{branch}/months/{month}', [StockReportController::class, 'signMonth'])->where('month', '\d{4}-\d{2}')->name('report.months.sign');
+    });
+
+    /*
      * One entry point per remaining workspace, each behind its area's gate. The
      * workspaces are built in later stages; until then each shows a placeholder.
      */
@@ -85,8 +106,6 @@ Route::middleware(['auth'])->group(function () {
         'inventory' => PermissionArea::Inventory,
         'owner' => PermissionArea::Owner,
         'sales' => PermissionArea::Sales,
-        'stock-count' => PermissionArea::Count,
-        'stock-report' => PermissionArea::Report,
     ];
 
     foreach ($workspaces as $path => $area) {
