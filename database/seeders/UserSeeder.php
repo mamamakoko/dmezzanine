@@ -10,14 +10,15 @@ use Illuminate\Database\Seeder;
 class UserSeeder extends Seeder
 {
     /**
-     * Demo accounts from the Landing prototype, all with the password "dmezzanine". Till PINs must be
+     * The Owner's account and the demo staff from the Landing prototype (where the Owner was Rico Cortez),
+     * all with the password "dmezzanine". Till PINs must be
      * unique among the people who can unlock a branch's till (its POS staff and the Owner), because the
      * PIN alone identifies who is unlocking.
      *
      * @var list<array{name: string, email: string, role: string, branch: ?string, pin: string}>
      */
     public const USERS = [
-        ['name' => 'Rico Cortez', 'email' => 'rico@dmezzanine.ph', 'role' => 'Owner', 'branch' => null, 'pin' => '9999'],
+        ['name' => 'John Francis Lomeda', 'email' => 'kokoylemonada@gmail.com', 'role' => 'Owner', 'branch' => null, 'pin' => '9999'],
         ['name' => 'Marisol Ganda', 'email' => 'marisol@dmezzanine.ph', 'role' => 'Warehouse', 'branch' => 'Warehouse · Iriga', 'pin' => '1234'],
         ['name' => 'Deng Alvarez', 'email' => 'deng@dmezzanine.ph', 'role' => 'Commissary', 'branch' => 'Commissary', 'pin' => '1234'],
         ['name' => 'Joy Bermudo', 'email' => 'joy@dmezzanine.ph', 'role' => 'Branch lead', 'branch' => 'DMC-Iriga Branch', 'pin' => '5678'],

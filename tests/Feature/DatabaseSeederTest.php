@@ -28,14 +28,14 @@ test('seeds demo users with their role, location, password and till PIN', functi
     $users = User::with(['role', 'branch'])->orderBy('id')->get();
 
     expect($users->map(fn (User $user) => [$user->email, $user->role->name, $user->branch?->name])->all())->toBe([
-        ['rico@dmezzanine.ph', 'Owner', null],
+        ['kokoylemonada@gmail.com', 'Owner', null],
         ['marisol@dmezzanine.ph', 'Warehouse', 'Warehouse · Iriga'],
         ['deng@dmezzanine.ph', 'Commissary', 'Commissary'],
         ['joy@dmezzanine.ph', 'Branch lead', 'DMC-Iriga Branch'],
         ['paolo@dmezzanine.ph', 'Cashier', 'DMC-Iriga Branch'],
     ])
         ->and($users->map(fn (User $user) => Hash::check(
-            ['rico@dmezzanine.ph' => '9999', 'joy@dmezzanine.ph' => '5678'][$user->email] ?? '1234',
+            ['kokoylemonada@gmail.com' => '9999', 'joy@dmezzanine.ph' => '5678'][$user->email] ?? '1234',
             $user->pin_hash,
         ))->all())->toBe([true, true, true, true, true]);
     $users->each(function (User $user) {
