@@ -21,6 +21,15 @@ class BranchPolicy
     }
 
     /**
+     * Change the location's stock: request stock for it, receive deliveries, and at the warehouse or the
+     * commissary, edit its items and run its production.
+     */
+    public function manageStock(User $user, Branch $branch): Response
+    {
+        return $this->manageLocation($user, $branch);
+    }
+
+    /**
      * Move the branch's pin on the client map ("Change location"): the Owner only.
      */
     public function moveOnMap(User $user, Branch $branch): Response

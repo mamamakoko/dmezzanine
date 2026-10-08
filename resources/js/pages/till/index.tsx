@@ -323,6 +323,7 @@ function Till(props: ReadyTillProps & { now: Date }) {
                 <BackOffice
                     data={props.backOffice}
                     branchName={branch.name}
+                    branchId={branch.id}
                     staffName={props.staff.name}
                     staffRole={props.staff.role}
                     toast={showToast}

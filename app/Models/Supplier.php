@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Models;
+
+use Database\Factories\SupplierFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+/**
+ * Who the warehouse buys from. Suppliers are shared by every location.
+ */
+class Supplier extends Model
+{
+    /** @use HasFactory<SupplierFactory> */
+    use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'contact',
+        'phone',
+        'supplies',
+    ];
+
+    /**
+     * @return HasMany<StockItem, $this>
+     */
+    public function stockItems(): HasMany
+    {
+        return $this->hasMany(StockItem::class);
+    }
+}

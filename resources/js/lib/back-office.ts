@@ -3,9 +3,10 @@
  * tab's data; see App\Services\BackOffice.
  */
 import { type PaymentKind } from '@/lib/till';
+import { type Source, type TransferRow } from '@/lib/transfers';
 import { router } from '@inertiajs/react';
 
-export type BackOfficeTab = 'dash' | 'menu' | 'addons' | 'payments' | 'stock' | 'sales';
+export type BackOfficeTab = 'dash' | 'menu' | 'addons' | 'payments' | 'stock' | 'stockin' | 'sales';
 
 export interface StockRow {
     id: number;
@@ -119,11 +120,13 @@ export interface Receipt {
 interface BackOfficeBase {
     isOwner: boolean;
     lowCount: number;
+    /** Transfers approved or on their way to the branch. */
+    incomingCount: number;
 }
 
 export type BackOfficeData = BackOfficeBase &
     (
-        | { tab: 'dash'; stock: StockRow[]; salesToday: { total: number; count: number }; unpaid: UnpaidOrder[] }
+        | { tab: 'dash'; stock: StockRow[]; salesToday: { total: number; count: number }; unpaid: UnpaidOrder[]; incoming: TransferRow[] }
         | {
               tab: 'menu';
               categories: MenuCategory[];
@@ -135,6 +138,7 @@ export type BackOfficeData = BackOfficeBase &
         | { tab: 'addons'; addons: AddonRow[]; stockItems: StockChoice[]; menuGroups: { name: string; items: { id: number; name: string }[] }[] }
         | { tab: 'payments'; methods: PaymentMethodRow[]; log: { id: number; who: string; text: string; when: string }[] }
         | { tab: 'stock'; stock: StockRow[] }
+        | { tab: 'stockin'; stock: StockRow[]; categories: string[]; units: string[]; transfers: TransferRow[]; sources: Source[] }
         | {
               tab: 'sales';
               filters: { from: string | null; to: string | null };
@@ -165,6 +169,7 @@ export const TAB_META: Record<BackOfficeTab, { label: string; title: string; sub
     },
     payments: { label: 'Till settings', title: 'Till settings', sub: "Payment methods this branch's till offers. Each branch sets its own." },
     stock: { label: 'Stock', title: 'Stock on hand', sub: 'On hand from the last approved count, against par.' },
+    stockin: { label: 'Stock-in', title: 'Stock-in', sub: 'Deliveries from suppliers and transfers with other locations.' },
     sales: { label: 'Sales', title: 'Sales', sub: 'Every sale and refund at this branch, newest first.' },
 };
 

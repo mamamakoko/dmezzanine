@@ -2,13 +2,17 @@
 
 use App\Enums\BranchKind;
 use App\Enums\PaymentMethodKind;
+use App\Enums\TransferStatus;
 use App\Models\Addon;
 use App\Models\Branch;
 use App\Models\MenuItem;
 use App\Models\PaymentMethod;
+use App\Models\Product;
 use App\Models\Role;
 use App\Models\StockItem;
+use App\Models\Transfer;
 use App\Models\User;
+use App\Models\WarehouseStock;
 use Illuminate\Support\Facades\Hash;
 
 test('seeds the warehouse, commissary and two café branches', function () {
@@ -65,7 +69,7 @@ test('gives each role its default page access', function (string $role, array $a
 test('seeds the 32 warehouse stock items', function () {
     $this->seed();
 
-    expect(StockItem::count())->toBe(32)
+    expect(StockItem::where('category', '!=', 'Semi-finished')->count())->toBe(32)
         ->and(StockItem::firstWhere('sku', 'WH-DRY-024'))
         ->name->toBe('Matcha powder')
         ->unit->toBe('g')
@@ -149,11 +153,49 @@ test('does not duplicate records when seeded twice', function () {
 
     expect(User::count())->toBe(7)
         ->and(Branch::count())->toBe(4)
-        ->and(StockItem::count())->toBe(32)
+        ->and(StockItem::count())->toBe(37)
         ->and(MenuItem::count())->toBe(21)
         ->and(Addon::count())->toBe(4)
         ->and(PaymentMethod::count())->toBe(8);
     $this->assertDatabaseCount('categories', 10);
     $this->assertDatabaseCount('branch_menu_items', 42);
     $this->assertDatabaseCount('role_permissions', 48);
+    $this->assertDatabaseCount('suppliers', 5);
+    $this->assertDatabaseCount('warehouse_stock', 17);
+    $this->assertDatabaseCount('products', 5);
+    $this->assertDatabaseCount('transfers', 2);
+});
+
+test('stocks the warehouse with each item\'s supplier and packaging', function () {
+    $this->seed();
+
+    $milk = WarehouseStock::with('stockItem.supplier')->whereRelation('stockItem', 'sku', 'WH-DRY-011')->sole();
+
+    expect(Branch::firstWhere('kind', BranchKind::Warehouse)->warehouseStock()->count())->toBe(17)
+        ->and($milk->stockItem->supplier->name)->toBe('Iriga Dairy Supply')
+        ->and($milk->stockItem->pack_name)->toBe('case')
+        ->and($milk->par)->toBe('40.000');
+});
+
+test('seeds the commissary\'s products with their recipes and costs', function () {
+    $this->seed();
+
+    $coldBrew = Product::with(['stockItem', 'ingredients'])->whereRelation('stockItem', 'sku', 'WH-SEM-001')->sole();
+
+    expect($coldBrew->stockItem)
+        ->name->toBe('Cold brew concentrate')
+        ->unit->toBe('L')
+        ->cost->toBe('18.20')
+        ->and($coldBrew->ingredients->mapWithKeys(fn (StockItem $item) => [$item->sku => (float) $item->pivot->qty])->all())
+        ->toEqualCanonicalizing(['WH-COF-004' => 0.25, 'WH-COF-001' => 0.1]);
+});
+
+test('seeds a requisition on its way to DMC-Iriga, taken off the warehouse\'s stock', function () {
+    $this->seed();
+
+    $toIriga = Transfer::whereRelation('to', 'name', 'DMC-Iriga Branch')->sole();
+    $beans = WarehouseStock::whereRelation('stockItem', 'sku', 'WH-COF-001')->sole();
+
+    expect($toIriga->status)->toBe(TransferStatus::InTransit)
+        ->and($beans->on_hand)->toBe('15.000');
 });

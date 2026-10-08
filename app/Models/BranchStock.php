@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * How much of a stock item a branch has on hand, as of its last approved count.
+ * How much of a stock item a branch has on hand: its last approved count, plus deliveries and transfers
+ * received since.
  */
 class BranchStock extends Model
 {

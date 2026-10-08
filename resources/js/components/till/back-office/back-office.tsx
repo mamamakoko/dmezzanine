@@ -3,6 +3,7 @@ import { DashboardTab } from '@/components/till/back-office/dashboard-tab';
 import { MenuTab } from '@/components/till/back-office/menu-tab';
 import { PaymentsTab } from '@/components/till/back-office/payments-tab';
 import { SalesTab } from '@/components/till/back-office/sales-tab';
+import { StockInTab } from '@/components/till/back-office/stock-in-tab';
 import { StockTab } from '@/components/till/back-office/stock-tab';
 import { openBackOffice, TAB_META, type BackOfficeData, type BackOfficeTab } from '@/lib/back-office';
 import { cn } from '@/lib/utils';
@@ -10,18 +11,19 @@ import { cn } from '@/lib/utils';
 interface BackOfficeProps {
     data: BackOfficeData;
     branchName: string;
+    branchId: number;
     staffName: string;
     staffRole: string;
     toast: (message: string) => void;
 }
 
-const TABS: BackOfficeTab[] = ['dash', 'menu', 'addons', 'payments', 'stock', 'sales'];
+const TABS: BackOfficeTab[] = ['dash', 'menu', 'addons', 'payments', 'stock', 'stockin', 'sales'];
 
 /**
  * The till's back office: a charcoal tab list on the left, the open tab on the right. Only the branch's
  * lead or the Owner gets here; the server checks every change again.
  */
-export function BackOffice({ data, branchName, staffName, staffRole, toast }: BackOfficeProps) {
+export function BackOffice({ data, branchName, branchId, staffName, staffRole, toast }: BackOfficeProps) {
     const meta = TAB_META[data.tab];
 
     return (
@@ -37,7 +39,8 @@ export function BackOffice({ data, branchName, staffName, staffRole, toast }: Ba
                 <div className="flex flex-wrap gap-[3px] md:flex-col">
                     {TABS.map((tab) => {
                         const on = data.tab === tab;
-                        const badge = tab === 'stock' && data.lowCount ? data.lowCount : null;
+                        const badge =
+                            tab === 'stock' && data.lowCount ? data.lowCount : tab === 'stockin' && data.incomingCount ? data.incomingCount : null;
 
                         return (
                             <button
@@ -89,6 +92,7 @@ export function BackOffice({ data, branchName, staffName, staffRole, toast }: Ba
                     {data.tab === 'addons' && <AddonsTab data={data} branchName={branchName} toast={toast} />}
                     {data.tab === 'payments' && <PaymentsTab data={data} branchName={branchName} toast={toast} />}
                     {data.tab === 'stock' && <StockTab data={data} />}
+                    {data.tab === 'stockin' && <StockInTab data={data} branchName={branchName} branchId={branchId} toast={toast} />}
                     {data.tab === 'sales' && <SalesTab data={data} branchName={branchName} toast={toast} />}
                 </div>
             </main>

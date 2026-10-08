@@ -152,4 +152,47 @@ class Branch extends Model
     {
         return $this->hasMany(StockReceipt::class);
     }
+
+    /**
+     * What this warehouse or commissary holds.
+     *
+     * @return HasMany<WarehouseStock, $this>
+     */
+    public function warehouseStock(): HasMany
+    {
+        return $this->hasMany(WarehouseStock::class);
+    }
+
+    /**
+     * Transfers sent to this location, including the requisitions it raised.
+     *
+     * @return HasMany<Transfer, $this>
+     */
+    public function transfersIn(): HasMany
+    {
+        return $this->hasMany(Transfer::class, 'to_branch_id');
+    }
+
+    /**
+     * Transfers this location sends, including requisitions raised against it.
+     *
+     * @return HasMany<Transfer, $this>
+     */
+    public function transfersOut(): HasMany
+    {
+        return $this->hasMany(Transfer::class, 'from_branch_id');
+    }
+
+    /**
+     * @return HasMany<Delivery, $this>
+     */
+    public function deliveries(): HasMany
+    {
+        return $this->hasMany(Delivery::class);
+    }
+
+    public function isCafe(): bool
+    {
+        return $this->kind === BranchKind::Branch;
+    }
 }

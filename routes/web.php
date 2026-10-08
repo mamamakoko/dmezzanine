@@ -7,8 +7,15 @@ use App\Http\Controllers\BackOffice\CategoryController;
 use App\Http\Controllers\BackOffice\MenuItemController;
 use App\Http\Controllers\BackOffice\PaymentMethodController;
 use App\Http\Controllers\BackOffice\RefundController;
+use App\Http\Controllers\BackOffice\StockInController;
 use App\Http\Controllers\BranchMenuOrderController;
 use App\Http\Controllers\ClientMapController;
+use App\Http\Controllers\Inventory\ProductController;
+use App\Http\Controllers\Inventory\ShoppingListController;
+use App\Http\Controllers\Inventory\SupplierController;
+use App\Http\Controllers\Inventory\TransferController;
+use App\Http\Controllers\Inventory\WarehouseItemController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\MarketingInboxController;
 use App\Http\Controllers\PosOrderController;
@@ -75,6 +82,15 @@ Route::middleware(['auth'])->group(function () {
             Route::put('payment-methods/{paymentMethod}', [PaymentMethodController::class, 'update'])->name('payment-methods.update');
             Route::patch('payment-methods/{paymentMethod}/toggle', [PaymentMethodController::class, 'toggle'])->name('payment-methods.toggle');
             Route::delete('payment-methods/{paymentMethod}', [PaymentMethodController::class, 'destroy'])->name('payment-methods.destroy');
+
+            Route::post('deliveries', [StockInController::class, 'receiveDelivery'])->name('deliveries.store');
+            Route::post('requisitions', [StockInController::class, 'requisition'])->name('requisitions.store');
+            Route::scopeBindings()->prefix('transfers/{transfer}')->name('transfers.')->group(function () {
+                Route::post('receive', [StockInController::class, 'receive'])->name('receive');
+                Route::post('lines/{line}/receive', [StockInController::class, 'receiveLine'])->name('lines.receive');
+                Route::put('lines/{line}/issue', [StockInController::class, 'flag'])->name('lines.flag');
+                Route::post('cancel', [StockInController::class, 'cancel'])->name('cancel');
+            });
         });
     });
 
@@ -122,11 +138,50 @@ Route::middleware(['auth'])->group(function () {
     });
 
     /*
+     * Inventory: the warehouse and commissary, transfers between locations (branch requisitions
+     * included), the shopping list and suppliers. Each location's own staff or the Owner change its stock.
+     */
+    Route::middleware('can:'.PermissionArea::Inventory->value)->prefix('inventory')->name('inventory')->group(function () {
+        Route::get('/', [InventoryController::class, 'show']);
+
+        Route::post('locations/{branch}/items', [WarehouseItemController::class, 'store'])->name('.items.store');
+        Route::put('locations/{branch}/categories', [WarehouseItemController::class, 'renameCategory'])->name('.categories.rename');
+        Route::put('items/{warehouseStock}', [WarehouseItemController::class, 'update'])->name('.items.update');
+        Route::patch('items/{warehouseStock}/on-hand', [WarehouseItemController::class, 'adjust'])->name('.items.adjust');
+        Route::delete('items/{warehouseStock}', [WarehouseItemController::class, 'destroy'])->name('.items.destroy');
+
+        Route::post('locations/{branch}/requisitions', [TransferController::class, 'store'])->name('.requisitions.store');
+        Route::scopeBindings()->prefix('transfers/{transfer}')->name('.transfers.')->group(function () {
+            Route::post('approve', [TransferController::class, 'approve'])->name('approve');
+            Route::post('reject', [TransferController::class, 'reject'])->name('reject');
+            Route::post('issue', [TransferController::class, 'issue'])->name('issue');
+            Route::post('cancel', [TransferController::class, 'cancel'])->name('cancel');
+            Route::post('receive', [TransferController::class, 'receive'])->name('receive');
+            Route::post('lines/{line}/receive', [TransferController::class, 'receiveLine'])->name('lines.receive');
+            Route::put('lines/{line}/issue', [TransferController::class, 'flag'])->name('lines.flag');
+        });
+
+        Route::post('products', [ProductController::class, 'store'])->name('.products.store');
+        Route::put('products/{product}', [ProductController::class, 'update'])->name('.products.update');
+        Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('.products.destroy');
+        Route::put('products/{product}/recipe', [ProductController::class, 'recipe'])->name('.products.recipe');
+        Route::post('products/{product}/batches', [ProductController::class, 'logBatch'])->name('.batches.store');
+        Route::patch('batches/{productionBatch}', [ProductController::class, 'advanceBatch'])->name('.batches.advance');
+
+        Route::post('shopping-list', [ShoppingListController::class, 'store'])->name('.shopping.store');
+        Route::patch('shopping-list/{shoppingListLine}', [ShoppingListController::class, 'update'])->name('.shopping.update');
+        Route::delete('shopping-list', [ShoppingListController::class, 'destroy'])->name('.shopping.destroy');
+
+        Route::post('suppliers', [SupplierController::class, 'store'])->name('.suppliers.store');
+        Route::put('suppliers/{supplier}', [SupplierController::class, 'update'])->name('.suppliers.update');
+        Route::delete('suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('.suppliers.destroy');
+    });
+
+    /*
      * One entry point per remaining workspace, each behind its area's gate. The
      * workspaces are built in later stages; until then each shows a placeholder.
      */
     $workspaces = [
-        'inventory' => PermissionArea::Inventory,
         'owner' => PermissionArea::Owner,
         'sales' => PermissionArea::Sales,
     ];

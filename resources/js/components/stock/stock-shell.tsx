@@ -8,22 +8,38 @@ interface StockShellProps {
     appName: string;
     kicker: string;
     title: string;
-    branch: StockBranch;
+    /** The branch the page works on; Inventory has none. */
+    branch?: StockBranch;
     /** The café branches the Owner can switch between; null for everyone else. */
-    branches: StockBranch[] | null;
-    onBranch: (id: number) => void;
+    branches?: StockBranch[] | null;
+    onBranch?: (id: number) => void;
     nav: ReactNode;
     /** Shown at the right of the sticky header, such as a status pill or search. */
     headerEnd?: ReactNode;
+    /** Tabs under the header's title, such as a screen's Stock and Transfers. */
+    headerTabs?: ReactNode;
     exitBody: string;
     toast: string;
     children: ReactNode;
 }
 
 /**
- * The charcoal sidebar and sticky header shared by Stock Count and Stock Report.
+ * The charcoal sidebar and sticky header shared by Stock Count, Stock Report and Inventory.
  */
-export function StockShell({ appName, kicker, title, branch, branches, onBranch, nav, headerEnd, exitBody, toast, children }: StockShellProps) {
+export function StockShell({
+    appName,
+    kicker,
+    title,
+    branch,
+    branches,
+    onBranch,
+    nav,
+    headerEnd,
+    headerTabs,
+    exitBody,
+    toast,
+    children,
+}: StockShellProps) {
     const { auth } = usePage<SharedData>().props;
     const [exiting, setExiting] = useState(false);
     const initials = auth.user.name
@@ -46,28 +62,30 @@ export function StockShell({ appName, kicker, title, branch, branches, onBranch,
                 <div className="flex flex-1 flex-col gap-0.5 overflow-x-hidden overflow-y-auto px-2.5 pt-1 pb-4">
                     {nav}
 
-                    <div className="rounded-btn mt-5 bg-neutral-100/7 px-[13px] pt-[13px] pb-3.5">
-                        <div className="text-[10px] tracking-[.16em] uppercase opacity-60">
-                            {appName === 'DMC Stock Count' ? 'Counting for' : 'Branch'}
+                    {branch && (
+                        <div className="rounded-btn mt-5 bg-neutral-100/7 px-[13px] pt-[13px] pb-3.5">
+                            <div className="text-[10px] tracking-[.16em] uppercase opacity-60">
+                                {appName === 'DMC Stock Count' ? 'Counting for' : 'Branch'}
+                            </div>
+                            {branches ? (
+                                <select
+                                    aria-label="Branch"
+                                    value={branch.id}
+                                    onChange={(event) => onBranch?.(Number(event.target.value))}
+                                    className="focus:border-accent rounded-btn mt-1.5 w-full cursor-pointer border border-white/18 bg-neutral-800 px-2 py-[7px] text-[13px] font-semibold text-neutral-100"
+                                >
+                                    {branches.map((option) => (
+                                        <option key={option.id} value={option.id}>
+                                            {option.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <div className="mt-[5px] text-[13.5px] leading-[1.25] font-semibold">{branch.name}</div>
+                            )}
+                            <div className="mt-[5px] text-[11.5px] opacity-60">{branches ? 'Owner · switch branch' : 'Your assigned branch'}</div>
                         </div>
-                        {branches ? (
-                            <select
-                                aria-label="Branch"
-                                value={branch.id}
-                                onChange={(event) => onBranch(Number(event.target.value))}
-                                className="focus:border-accent rounded-btn mt-1.5 w-full cursor-pointer border border-white/18 bg-neutral-800 px-2 py-[7px] text-[13px] font-semibold text-neutral-100"
-                            >
-                                {branches.map((option) => (
-                                    <option key={option.id} value={option.id}>
-                                        {option.name}
-                                    </option>
-                                ))}
-                            </select>
-                        ) : (
-                            <div className="mt-[5px] text-[13.5px] leading-[1.25] font-semibold">{branch.name}</div>
-                        )}
-                        <div className="mt-[5px] text-[11.5px] opacity-60">{branches ? 'Owner · switch branch' : 'Your assigned branch'}</div>
-                    </div>
+                    )}
                 </div>
 
                 <div className="flex-none border-t border-white/12 px-[18px] pt-3.5 pb-[18px] text-xs">
@@ -91,12 +109,15 @@ export function StockShell({ appName, kicker, title, branch, branches, onBranch,
             </aside>
 
             <div className="relative min-w-0 overflow-x-hidden overflow-y-auto">
-                <div className="border-divider bg-bg/92 sticky top-0 z-[5] flex flex-wrap items-end gap-5 border-b px-4 pt-[22px] pb-4 backdrop-blur-[8px] sm:px-8">
-                    <div className="min-w-[200px] flex-[1_1_220px]">
-                        <div className="text-text/74 text-[11.5px] tracking-[.1em] uppercase">{kicker}</div>
-                        <h2 className="mt-1 mb-0 text-[23px] leading-[1.1]">{title}</h2>
+                <div className="border-divider bg-bg/92 sticky top-0 z-[5] border-b px-4 pt-[22px] backdrop-blur-[8px] sm:px-8">
+                    <div className="flex flex-wrap items-end gap-5 pb-4">
+                        <div className="min-w-[200px] flex-[1_1_220px]">
+                            <div className="text-text/74 text-[11.5px] tracking-[.1em] uppercase">{kicker}</div>
+                            <h2 className="mt-1 mb-0 text-[23px] leading-[1.1]">{title}</h2>
+                        </div>
+                        {headerEnd}
                     </div>
-                    {headerEnd}
+                    {headerTabs}
                 </div>
                 <div className="px-4 pt-[26px] pb-[60px] sm:px-8">{children}</div>
             </div>

@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Stock that arrived at a branch on a day, such as a warehouse delivery. It is the "In" on the stock
- * report: usage between two counts is beginning + received − ending.
+ * report: usage between two counts is beginning + received − ending. Receipts at the warehouse and the
+ * commissary are kept the same way. Each belongs to the delivery it came in on.
  */
 class StockReceipt extends Model
 {
@@ -22,10 +23,12 @@ class StockReceipt extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'delivery_id',
         'branch_id',
         'stock_item_id',
         'day',
         'qty',
+        'unit_cost',
         'source',
         'received_by_id',
     ];
@@ -40,6 +43,7 @@ class StockReceipt extends Model
         return [
             'day' => 'date:Y-m-d',
             'qty' => 'decimal:3',
+            'unit_cost' => 'decimal:2',
         ];
     }
 
@@ -65,5 +69,13 @@ class StockReceipt extends Model
     public function receivedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'received_by_id');
+    }
+
+    /**
+     * @return BelongsTo<Delivery, $this>
+     */
+    public function delivery(): BelongsTo
+    {
+        return $this->belongsTo(Delivery::class);
     }
 }

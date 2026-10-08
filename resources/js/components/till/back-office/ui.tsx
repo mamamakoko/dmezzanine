@@ -174,7 +174,8 @@ export function useBackOfficeAction(toast: (message: string) => void) {
         };
 
         if (method === 'delete') {
-            router.delete(url, visit);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            router.delete(url, { ...visit, data: data as any });
         } else {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             router[method](url, data as any, visit);

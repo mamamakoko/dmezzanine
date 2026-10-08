@@ -23,6 +23,13 @@ export function DashboardTab({ data, branchName }: { data: TabData<'dash'>; bran
             tab: 'stock' as const,
         },
         {
+            label: 'On the way in',
+            value: String(data.incoming.length),
+            sub: 'approved or in transit',
+            alert: false,
+            tab: 'stockin' as const,
+        },
+        {
             label: 'Sales today',
             value: peso(data.salesToday.total),
             sub: `${data.salesToday.count} ${data.salesToday.count === 1 ? 'receipt' : 'receipts'}`,
@@ -128,8 +135,19 @@ export function DashboardTab({ data, branchName }: { data: TabData<'dash'>; bran
                         what={`${row.name} — ${qtyLabel(row.on_hand, row.unit)} left`}
                         meta={`${row.category} · par ${qtyLabel(row.par, row.unit)}`}
                         tag={row.on_hand <= 0 ? 'Out' : 'Low'}
-                        action="Open stock"
-                        onAction={() => openBackOffice('stock')}
+                        action="Request stock"
+                        onAction={() => openBackOffice('stockin')}
+                    />
+                ))}
+                {data.incoming.map((transfer) => (
+                    <AttentionRow
+                        key={`in-${transfer.id}`}
+                        what={`${transfer.no} · ${transfer.lines.length} ${transfer.lines.length === 1 ? 'line' : 'lines'} inbound`}
+                        meta={`${transfer.from.name} → ${branchName} · ${transfer.status_label}`}
+                        tag="Incoming"
+                        action="Open transfers"
+                        onAction={() => openBackOffice('stockin')}
+                        neutral
                     />
                 ))}
                 {data.unpaid.map((order) => (
@@ -143,7 +161,7 @@ export function DashboardTab({ data, branchName }: { data: TabData<'dash'>; bran
                         neutral
                     />
                 ))}
-                {low.length === 0 && data.unpaid.length === 0 && (
+                {low.length === 0 && data.unpaid.length === 0 && data.incoming.length === 0 && (
                     <div className="text-text/74 py-[22px] text-center text-[13px]">Nothing needs attention right now.</div>
                 )}
             </Panel>

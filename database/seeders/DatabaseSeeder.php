@@ -22,6 +22,10 @@ class DatabaseSeeder extends Seeder
             BranchStockSeeder::class,
             BranchStockItemSeeder::class,
             ClientTypeSeeder::class,
+            SupplierSeeder::class,
+            WarehouseStockSeeder::class,
+            ProductSeeder::class,
+            TransferSeeder::class,
         ]);
     }
 }

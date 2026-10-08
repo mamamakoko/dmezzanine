@@ -6,6 +6,7 @@ use App\Models\BranchStock;
 use App\Models\StockCount;
 use App\Models\StockCountLine;
 use App\Models\StockItem;
+use App\Models\StockReceipt;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -39,6 +40,21 @@ test('approving an older day keeps a newer approved figure', function () {
     $this->actingAs($lead)->post("/stock-report/sheets/{$olderSheet->id}/approve");
 
     expect($onHand->fresh())->on_hand->toBe('12.000')->counted_on->toDateString()->toBe('2026-10-08');
+});
+
+test('approving a day adds stock received after it to the counted ending', function () {
+    $this->seed(RoleSeeder::class);
+    $branch = Branch::factory()->create();
+    $lead = User::factory()->withRole('Branch lead')->for($branch)->create();
+    $milk = StockItem::factory()->create();
+    $sheet = StockCount::factory()->for($branch)->submitted()->create(['day' => '2026-10-07']);
+    StockCountLine::factory()->for($sheet)->for($milk)->create(['counted' => 3]);
+    StockReceipt::factory()->for($branch)->for($milk)->create(['day' => '2026-10-07', 'qty' => 6]);
+    StockReceipt::factory()->for($branch)->for($milk)->create(['day' => '2026-10-08', 'qty' => 12]);
+
+    $this->actingAs($lead)->post("/stock-report/sheets/{$sheet->id}/approve");
+
+    $this->assertDatabaseHas('branch_stock', ['branch_id' => $branch->id, 'stock_item_id' => $milk->id, 'on_hand' => 15]);
 });
 
 test('lets the manager correct an ending and flag an item while the day is under review', function () {

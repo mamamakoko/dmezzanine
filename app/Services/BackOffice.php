@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\BranchKind;
+use App\Http\Resources\TransferResource;
 use App\Models\Addon;
 use App\Models\Branch;
 use App\Models\BranchMenuItem;
@@ -14,7 +16,9 @@ use App\Models\OrderPayment;
 use App\Models\PaymentMethod;
 use App\Models\PaymentMethodLog;
 use App\Models\StockItem;
+use App\Models\Transfer;
 use App\Models\User;
+use App\Models\WarehouseStock;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,12 +27,31 @@ use Illuminate\Support\Facades\Storage;
  */
 class BackOffice
 {
-    public const TABS = ['dash', 'menu', 'addons', 'payments', 'stock', 'sales'];
+    public const TABS = ['dash', 'menu', 'addons', 'payments', 'stock', 'stockin', 'sales'];
 
     /**
      * The sales list shows at most this many receipts, newest first.
      */
     public const SALES_LIMIT = 300;
+
+    /**
+     * Stock-in shows the branch's latest transfers, up to this many.
+     */
+    public const TRANSFERS_LIMIT = 150;
+
+    /**
+     * What TransferResource needs loaded.
+     *
+     * @var list<string>
+     */
+    public const TRANSFER_RELATIONS = ['from', 'to', 'requestedBy', 'lines.stockItem', 'lines.issue'];
+
+    /**
+     * Units offered when a delivery brings in an item no location has stocked before.
+     *
+     * @var list<string>
+     */
+    public const UNITS = ['pc', 'g', 'kg', 'ml', 'L', 'btl', 'can', 'pack', 'box', 'tray', 'sachet', 'slice'];
 
     /**
      * @param  array{from?: ?string, to?: ?string}  $filters
@@ -40,12 +63,14 @@ class BackOffice
             'tab' => $tab,
             'isOwner' => $staff->isOwner(),
             'lowCount' => $this->stock($branch)->filter(fn (array $item) => $item['low'])->count(),
+            'incomingCount' => $branch->transfersIn()->incoming()->count(),
             ...match ($tab) {
                 'dash' => $this->dashboard($branch),
                 'menu' => $this->menu($branch),
                 'addons' => $this->addons($branch),
                 'payments' => $this->paymentMethods($branch),
                 'stock' => ['stock' => $this->stock($branch)->values()->all()],
+                'stockin' => $this->stockIn($branch),
                 'sales' => $this->sales($branch, $filters),
             },
         ];
@@ -63,6 +88,46 @@ class BackOffice
             'stock' => $this->stock($branch)->sortBy(fn (array $item) => $item['par'] > 0 ? $item['on_hand'] / $item['par'] : 1)->values()->all(),
             'salesToday' => ['total' => (float) (clone $today)->sum('total'), 'count' => $today->count()],
             'unpaid' => $this->unpaidOrders($branch),
+            'incoming' => TransferResource::collection(
+                $branch->transfersIn()->incoming()->with(self::TRANSFER_RELATIONS)->latest('id')->get(),
+            )->resolve(),
+        ];
+    }
+
+    /**
+     * Stock-in: supplier deliveries, and transfers into and out of the branch, with what the warehouse and
+     * the commissary hold for a requisition.
+     *
+     * @return array<string, mixed>
+     */
+    private function stockIn(Branch $branch): array
+    {
+        return [
+            'stock' => $this->stock($branch)->values()->all(),
+            'categories' => StockItem::distinct()->orderBy('category')->pluck('category')->all(),
+            'units' => self::UNITS,
+            'transfers' => TransferResource::collection(
+                Transfer::where(fn ($query) => $query->where('from_branch_id', $branch->id)->orWhere('to_branch_id', $branch->id))
+                    ->with(self::TRANSFER_RELATIONS)
+                    ->latest('id')
+                    ->limit(self::TRANSFERS_LIMIT)
+                    ->get(),
+            )->resolve(),
+            'sources' => Branch::where('kind', '!=', BranchKind::Branch)->orderBy('id')
+                ->with(['warehouseStock.stockItem'])
+                ->get()
+                ->map(fn (Branch $source) => [
+                    'id' => $source->id,
+                    'name' => $source->name,
+                    'items' => $source->warehouseStock->sortBy('stockItem.name')->map(fn (WarehouseStock $held) => [
+                        'id' => $held->stock_item_id,
+                        'sku' => $held->stockItem->sku,
+                        'name' => $held->stockItem->name,
+                        'category' => $held->stockItem->category,
+                        'unit' => $held->stockItem->unit,
+                        'on_hand' => (float) $held->on_hand,
+                    ])->values()->all(),
+                ])->all(),
         ];
     }
 

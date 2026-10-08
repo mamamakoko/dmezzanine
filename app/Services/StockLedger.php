@@ -90,8 +90,8 @@ class StockLedger
     }
 
     /**
-     * Approve the day: its endings become the branch's on hand, which the till shows. An item that already
-     * has a newer approved figure keeps it.
+     * Approve the day: its endings become the branch's on hand, which the till shows, plus anything received
+     * since that day (the count can't have seen it). An item that already has a newer approved figure keeps it.
      */
     public function approve(StockCount $sheet, User $manager): void
     {
@@ -99,6 +99,11 @@ class StockLedger
 
         DB::transaction(function () use ($sheet, $manager) {
             $day = $sheet->day->toDateString();
+            $receivedSince = $sheet->branch->stockReceipts()
+                ->whereDate('day', '>', $day)
+                ->selectRaw('stock_item_id, SUM(qty) as qty')
+                ->groupBy('stock_item_id')
+                ->pluck('qty', 'stock_item_id');
 
             foreach ($sheet->lines as $line) {
                 $ending = $line->ending();
@@ -113,7 +118,7 @@ class StockLedger
                     continue;
                 }
 
-                $onHand->fill(['on_hand' => $ending, 'counted_on' => $day, 'counted_by_id' => $sheet->submitted_by_id])->save();
+                $onHand->fill(['on_hand' => $ending + (float) ($receivedSince[$line->stock_item_id] ?? 0), 'counted_on' => $day, 'counted_by_id' => $sheet->submitted_by_id])->save();
             }
 
             $sheet->update(['status' => StockCountStatus::Approved, 'reviewed_by_id' => $manager->id, 'reviewed_at' => now()]);
