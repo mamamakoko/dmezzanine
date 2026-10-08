@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\BackOffice;
 
+use App\Events\MenuAvailabilityChanged;
 use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class CategoryController extends BackOfficeController
             'name' => $this->validatedName($request, $branch->id),
             'sort' => (int) $branch->categories()->max('sort') + 1,
         ]);
+        MenuAvailabilityChanged::dispatch($branch->id);
 
         return back();
     }
@@ -31,6 +33,7 @@ class CategoryController extends BackOfficeController
         $this->authorizeStaff('update', $category);
 
         $category->update(['name' => $this->validatedName($request, $category->branch_id, $category)]);
+        MenuAvailabilityChanged::dispatch($category->branch_id);
 
         return back();
     }
@@ -44,6 +47,7 @@ class CategoryController extends BackOfficeController
         }
 
         $category->delete();
+        MenuAvailabilityChanged::dispatch($category->branch_id);
 
         return back();
     }

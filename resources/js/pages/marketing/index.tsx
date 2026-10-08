@@ -1,5 +1,6 @@
 import { MarketingBar } from '@/components/marketing/marketing-bar';
 import { choiceClass, Sheet, Toast } from '@/components/till/sheet';
+import { useLiveReload } from '@/hooks/use-live-reload';
 import { useToast } from '@/hooks/use-toast';
 import { type MarketingBranch, type MarketingOrderView } from '@/lib/marketing';
 import { firstError } from '@/lib/till';
@@ -63,7 +64,13 @@ export default function Marketing({ branches, sent }: MarketingProps) {
     const [filter, setFilter] = useState<'All' | 'Waiting' | 'Accepted' | 'Declined'>('All');
     const [toast, showToast] = useToast();
 
-    usePoll(15000, { only: ['sent'] });
+    useLiveReload('marketing', {
+        MarketingOrderUpdated: ['sent'],
+        MenuAvailabilityChanged: ['branches'],
+    });
+
+    // A fallback for when live updates aren't reaching this page.
+    usePoll(60000, { only: ['sent'] });
 
     const branch = branches.find((candidate) => candidate.id === branchId) ?? branches[0];
     const categoryName = (id: number) => branch.categories.find((category) => category.id === id)?.name ?? '';

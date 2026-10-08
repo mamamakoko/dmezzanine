@@ -10,6 +10,7 @@ import { ReceiptSheet } from '@/components/till/receipt-sheet';
 import { SendSheet } from '@/components/till/send-sheet';
 import { ConfirmDialog, Toast } from '@/components/till/sheet';
 import { TopBar, type TillScreen } from '@/components/till/top-bar';
+import { useLiveReload } from '@/hooks/use-live-reload';
 import { useToast } from '@/hooks/use-toast';
 import { openBackOffice, type BackOfficeData } from '@/lib/back-office';
 import { type MarketingOrderView } from '@/lib/marketing';
@@ -142,7 +143,18 @@ function Till(props: ReadyTillProps & { now: Date }) {
     const [inboxOpen, setInboxOpen] = useState(false);
     const [toast, showToast] = useToast();
 
-    usePoll(15000, { only: orderOnly ? ['openTickets', 'nextOrderNo'] : ['openTickets', 'nextOrderNo', 'queue', 'inbox'] });
+    const queueProps = orderOnly ? ['openTickets', 'nextOrderNo'] : ['openTickets', 'nextOrderNo', 'queue', 'inbox'];
+
+    useLiveReload(`branch.${branch.id}`, {
+        OrderStatusChanged: queueProps,
+        MarketingOrderSent: orderOnly ? [] : ['inbox'],
+        MarketingOrderUpdated: queueProps,
+        MenuAvailabilityChanged: ['categories', 'menu', 'addons'],
+        StockCountApproved: orderOnly ? [] : ['backOffice'],
+    });
+
+    // A fallback for when live updates aren't reaching this till.
+    usePoll(60000, { only: queueProps });
 
     // Another till may take the selected ticket; move on to the next free one.
     useEffect(() => {

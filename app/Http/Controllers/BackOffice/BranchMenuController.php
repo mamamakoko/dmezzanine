@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\BackOffice;
 
+use App\Events\MenuAvailabilityChanged;
 use App\Models\BranchMenuItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,6 +30,7 @@ class BranchMenuController extends BackOfficeController
         ]);
 
         $branch->menuEntries()->create($data + ['available' => true, 'sort' => (int) $branch->menuEntries()->max('sort') + 1]);
+        MenuAvailabilityChanged::dispatch($branch->id);
 
         return back();
     }
@@ -44,6 +46,7 @@ class BranchMenuController extends BackOfficeController
             'available' => ['sometimes', 'boolean'],
             'category_id' => ['sometimes', 'integer', Rule::exists('categories', 'id')->where('branch_id', $branchMenuItem->branch_id)],
         ]));
+        MenuAvailabilityChanged::dispatch($branchMenuItem->branch_id);
 
         return back();
     }
@@ -56,6 +59,7 @@ class BranchMenuController extends BackOfficeController
         $this->authorizeStaff('delete', $branchMenuItem);
 
         $branchMenuItem->delete();
+        MenuAvailabilityChanged::dispatch($branchMenuItem->branch_id);
 
         return back();
     }

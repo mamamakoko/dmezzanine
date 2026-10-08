@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Enums\MarketingOrderStatus;
 use App\Enums\OrderService;
 use App\Enums\OrderSource;
+use App\Events\MarketingOrderSent;
+use App\Events\MarketingOrderUpdated;
 use App\Models\Branch;
 use App\Models\BranchMenuItem;
 use App\Models\MarketingOrder;
@@ -48,6 +50,8 @@ class MarketingOrders
             ]);
             $order->lines()->createMany($lines);
 
+            MarketingOrderSent::dispatch($branch->id, $order->id);
+
             return $order;
         });
     }
@@ -88,6 +92,8 @@ class MarketingOrders
                 'replied_at' => now(),
             ]);
 
+            event(MarketingOrderUpdated::for($marketingOrder));
+
             return $marketingOrder;
         });
     }
@@ -107,6 +113,8 @@ class MarketingOrders
                 'reply' => filled($reply) ? trim($reply) : self::DECLINE_REPLY,
                 'replied_at' => now(),
             ]);
+
+            event(MarketingOrderUpdated::for($marketingOrder));
 
             return $marketingOrder;
         });

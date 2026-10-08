@@ -8,6 +8,8 @@ use App\Enums\OrderService;
 use App\Enums\OrderSource;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethodKind;
+use App\Events\MarketingOrderUpdated;
+use App\Events\OrderStatusChanged;
 use App\Models\Branch;
 use App\Models\BranchMenuItem;
 use App\Models\Order;
@@ -84,6 +86,8 @@ class TillCheckout
 
             $order->payments()->createMany($payment['payments']);
 
+            event(OrderStatusChanged::for($order));
+
             return $order;
         });
     }
@@ -115,6 +119,12 @@ class TillCheckout
                 'settled_by_id' => $staff->id,
             ]);
             $order->payments()->createMany($payment['payments']);
+
+            event(OrderStatusChanged::for($order));
+
+            if ($order->marketingOrder !== null) {
+                event(MarketingOrderUpdated::for($order->marketingOrder));
+            }
 
             return $order;
         });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\BackOffice;
 
+use App\Events\MenuAvailabilityChanged;
 use App\Models\MenuItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -42,6 +43,8 @@ class MenuItemController extends BackOfficeController
             ]);
         });
 
+        MenuAvailabilityChanged::everywhere();
+
         return back();
     }
 
@@ -54,6 +57,8 @@ class MenuItemController extends BackOfficeController
             $categoryId = $this->save($menuItem, $request);
             $branch->menuEntries()->where('menu_item_id', $menuItem->id)->update(['category_id' => $categoryId]);
         });
+
+        MenuAvailabilityChanged::everywhere();
 
         return back();
     }
@@ -79,6 +84,8 @@ class MenuItemController extends BackOfficeController
             Storage::disk('public')->delete($previous);
         }
 
+        MenuAvailabilityChanged::everywhere();
+
         return back();
     }
 
@@ -90,6 +97,8 @@ class MenuItemController extends BackOfficeController
             Storage::disk('public')->delete($menuItem->photo_path);
             $menuItem->update(['photo_path' => null]);
         }
+
+        MenuAvailabilityChanged::everywhere();
 
         return back();
     }

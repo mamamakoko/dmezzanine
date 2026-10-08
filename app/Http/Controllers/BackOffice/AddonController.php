@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\BackOffice;
 
+use App\Events\MenuAvailabilityChanged;
 use App\Models\Addon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class AddonController extends BackOfficeController
         $this->authorizeStaff('create', Addon::class);
 
         $this->save(new Addon, $request);
+        MenuAvailabilityChanged::everywhere();
 
         return back();
     }
@@ -27,6 +29,7 @@ class AddonController extends BackOfficeController
         $this->authorizeStaff('update', $addon);
 
         $this->save($addon, $request);
+        MenuAvailabilityChanged::everywhere();
 
         return back();
     }
@@ -39,6 +42,7 @@ class AddonController extends BackOfficeController
         $this->authorizeStaff('delete', $addon);
 
         $addon->delete();
+        MenuAvailabilityChanged::everywhere();
 
         return back();
     }
@@ -56,6 +60,8 @@ class AddonController extends BackOfficeController
         } else {
             $branch->disabledAddons()->syncWithoutDetaching([$addon->id]);
         }
+
+        MenuAvailabilityChanged::dispatch($branch->id);
 
         return back();
     }

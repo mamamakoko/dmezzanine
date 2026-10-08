@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\CountMark;
 use App\Enums\StockCountStatus;
+use App\Events\StockCountApproved;
 use App\Http\Controllers\Concerns\PicksStockBranch;
 use App\Models\Branch;
 use App\Models\StockCount;
@@ -86,6 +87,8 @@ class StockReportController extends Controller
         Gate::authorize('manage', $stockCount->branch);
 
         $this->ledger->approve($stockCount, $request->user());
+
+        StockCountApproved::dispatch($stockCount->branch_id, $stockCount->day->toDateString());
 
         return back();
     }

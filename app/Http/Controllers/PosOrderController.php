@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\OrderSource;
 use App\Enums\OrderStatus;
+use App\Events\OrderStatusChanged;
 use App\Http\Requests\SettleOrderRequest;
 use App\Http\Requests\StoreSaleRequest;
 use App\Models\Order;
@@ -58,6 +59,8 @@ class PosOrderController extends Controller
         }
 
         $order->update(['status' => $status]);
+
+        event(OrderStatusChanged::for($order));
 
         return to_route('pos');
     }
