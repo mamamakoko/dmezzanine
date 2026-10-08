@@ -189,7 +189,7 @@ function PasswordForm() {
     return (
         <form onSubmit={submit}>
             <div className="field mb-3.5">
-                <label htmlFor="email">Work email</label>
+                <label htmlFor="email">Email</label>
                 <input
                     id="email"
                     type="email"
