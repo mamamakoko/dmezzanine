@@ -18,8 +18,12 @@ use App\Http\Controllers\Inventory\WarehouseItemController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\MarketingInboxController;
+use App\Http\Controllers\Owner\BranchController as OwnerBranchController;
+use App\Http\Controllers\Owner\UserController;
+use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\PosOrderController;
 use App\Http\Controllers\PosUnlockController;
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\StockReportController;
 use App\Http\Controllers\TillController;
@@ -178,19 +182,25 @@ Route::middleware(['auth'])->group(function () {
     });
 
     /*
-     * One entry point per remaining workspace, each behind its area's gate. The
-     * workspaces are built in later stages; until then each shows a placeholder.
+     * Sales reporting: the Owner across café branches, everyone else for their own branch.
      */
-    $workspaces = [
-        'owner' => PermissionArea::Owner,
-        'sales' => PermissionArea::Sales,
-    ];
+    Route::get('sales', [SalesController::class, 'show'])->middleware('can:'.PermissionArea::Sales->value)->name('sales');
 
-    foreach ($workspaces as $path => $area) {
-        Route::get($path, function () use ($area) {
-            return Inertia::render('workspace-pending', ['area' => $area->value]);
-        })->middleware("can:{$area->value}")->name($area->value);
-    }
+    /*
+     * The Owner console: users, page access, locations and the activity log.
+     */
+    Route::middleware('can:'.PermissionArea::Owner->value)->prefix('owner')->name('owner')->group(function () {
+        Route::get('/', [OwnerController::class, 'show']);
+
+        Route::post('users', [UserController::class, 'store'])->name('.users.store');
+        Route::put('users/{user}', [UserController::class, 'update'])->name('.users.update');
+        Route::patch('users/{user}/access', [UserController::class, 'toggle'])->name('.users.access');
+        Route::post('users/{user}/credentials', [UserController::class, 'credentials'])->name('.users.credentials');
+        Route::put('users/{user}/pages/{area}', [UserController::class, 'pages'])->name('.users.pages');
+
+        Route::post('locations', [OwnerBranchController::class, 'store'])->name('.locations.store');
+        Route::put('locations/{branch}', [OwnerBranchController::class, 'update'])->name('.locations.update');
+    });
 });
 
 require __DIR__.'/settings.php';

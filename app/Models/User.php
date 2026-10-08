@@ -55,6 +55,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'pin_hash' => 'hashed',
             'active' => 'boolean',
+            'last_login_at' => 'datetime',
         ];
     }
 
@@ -96,9 +97,27 @@ class User extends Authenticatable
         return $this->hasMany(UserPermissionOverride::class);
     }
 
+    /**
+     * The locations this user manages, as shown on the Owner console's location cards.
+     *
+     * @return HasMany<Branch, $this>
+     */
+    public function managedBranches(): HasMany
+    {
+        return $this->hasMany(Branch::class, 'manager_id');
+    }
+
     public function isOwner(): bool
     {
         return $this->role->isOwner();
+    }
+
+    /**
+     * Whether the Owner has issued this user's access but they haven't signed in yet.
+     */
+    public function isInvitePending(): bool
+    {
+        return $this->active && $this->last_login_at === null;
     }
 
     /**
@@ -125,10 +144,16 @@ class User extends Authenticatable
      */
     public function accessibleAreas(): array
     {
-        if (! $this->active) {
-            return [];
-        }
+        return $this->active ? $this->grantedAreas() : [];
+    }
 
+    /**
+     * The areas the user's role and overrides give them, whether or not their access is switched on.
+     *
+     * @return list<PermissionArea>
+     */
+    public function grantedAreas(): array
+    {
         if ($this->isOwner()) {
             return PermissionArea::cases();
         }

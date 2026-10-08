@@ -7,6 +7,7 @@ use App\Enums\BranchStatus;
 use Database\Factories\BranchFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -27,6 +28,7 @@ class Branch extends Model
         'name',
         'kind',
         'address',
+        'manager_id',
         'status',
         'lat',
         'lng',
@@ -45,6 +47,16 @@ class Branch extends Model
             'lat' => 'decimal:7',
             'lng' => 'decimal:7',
         ];
+    }
+
+    /**
+     * Who runs the location, as set on the Owner console.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function manager(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'manager_id');
     }
 
     /**
